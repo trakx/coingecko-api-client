@@ -18,7 +18,7 @@ namespace Trakx.CoinGecko.ApiClient.Tests.Integration
         }
 
         [Fact]
-        public async Task GetTicker_should_return_tickers_for_all_exchanges()
+        public async Task ListAllAsync_should_all_coins_from_the_coingecko()
         {
             var result = await _coinsClient.ListAllAsync();
             var list = result.Result;
