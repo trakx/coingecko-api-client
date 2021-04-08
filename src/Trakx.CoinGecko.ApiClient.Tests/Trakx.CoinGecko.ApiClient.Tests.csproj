@@ -9,14 +9,6 @@
   <Import Project="../Common.Projects.props" />
 
   <ItemGroup>
-    <None Remove="CoinFullData.json" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <EmbeddedResource Include="CoinFullData.json" />
-  </ItemGroup>
-
-  <ItemGroup>
     <None Include="..\..\LICENSE" Link="LICENSE" />
   </ItemGroup>
 
