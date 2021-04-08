@@ -13,34 +13,35 @@ namespace Trakx.CoinGecko.ApiClient
         private static void AddClients(this IServiceCollection services)
         {
             var delay = Backoff.DecorrelatedJitterBackoffV2(medianFirstRetryDelay: TimeSpan.FromMilliseconds(100), retryCount: 10, fastFirst: true);
-
-            services.AddHttpClient<ICoinsClient, CoinsClient>("Trakx.Shrimpy.ApiClient.CoinsClient")
-                .AddPolicyHandler((s, request) =>
+                                    
+            services.AddHttpClient<ISimpleClient, SimpleClient>("Trakx.CoinGecko.ApiClient.SimpleClient")
+                .AddPolicyHandler((s, request) => 
                     Policy<HttpResponseMessage>
-                        .Handle<ApiException>()
-                        .Or<HttpRequestException>()
-                        .OrTransientHttpStatusCode()
-                        .WaitAndRetryAsync(delay,
-                            onRetry: (result, timeSpan, retryCount, context) =>
-                            {
-                                var logger = Log.Logger.ForContext<CoinsClient>();
-                                LogFailure(logger, result, timeSpan, retryCount, context);
-                            })
-                        .WithPolicyKey("Trakx.CoinGecko.ApiClient.CoinsClient"));
+                    .Handle<ApiException>()
+                    .Or<HttpRequestException>()
+                    .OrTransientHttpStatusCode()
+                    .WaitAndRetryAsync(delay,
+                        onRetry: (result, timeSpan, retryCount, context) =>
+                        {
+                            var logger = Log.Logger.ForContext<SimpleClient>();
+                            LogFailure(logger, result, timeSpan, retryCount, context);
+                        })
+                    .WithPolicyKey("Trakx.CoinGecko.ApiClient.SimpleClient"));
 
-            services.AddHttpClient<ISimpleClient, SimpleClient>("Trakx.Shrimpy.ApiClient.SimpleClient")
-                .AddPolicyHandler((s, request) =>
+                                
+            services.AddHttpClient<ICoinsClient, CoinsClient>("Trakx.CoinGecko.ApiClient.CoinsClient")
+                .AddPolicyHandler((s, request) => 
                     Policy<HttpResponseMessage>
-                        .Handle<ApiException>()
-                        .Or<HttpRequestException>()
-                        .OrTransientHttpStatusCode()
-                        .WaitAndRetryAsync(delay,
-                            onRetry: (result, timeSpan, retryCount, context) =>
-                            {
-                                var logger = Log.Logger.ForContext<SimpleClient>();
-                                LogFailure(logger, result, timeSpan, retryCount, context);
-                            })
-                        .WithPolicyKey("Trakx.CoinGecko.ApiClient.SimpleClient"));
+                    .Handle<ApiException>()
+                    .Or<HttpRequestException>()
+                    .OrTransientHttpStatusCode()
+                    .WaitAndRetryAsync(delay,
+                        onRetry: (result, timeSpan, retryCount, context) =>
+                        {
+                            var logger = Log.Logger.ForContext<CoinsClient>();
+                            LogFailure(logger, result, timeSpan, retryCount, context);
+                        })
+                    .WithPolicyKey("Trakx.CoinGecko.ApiClient.CoinsClient"));
 
         }
     }

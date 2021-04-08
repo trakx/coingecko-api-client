@@ -23,7 +23,7 @@ namespace <#= nameSpace #>
         {
             var delay = Backoff.DecorrelatedJitterBackoffV2(medianFirstRetryDelay: TimeSpan.FromMilliseconds(100), retryCount: 10, fastFirst: true);
             <# 
-            var clientNames = new [] { /*"ExchangesClient",*/ "MarketDataClient", "AccountsClient" };
+            var clientNames = new [] { "SimpleClient", "CoinsClient" };
 
             foreach(var name in clientNames)
             {

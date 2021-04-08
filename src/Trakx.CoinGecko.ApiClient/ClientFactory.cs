@@ -3,7 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Trakx.CoinGecko.ApiClient
 {
-    public class ClientFactory
+    public class ClientFactory : IClientFactory
     {
         private readonly IServiceProvider _serviceProvider;
 
@@ -21,5 +21,6 @@ namespace Trakx.CoinGecko.ApiClient
         {
             return _serviceProvider.GetRequiredService<ISimpleClient>();
         }
+
     }
 }

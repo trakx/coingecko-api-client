@@ -11,9 +11,8 @@
     "openApiToCSharpClient": {
       "clientBaseClass": "AuthorisedClient",
       "configurationClass": "ClientConfigurator",
-      "generateClientClasses": true,
+            "generateClientClasses": true,
       "generateClientInterfaces": true,
-      "clientBaseInterface": "IFavouriteExchangesClient",
       "injectHttpClient": true,
       "disposeHttpClient": true,
       "protectedMethods": [],
