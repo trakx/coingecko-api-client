@@ -19,7 +19,7 @@ namespace Trakx.CoinGecko.ApiClient.Tests.Integration
         {
             _coinsClient = ServiceProvider.GetRequiredService<ICoinGeckoClient>();
             _coinGeckoId = Constants.BitConnect;
-            _quoteCurrencyId = Constants.UniswapStateDollar;
+            _quoteCurrencyId = Constants.UsdCoin;
             _asOf = DateTime.Today.AddDays(-5);
         }
 

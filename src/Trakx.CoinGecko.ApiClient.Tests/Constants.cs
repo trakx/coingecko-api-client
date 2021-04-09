@@ -4,7 +4,7 @@
     {
 
         internal const string BitConnect = "bitconnect";
-        internal const string UniswapStateDollar = "uniswap-state-dollar";
+        public const string UsdCoin = "usd-coin";
         internal const string Bitcoin = "bitcoin";
         internal const string Usd = "usd";
         internal const string Bcc = "bcc";
