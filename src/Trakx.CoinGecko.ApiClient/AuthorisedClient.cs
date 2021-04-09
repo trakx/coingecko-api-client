@@ -1,8 +1,4 @@
-﻿using System.Net.Http;
-using System.Threading;
-using System.Threading.Tasks;
-
-namespace Trakx.CoinGecko.ApiClient
+﻿namespace Trakx.CoinGecko.ApiClient
 {
     internal abstract class AuthorisedClient
     {
@@ -12,12 +8,6 @@ namespace Trakx.CoinGecko.ApiClient
         protected AuthorisedClient(ClientConfigurator clientConfigurator)
         {
             Configuration = clientConfigurator.ApiConfiguration;
-        }
-
-        protected Task<HttpRequestMessage> CreateHttpRequestMessageAsync(CancellationToken cancellationToken)
-        {
-            var msg = new HttpRequestMessage();
-            return Task.FromResult(msg);
         }
     }
 }

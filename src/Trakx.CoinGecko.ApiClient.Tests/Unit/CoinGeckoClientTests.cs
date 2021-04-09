@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using FluentAssertions;
-using Microsoft.Extensions.Caching.Memory;
-using Microsoft.Extensions.DependencyInjection;
 using NSubstitute;
 using Serilog;
 using Trakx.Utils.Testing;
@@ -17,29 +15,21 @@ namespace Trakx.CoinGecko.ApiClient.Tests.Unit
     {
 
         private readonly ICoinGeckoClient _coinGeckoClient;
-        private readonly IClientFactory _clientFactory;
-        private readonly IMemoryCache _memoryCache;
-        private readonly ILogger _logger;
         private readonly ISimpleClient _simpleClient;
         private readonly ICoinsClient _coinsClient;
         private readonly MockCreator _mockCreator;
 
         public CoinGeckoClientTests(ITestOutputHelper output)
         {
-            var serviceCollection = new ServiceCollection();
-            serviceCollection.AddMemoryCache();
-            var build = serviceCollection.BuildServiceProvider();
-            _memoryCache = build.GetService<IMemoryCache>();
-
-            _clientFactory = Substitute.For<IClientFactory>();
+            IClientFactory clientFactory = Substitute.For<IClientFactory>();
             _simpleClient = Substitute.For<ISimpleClient>();
             _coinsClient = Substitute.For<ICoinsClient>();
-            _clientFactory.CreateCoinsClient().Returns(_coinsClient);
-            _clientFactory.CreateSimpleClient().Returns(_simpleClient);
-            _logger = Substitute.For<ILogger>();
+            clientFactory.CreateCoinsClient().Returns(_coinsClient);
+            clientFactory.CreateSimpleClient().Returns(_simpleClient);
+            ILogger logger = Substitute.For<ILogger>();
             _mockCreator = new MockCreator(output);
 
-            _coinGeckoClient = new CoinGeckoClient(_clientFactory, _memoryCache, _logger);
+            _coinGeckoClient = new CoinGeckoClient(clientFactory, logger);
         }
 
         [Fact]
@@ -101,7 +91,7 @@ namespace Trakx.CoinGecko.ApiClient.Tests.Unit
         {
             var id = _mockCreator.GetRandomString(10);
             var symbol = _mockCreator.GetRandomString(30);
-            ConfigureListAllAsync(id, symbol, 1);
+            ConfigureListAllAsync(id, symbol);
             var result = await _coinGeckoClient.GetCoinGeckoIdFromSymbol(symbol);
             result.Should().Be(id);
         }
@@ -150,11 +140,11 @@ namespace Trakx.CoinGecko.ApiClient.Tests.Unit
             IDictionary<string, IDictionary<string, decimal?>> obj = new Dictionary<string, IDictionary<string, decimal?>>();
             obj[id] = new Dictionary<string, decimal?>
             {
-                ["usd"] = coinPrice
+                [Constants.Usd] = coinPrice
             };
             obj[currency] = new Dictionary<string, decimal?>
             {
-                ["usd"] = currencyPrice
+                [Constants.Usd] = currencyPrice
             };
             _simpleClient.PriceAsync(Arg.Any<string>(), Arg.Any<string>())
                 .Returns(new Response<IDictionary<string, IDictionary<string, decimal?>>>(200, null, obj));
@@ -170,15 +160,15 @@ namespace Trakx.CoinGecko.ApiClient.Tests.Unit
                 {
                     Current_price = new Dictionary<string, decimal?>
                     {
-                        {"usd", price}
+                        {Constants.Usd, price}
                     },
                     Market_cap = new Dictionary<string, decimal?>
                     {
-                        {"usd", 0}
+                        {Constants.Usd, 0}
                     },
                     Total_volume = new Dictionary<string, decimal?>
                     {
-                        {"usd", volume}
+                        {Constants.Usd, volume}
                     },
                 }
             };
@@ -186,10 +176,10 @@ namespace Trakx.CoinGecko.ApiClient.Tests.Unit
                 .Returns(new Response<CoinData>(200, null, result));
         }
 
-        private void ConfigureListAllAsync(string id = default, string symbol = default, int count = 1)
+        private void ConfigureListAllAsync(string? id = default, string? symbol = default, int count = 1)
         {
             var list = Enumerable.Range(0, count)
-                .Select(f => new CoinList
+                .Select(_ => new CoinList
                 {
                     Id = id ?? _mockCreator.GetRandomString(10),
                     Symbol = symbol ?? _mockCreator.GetRandomString(30)

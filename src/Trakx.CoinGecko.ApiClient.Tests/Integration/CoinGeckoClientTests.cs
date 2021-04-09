@@ -1,11 +1,8 @@
 using System;
-using System.IO;
-using System.Net;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
-using Xunit.Abstractions;
 
 namespace Trakx.CoinGecko.ApiClient.Tests.Integration
 {
@@ -17,11 +14,12 @@ namespace Trakx.CoinGecko.ApiClient.Tests.Integration
         private readonly string _quoteCurrencyId;
         private readonly DateTime _asOf;
 
-        public CoinGeckoClientTests(CoinGeckoApiFixture apiFixture, ITestOutputHelper output) : base(apiFixture, output)
+        public CoinGeckoClientTests(CoinGeckoApiFixture apiFixture)
+            : base(apiFixture)
         {
             _coinsClient = ServiceProvider.GetRequiredService<ICoinGeckoClient>();
-            _coinGeckoId = "bitconnect";
-            _quoteCurrencyId = "uniswap-state-dollar";
+            _coinGeckoId = Constants.BitConnect;
+            _quoteCurrencyId = Constants.UniswapStateDollar;
             _asOf = DateTime.Today.AddDays(-5);
         }
 
@@ -56,7 +54,7 @@ namespace Trakx.CoinGecko.ApiClient.Tests.Integration
         public async Task GetCoinGeckoIdFromSymbol_should_return_valid_data_when_passing_valid_id()
         {
             var result = await _coinsClient.GetCoinGeckoIdFromSymbol("btc");
-            result.Should().Be("bitcoin");
+            result.Should().Be(Constants.Bitcoin);
         }
 
         [Fact]
@@ -69,12 +67,14 @@ namespace Trakx.CoinGecko.ApiClient.Tests.Integration
         [Fact]
         public async Task GetAllPrices_should_return_a_valid_list_of_prices_when_passing_valid_ids_and_currencies()
         {
-            var result = await _coinsClient.GetAllPrices(new[] { _coinGeckoId, "bitcoin" }, new[] { "usd" });
+            var result = await _coinsClient.GetAllPrices(
+                new[] { _coinGeckoId, Constants.Bitcoin }, 
+                new[] { Constants.Usd });
             result.Keys.Should().Contain(_coinGeckoId);
-            result.Keys.Should().Contain("bitcoin");
+            result.Keys.Should().Contain(Constants.Bitcoin);
             foreach (var prices in result.Values)
             {
-                prices.Keys.Should().OnlyContain(f => f == "usd");
+                prices.Keys.Should().OnlyContain(f => f == Constants.Usd);
                 prices.Values.Should().OnlyContain(f => f > 0);
             }
         }

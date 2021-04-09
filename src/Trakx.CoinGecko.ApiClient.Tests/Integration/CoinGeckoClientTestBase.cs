@@ -8,7 +8,6 @@ using Newtonsoft.Json;
 using Serilog;
 using Serilog.Filters;
 using Xunit;
-using Xunit.Abstractions;
 
 namespace Trakx.CoinGecko.ApiClient.Tests.Integration
 {
@@ -17,9 +16,8 @@ namespace Trakx.CoinGecko.ApiClient.Tests.Integration
     {
 
         protected ServiceProvider ServiceProvider;
-        protected ILogger Logger;
 
-        public CoinGeckoClientTestBase(CoinGeckoApiFixture apiFixture, ITestOutputHelper output)
+        public CoinGeckoClientTestBase(CoinGeckoApiFixture apiFixture)
         {
             ServiceProvider = apiFixture.ServiceProvider;
         }

@@ -19,9 +19,12 @@ namespace <#= nameSpace #>
 {
     public static partial class AddCoinGeckoClientExtension
     {
-        private static void AddClients(this IServiceCollection services)
+        private static void AddClients(this IServiceCollection services, CoinGeckoApiConfiguration configuration)
         {
-            var delay = Backoff.DecorrelatedJitterBackoffV2(medianFirstRetryDelay: TimeSpan.FromMilliseconds(100), retryCount: 10, fastFirst: true);
+            var delay = Backoff.DecorrelatedJitterBackoffV2(
+                medianFirstRetryDelay: TimeSpan.FromMilliseconds(configuration.InitialRetryDelayInMilliseconds ?? 100), 
+                retryCount: configuration.MaxRetryCount ?? 10, fastFirst: true);
+
             <# 
             var clientNames = new [] { "PingClient", "SimpleClient", "CoinsClient", "ContractClient", 
                                        "ExchangesClient", "FinanceClient", "IndexesClient", "DerivativesClient", 
@@ -35,7 +38,10 @@ namespace <#= nameSpace #>
             services.AddHttpClient<I<#= name #>, <#= name #>>("<#= nameSpace #>.<#= name #>")
                 .AddPolicyHandler((s, request) => 
                     Policy<HttpResponseMessage>
-                    .Handle<ApiException>()
+                    .Handle<HttpRequestException>()
+                    .OrResult(msg => msg.StatusCode == System.Net.HttpStatusCode.TooManyRequests)
+                    .OrResult(msg => msg.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+                    .OrResult(msg => msg.StatusCode == System.Net.HttpStatusCode.Forbidden)
                     .Or<HttpRequestException>()
                     .OrTransientHttpStatusCode()
                     .WaitAndRetryAsync(delay,
@@ -44,7 +50,8 @@ namespace <#= nameSpace #>
                             var logger = Log.Logger.ForContext<<#= name #>>();
                             LogFailure(logger, result, timeSpan, retryCount, context);
                         })
-                    .WithPolicyKey("<#= nameSpace #>.<#= name #>"));
+                    .WithPolicyKey("<#= nameSpace #>.<#= name #>"))
+                .AddHttpMessageHandler<CachedHttpClientHandler>();
 
         <#
         }

@@ -1,11 +1,17 @@
-﻿using System.Collections.Generic;
-
-namespace Trakx.CoinGecko.ApiClient
+﻿namespace Trakx.CoinGecko.ApiClient
 {
     public class CoinGeckoApiConfiguration
     {
-#nullable disable
+        
         public string BaseUrl { get; set; }
-#nullable restore
+
+        public int? MaxRetryCount { get; set; }
+
+        public int? InitialRetryDelayInMilliseconds { get; set; }
+
+        public  int? ThrottleDelayPerSecond { get; set; }
+
+        public int? CacheDurationInSeconds { get; set; }
+
     }
 }

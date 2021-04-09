@@ -30,7 +30,8 @@ namespace Trakx.CoinGecko.ApiClient
 
             services.AddSingleton<ICoinGeckoClient, CoinGeckoClient>();
             services.AddMemoryCache();
-            services.AddClients();
+            services.AddClients(apiConfiguration);
+            services.AddTransient<CachedHttpClientHandler>();
 
             AddCommonDependencies(services);
 
@@ -42,7 +43,6 @@ namespace Trakx.CoinGecko.ApiClient
             services.AddSingleton(s => new ClientConfigurator(s));
             services.AddSingleton<IDateTimeProvider, DateTimeProvider>();
             services.AddSingleton<IClientFactory, ClientFactory>();
-            AddClients(services);
         }
 
         private static void LogFailure(ILogger logger, DelegateResult<HttpResponseMessage> result, TimeSpan timeSpan, int retryCount, Context context)

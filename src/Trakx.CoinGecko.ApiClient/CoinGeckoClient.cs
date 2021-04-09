@@ -4,7 +4,6 @@ using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Ardalis.GuardClauses;
-using Microsoft.Extensions.Caching.Memory;
 using Polly;
 using Polly.Retry;
 using Serilog;
@@ -14,7 +13,6 @@ namespace Trakx.CoinGecko.ApiClient
 {
     public class CoinGeckoClient : ICoinGeckoClient
     {
-        private readonly IMemoryCache _memoryCache;
         private readonly ILogger _logger;
         private readonly ICoinsClient _coinsClient;
         private readonly AsyncRetryPolicy _retryPolicy;
@@ -34,9 +32,8 @@ namespace Trakx.CoinGecko.ApiClient
 
         public Dictionary<string, CoinFullData> CoinFullDataByIds { get; }
 
-        public CoinGeckoClient(IClientFactory factory, IMemoryCache memoryCache, ILogger logger)
+        public CoinGeckoClient(IClientFactory factory, ILogger logger)
         {
-            _memoryCache = memoryCache;
             _logger = logger;
             _retryPolicy = Policy.Handle<Exception>()
                 .WaitAndRetryAsync(3, c => TimeSpan.FromSeconds(c * c));
@@ -100,9 +97,8 @@ namespace Trakx.CoinGecko.ApiClient
         {
             Guard.Against.NullOrWhiteSpace(quoteCurrencyId, nameof(quoteCurrencyId));
 
-            var quoteResponse = await _memoryCache.GetOrCreateAsync($"{date}|{quoteCurrencyId}",
-                async _ => await _retryPolicy.ExecuteAsync(() =>
-                    _coinsClient.HistoryAsync(quoteCurrencyId, date, false.ToString())));
+            var quoteResponse = await _retryPolicy.ExecuteAsync(() =>
+                _coinsClient.HistoryAsync(quoteCurrencyId, date, false.ToString()));
 
             var fxRate = quoteResponse.Result.Market_data.Current_price["usd"];
 
@@ -187,8 +183,9 @@ namespace Trakx.CoinGecko.ApiClient
 
         public async Task<IReadOnlyList<CoinList>> GetCoinList()
         {
-            var coinList = await _memoryCache.GetOrCreateAsync("CoinGecko.CoinList", async _ =>
-                await _retryPolicy.ExecuteAsync(() => _coinsClient.ListAllAsync()).ConfigureAwait(false));
+            var coinList =
+                await _retryPolicy.ExecuteAsync(() => 
+                    _coinsClient.ListAllAsync()).ConfigureAwait(false);
             return coinList.Result;
         }
 
@@ -199,13 +196,7 @@ namespace Trakx.CoinGecko.ApiClient
             return coinsPrice.Result;
         }
 
-        public IReadOnlyList<CoinList> CoinList => _memoryCache.GetOrCreate("CoinGecko.CoinList",
-            entry =>
-            {
-                var coinList = _retryPolicy.ExecuteAsync(() => _coinsClient.ListAllAsync())
-                    .ConfigureAwait(false).GetAwaiter().GetResult();
-                entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromHours(24);
-                return coinList.Result;
-            });
+        public IReadOnlyList<CoinList> CoinList => _retryPolicy.ExecuteAsync(() => _coinsClient.ListAllAsync())
+            .ConfigureAwait(false).GetAwaiter().GetResult().Result;
     }
 }
