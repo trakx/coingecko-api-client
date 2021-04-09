@@ -73,7 +73,7 @@ namespace Trakx.CoinGecko.ApiClient
         }
 
         /// <inheritdoc />
-        public async Task<decimal?> GetPriceAsOfFromId(string id, DateTime asOf, string quoteCurrencyId = "usd-coin")
+        public async Task<decimal?> GetPriceAsOfFromId(string id, DateTime asOf, string quoteCurrencyId = Constants.UsdCoin)
         {
             try
             {
@@ -84,11 +84,11 @@ namespace Trakx.CoinGecko.ApiClient
                 var historicalPrice = await _retryPolicy.ExecuteAsync(() =>
                         _coinsClient.HistoryAsync(id, date, false.ToString()));
 
-                return historicalPrice.Result.Market_data.Current_price["usd"] / fxRate;
+                return historicalPrice.Result.Market_data.Current_price[Constants.Usd] / fxRate;
             }
             catch (Exception e)
             {
-                _logger.Warning(e, "Failed to retrieve price for {0} as of {1:yyyyMMdd}", id, asOf);
+                _logger.Debug(e, "Failed to retrieve price for {0} as of {1:yyyyMMdd}", id, asOf);
                 return null;
             }
         }
@@ -100,10 +100,14 @@ namespace Trakx.CoinGecko.ApiClient
             var quoteResponse = await _retryPolicy.ExecuteAsync(() =>
                 _coinsClient.HistoryAsync(quoteCurrencyId, date, false.ToString()));
 
-            var fxRate = quoteResponse.Result.Market_data.Current_price["usd"];
+            var fxRate = quoteResponse.Result.Market_data.Current_price.ContainsKey(Constants.Usd) ?
+                quoteResponse.Result.Market_data.Current_price[Constants.Usd] : default;
 
             if (fxRate == null)
+            {
+                _logger.Debug($"Current price for '{Constants.Usd}' in coin id '{quoteCurrencyId} for date '{date:dd-MM-yyyy}' is missing.");
                 throw new FailedToRetrievePriceException($"Failed to retrieve price of {quoteCurrencyId} as of {date}");
+            }
 
             return (decimal)fxRate;
         }
@@ -120,9 +124,9 @@ namespace Trakx.CoinGecko.ApiClient
                 AsOf = asOf,
                 CoinId = fullData.Result.Id,
                 CoinSymbol = fullData.Result.Symbol,
-                MarketCap = fullData.Result.Market_data.Market_cap["usd"] / fxRate,
-                Volume = fullData.Result.Market_data.Total_volume["usd"] / fxRate,
-                Price = fullData.Result.Market_data.Current_price["usd"] / fxRate,
+                MarketCap = fullData.Result.Market_data.Market_cap[Constants.Usd] / fxRate,
+                Volume = fullData.Result.Market_data.Total_volume[Constants.Usd] / fxRate,
+                Price = fullData.Result.Market_data.Current_price[Constants.Usd] / fxRate,
                 QuoteCurrency = fullData.Result.Symbol
             };
 
@@ -184,7 +188,7 @@ namespace Trakx.CoinGecko.ApiClient
         public async Task<IReadOnlyList<CoinList>> GetCoinList()
         {
             var coinList =
-                await _retryPolicy.ExecuteAsync(() => 
+                await _retryPolicy.ExecuteAsync(() =>
                     _coinsClient.ListAllAsync()).ConfigureAwait(false);
             return coinList.Result;
         }
