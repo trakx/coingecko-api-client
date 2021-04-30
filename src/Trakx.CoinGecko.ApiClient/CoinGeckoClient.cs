@@ -2,10 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
 using Ardalis.GuardClauses;
-using Polly;
-using Polly.Retry;
 using Serilog;
 using Trakx.Utils.Extensions;
 
@@ -15,7 +14,6 @@ namespace Trakx.CoinGecko.ApiClient
     {
         private readonly ILogger _logger;
         private readonly ICoinsClient _coinsClient;
-        private readonly AsyncRetryPolicy _retryPolicy;
         private readonly ISimpleClient _simpleClient;
         private Dictionary<string, string>? _symbolsByNames;
         private Dictionary<string, string>? _idsBySymbolName;
@@ -24,7 +22,7 @@ namespace Trakx.CoinGecko.ApiClient
         {
             get
             {
-                var idsBySymbolName = _idsBySymbolName ??= CoinList
+                var idsBySymbolName = _idsBySymbolName ??= GetCoinList().GetAwaiter().GetResult()
                     .ToDictionary(c => GetSymbolNameKey(c.Symbol, c.Name), c => c.Id);
                 return idsBySymbolName;
             }
@@ -32,14 +30,12 @@ namespace Trakx.CoinGecko.ApiClient
 
         public Dictionary<string, CoinFullData> CoinFullDataByIds { get; }
 
-        public CoinGeckoClient(IClientFactory factory, ILogger logger)
+        public CoinGeckoClient(ICoinsClient coinsClient, ISimpleClient simpleClient, ILogger logger)
         {
+            _coinsClient = coinsClient;
+            _simpleClient = simpleClient;
             _logger = logger;
-            _retryPolicy = Policy.Handle<Exception>()
-                .WaitAndRetryAsync(3, c => TimeSpan.FromSeconds(c * c));
-            _coinsClient = factory.CreateCoinsClient();
-            _simpleClient = factory.CreateSimpleClient();
-
+            
             CoinFullDataByIds = new Dictionary<string, CoinFullData>();
         }
 
@@ -81,8 +77,7 @@ namespace Trakx.CoinGecko.ApiClient
 
                 var fxRate = await GetUsdFxRate(quoteCurrencyId, date);
 
-                var historicalPrice = await _retryPolicy.ExecuteAsync(() =>
-                        _coinsClient.HistoryAsync(id, date, false.ToString()));
+                var historicalPrice = await _coinsClient.HistoryAsync(id, date, false.ToString()).ConfigureAwait(false);
 
                 return historicalPrice.Result.Market_data.Current_price[Constants.Usd] / fxRate;
             }
@@ -97,19 +92,16 @@ namespace Trakx.CoinGecko.ApiClient
         {
             Guard.Against.NullOrWhiteSpace(quoteCurrencyId, nameof(quoteCurrencyId));
 
-            var quoteResponse = await _retryPolicy.ExecuteAsync(() =>
-                _coinsClient.HistoryAsync(quoteCurrencyId, date, false.ToString()));
+            var quoteResponse = await _coinsClient.HistoryAsync(quoteCurrencyId, date, false.ToString()).ConfigureAwait(false);
 
             var fxRate = quoteResponse.Result.Market_data.Current_price.ContainsKey(Constants.Usd) ?
                 quoteResponse.Result.Market_data.Current_price[Constants.Usd] : default;
 
-            if (fxRate == null)
-            {
-                _logger.Debug($"Current price for '{Constants.Usd}' in coin id '{quoteCurrencyId} for date '{date:dd-MM-yyyy}' is missing.");
-                throw new FailedToRetrievePriceException($"Failed to retrieve price of {quoteCurrencyId} as of {date}");
-            }
+            if (fxRate != null) return (decimal) fxRate;
 
-            return (decimal)fxRate;
+            _logger.Debug($"Current price for '{Constants.Usd}' in coin id '{quoteCurrencyId} for date '{date:dd-MM-yyyy}' is missing.");
+            throw new FailedToRetrievePriceException($"Failed to retrieve price of {quoteCurrencyId} as of {date}");
+
         }
 
         /// <inheritdoc />
@@ -135,7 +127,7 @@ namespace Trakx.CoinGecko.ApiClient
 
         public bool TryRetrieveSymbol(string coinName, out string? symbol)
         {
-            _symbolsByNames ??= CoinList.ToDictionary(c => c.Name, c => c.Symbol);
+            _symbolsByNames ??= GetCoinList().GetAwaiter().GetResult().ToDictionary(c => c.Name, c => c.Symbol);
             var bestMatch = coinName.FindBestLevenshteinMatch(_symbolsByNames.Keys);
             symbol = bestMatch != null ? _symbolsByNames[bestMatch] : null;
 
@@ -154,16 +146,12 @@ namespace Trakx.CoinGecko.ApiClient
                 return coinGeckoId;
 
             var bestMatch = symbolNameKey.FindBestLevenshteinMatch(IdsBySymbolName.Keys);
-            if (bestMatch != null)
-            {
-                coinGeckoId = IdsBySymbolName[bestMatch];
-                IdsBySymbolName.Add(symbolNameKey, coinGeckoId);
-                return coinGeckoId;
-            }
-            else
-            {
-                throw new FailedToRetrieveCoinGeckoIdException($"Unable to find the best coin gecko id match for symbol '{symbol}'.");
-            }
+            if (bestMatch == null) throw new FailedToRetrieveCoinGeckoIdException($"Unable to find the best coin gecko id match for symbol '{symbol}'.");
+
+            coinGeckoId = IdsBySymbolName[bestMatch];
+            IdsBySymbolName.Add(symbolNameKey, coinGeckoId);
+            return coinGeckoId;
+
         }
         public CoinFullData? RetrieveCoinFullData(string coinId)
         {
@@ -187,9 +175,7 @@ namespace Trakx.CoinGecko.ApiClient
 
         public async Task<IReadOnlyList<CoinList>> GetCoinList()
         {
-            var coinList =
-                await _retryPolicy.ExecuteAsync(() =>
-                    _coinsClient.ListAllAsync()).ConfigureAwait(false);
+            var coinList = await _coinsClient.ListAllAsync().ConfigureAwait(false);
             return coinList.Result;
         }
 
@@ -200,7 +186,27 @@ namespace Trakx.CoinGecko.ApiClient
             return coinsPrice.Result;
         }
 
-        public IReadOnlyList<CoinList> CoinList => _retryPolicy.ExecuteAsync(() => _coinsClient.ListAllAsync())
-            .ConfigureAwait(false).GetAwaiter().GetResult().Result;
+        public async Task<IDictionary<DateTimeOffset, MarketData>> GetMarketDataForDateRange(string id, string vsCurrency, DateTimeOffset start, DateTimeOffset end,
+            CancellationToken cancellationToken)
+        {
+            var range = await _coinsClient
+                .RangeAsync(id, vsCurrency, start.ToUnixTimeSeconds(), end.ToUnixTimeSeconds(), CancellationToken.None)
+                .ConfigureAwait(false);
+            
+            var result = Enumerable.Range(0, range.Result.Prices.Count).Select(i =>
+                new { Index = i, Date = DateTimeOffset.FromUnixTimeMilliseconds((long)range.Result.Prices[i][0]) })
+                .ToDictionary(d => d.Date,
+                    d => new MarketData
+                    {
+                        AsOf = d.Date,
+                        CoinId = id,
+                        CoinSymbol = null,
+                        MarketCap = (decimal)range.Result.Market_caps[d.Index][1],
+                        Price = (decimal)range.Result.Prices[d.Index][1],
+                        Volume = (decimal)range.Result.Total_volumes[d.Index][1],
+                        QuoteCurrency = vsCurrency
+                    });
+            return result;
+        }
     }
 }

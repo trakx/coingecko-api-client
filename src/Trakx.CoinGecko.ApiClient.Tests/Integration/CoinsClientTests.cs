@@ -56,10 +56,10 @@ namespace Trakx.CoinGecko.ApiClient.Tests.Integration
         public async Task RangeAsync_should_return_historical_data_for_a_range_of_dates()
         {
             var start = DateTimeOffset.Parse("2020-12-01");
-            var end = DateTimeOffset.Parse("2020-12-31");
-            var range = await _coinsClient
+            var end = DateTimeOffset.Parse("2020-12-31");var range = await _coinsClient
                 .RangeAsync("ethereum", "usd", start.ToUnixTimeSeconds(), end.ToUnixTimeSeconds(), CancellationToken.None)
                 .ConfigureAwait(false);
+            
             range.StatusCode.Should().Be((int)HttpStatusCode.OK);
             range.Result.Prices.Count.Should().BeGreaterThan(30);
             range.Result.Market_caps.Count.Should().Be(range.Result.Prices.Count);

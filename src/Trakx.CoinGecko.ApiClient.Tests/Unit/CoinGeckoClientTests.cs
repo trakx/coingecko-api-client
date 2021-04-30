@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
 using NSubstitute;
@@ -21,15 +22,12 @@ namespace Trakx.CoinGecko.ApiClient.Tests.Unit
 
         public CoinGeckoClientTests(ITestOutputHelper output)
         {
-            IClientFactory clientFactory = Substitute.For<IClientFactory>();
             _simpleClient = Substitute.For<ISimpleClient>();
             _coinsClient = Substitute.For<ICoinsClient>();
-            clientFactory.CreateCoinsClient().Returns(_coinsClient);
-            clientFactory.CreateSimpleClient().Returns(_simpleClient);
             ILogger logger = Substitute.For<ILogger>();
             _mockCreator = new MockCreator(output);
 
-            _coinGeckoClient = new CoinGeckoClient(clientFactory, logger);
+            _coinGeckoClient = new CoinGeckoClient(_coinsClient, _simpleClient, logger);
         }
 
         [Fact]
@@ -130,6 +128,56 @@ namespace Trakx.CoinGecko.ApiClient.Tests.Unit
                 prices.Keys.Should().OnlyContain(f => f == "usd");
                 prices.Values.Should().OnlyContain(f => f > 0);
             }
+        }
+
+        [Fact]
+        public async Task GetMarketDataForDateRange_should_call_Range_and_transform_data()
+        {
+            var dates = new double[] {1619756926435, 1619757185872};
+            var range = new Range
+            {
+                Market_caps = new List<TimestampedValue>
+                {
+                    new() { dates[0], 318992245176.35913 },
+                    new() { dates[1], 319632242563.95764 },
+                },
+                Total_volumes = new List<TimestampedValue>
+                {
+                    new() { dates[0], 38069451649.54143 },
+                    new() { dates[1], 38825217290.29339 },
+                },
+                Prices = new List<TimestampedValue>
+                {
+                    new() { dates[0], 2756.166102270321 },
+                    new() { dates[1], 2761.460672838776 },
+                }
+            };
+            var id = _mockCreator.GetRandomString(5);
+            var vsCurrency = _mockCreator.GetRandomString(3);
+            var start = _mockCreator.GetRandomUtcDateTimeOffset();
+            var end = _mockCreator.GetRandomUtcDateTimeOffset();
+            
+            _coinsClient.RangeAsync(id, vsCurrency, start.ToUnixTimeSeconds(), end.ToUnixTimeSeconds(), CancellationToken.None)
+                .Returns(new Response<Range>(200, null, range));
+
+            var result = await _coinGeckoClient.GetMarketDataForDateRange(id, vsCurrency, start, end, CancellationToken.None)
+                .ConfigureAwait(false);
+
+            await _coinsClient.Received(1)
+                .RangeAsync(id, vsCurrency, start.ToUnixTimeSeconds(), end.ToUnixTimeSeconds(), CancellationToken.None)
+                .ConfigureAwait(false);
+
+            result.Keys.Should().BeEquivalentTo(dates.Select(d => DateTimeOffset.FromUnixTimeMilliseconds((long)d)));
+            
+            var firstDate = DateTimeOffset.FromUnixTimeMilliseconds((long)dates[0]);
+            var firstResult = result[firstDate];
+            firstResult.Price.Should().Be((decimal)2756.166102270321);
+            firstResult.Volume.Should().Be((decimal)38069451649.54143);
+            firstResult.MarketCap.Should().Be((decimal)318992245176.35913);
+            firstResult.CoinId.Should().Be(id);
+            firstResult.QuoteCurrency.Should().Be(vsCurrency);
+            firstResult.AsOf.Should().Be(firstDate);
+            firstResult.CoinSymbol.Should().BeNull();
         }
 
         #region Helper Methods

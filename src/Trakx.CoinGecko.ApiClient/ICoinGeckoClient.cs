@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Trakx.CoinGecko.ApiClient
@@ -12,5 +13,7 @@ namespace Trakx.CoinGecko.ApiClient
         Task<string?> GetCoinGeckoIdFromSymbol(string symbol);
         Task<IReadOnlyList<CoinList>> GetCoinList();
         Task<IDictionary<string, IDictionary<string, decimal?>>> GetAllPrices(string[] ids, string[]? vsCurrencies = null);
+        Task<IDictionary<DateTimeOffset, MarketData>> GetMarketDataForDateRange(string id, string vsCurrency,
+            DateTimeOffset start, DateTimeOffset end, CancellationToken cancellationToken);
     }
 }

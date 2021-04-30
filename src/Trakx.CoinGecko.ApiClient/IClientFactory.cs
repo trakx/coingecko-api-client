@@ -1,11 +1,8 @@
 ﻿namespace Trakx.CoinGecko.ApiClient
 {
-    public  interface IClientFactory
+    internal interface IClientFactory
     {
-
         ICoinsClient CreateCoinsClient();
-
         ISimpleClient CreateSimpleClient();
-
     }
 }
