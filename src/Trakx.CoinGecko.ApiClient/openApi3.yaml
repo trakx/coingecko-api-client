@@ -403,8 +403,7 @@ paths:
     get:
       tags:
       - coins
-      summary: Get historical market data include price, market cap, and 24h volume
-        within a range of timestamp (granularity auto)
+      summary: Get historical market data include price, market cap, and 24h volume within a range of timestamp (granularity auto)
       description: |-
         Get historical market data include price, market cap, and 24h volume within a range of timestamp (granularity auto)
          <b>Minutely data will be used for duration within 1 day, Hourly data will be used for duration between 1 day and 90 days, Daily data will be used for duration above 90 days.</b>
@@ -426,18 +425,20 @@ paths:
         description: From date in UNIX Timestamp (eg. 1392577232)
         required: true
         schema:
-          type: string
+          $ref: '#/components/schemas/UnixTimeStampSeconds'
       - name: to
         in: query
         description: To date in UNIX Timestamp (eg. 1422577232)
         required: true
         schema:
-          type: string
+          $ref: '#/components/schemas/UnixTimeStampSeconds'
       responses:
         200:
-          description: Get historical market data include price, market cap, and 24h
-            volume
-          content: {}
+          description: Get historical market data include price, market cap, and 24h volume
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Range'
   /coins/{id}/status_updates:
     get:
       tags:
@@ -1150,635 +1151,671 @@ components:
       in: header
       name: X-Api-Key
   schemas:
-        Price:
-            type: object
-            additionalProperties:
+    Price:
+      type: object
+      additionalProperties:
+        type: object
+        additionalProperties:
+          type: number
+          format: decimal
+          nullable: true
+    CoinList:
+      type: object
+      properties:
+        id:
+          type: string
+        symbol:
+          type: string
+        name:
+          type: string
+    CoinData:
+      type: object
+      properties:
+        id:
+          type: string
+        symbol:
+          type: string
+        name:
+          type: string
+        localization:
+          type: object
+          nullable: true
+          additionalProperties:
+            type: string
+        image:
+          type: object
+          properties:
+            thumb:
+              type: string
+            small:
+              type: string
+            large:
+              type: string
+              nullable: true
+        market_data:
+          type: object
+          nullable: true
+          properties:
+            current_price:
+              type: object
+              nullable: true
+              additionalProperties:
+                type: number
+                format: decimal
+                nullable: true
+            ath:
+              type: object
+              nullable: true
+              additionalProperties:
+                type: number
+                format: decimal
+                nullable: true
+            ath_change_percentage:
+              type: object
+              nullable: true
+              additionalProperties:
+                type: number
+                format: decimal
+                nullable: true
+            ath_date:
+              type: datetime
+            atl:
+              type: object
+              nullable: true
+              additionalProperties:
+                type: number
+                format: decimal
+                nullable: true
+            atl_change_percentage:
+              type: object
+              nullable: true
+              additionalProperties:
+                type: number
+                format: decimal
+                nullable: true
+            atl_date:
+              type: datetime
+            market_cap:
+              type: object
+              nullable: true
+              additionalProperties:
+                type: number
+                format: decimal
+                nullable: true
+            total_volume:
+              type: object
+              nullable: true
+              additionalProperties:
+                type: number
+                format: decimal
+                nullable: true
+            high_24h:
+              type: object
+              nullable: true
+              additionalProperties:
+                type: number
+                format: decimal
+                nullable: true
+            low_24h:
+              type: object
+              nullable: true
+              additionalProperties:
+                type: number
+                format: decimal
+                nullable: true
+            price_change_24h_in_currency:
+              type: object
+              nullable: true
+              additionalProperties:
+                type: number
+                format: decimal
+                nullable: true
+            price_change_percentage_1h_in_currency:
+              type: object
+              nullable: true
+              additionalProperties:
+                type: number
+                format: decimal
+                nullable: true
+            price_change_percentage_24h_in_currency:
+              type: object
+              nullable: true
+              additionalProperties:
+                type: number
+                format: decimal
+                nullable: true
+            price_change_percentage_7d_in_currency:
+              type: object
+              nullable: true
+              additionalProperties:
+                type: number
+                format: decimal
+                nullable: true
+            price_change_percentage_14d_in_currency:
+              type: object
+              nullable: true
+              additionalProperties:
+                type: number
+                format: decimal
+                nullable: true
+            price_change_percentage_30d_in_currency:
+              type: object
+              nullable: true
+              additionalProperties:
+                type: number
+                format: decimal
+                nullable: true
+            price_change_percentage_60d_in_currency:
+              type: object
+              nullable: true
+              additionalProperties:
+                type: number
+                format: decimal
+                nullable: true
+            price_change_percentage_200d_in_currency:
+              type: object
+              nullable: true
+              additionalProperties:
+                type: number
+                format: decimal
+                nullable: true
+            price_change_percentage_1y_in_currency:
+              type: object
+              nullable: true
+              additionalProperties:
+                type: number
+                format: decimal
+                nullable: true
+            market_cap_change_24h_in_currency:
+              type: object
+              nullable: true
+              additionalProperties:
+                type: number
+                format: decimal
+                nullable: true
+            market_cap_change_percentage_24h_in_currency:
+              type: object
+              nullable: true
+              additionalProperties:
+                type: number
+                format: decimal
+                nullable: true
+            total_supply:
+              type: number
+              format: decimal
+              nullable: true
+            max_supply:
+              type: number
+              format: decimal
+              nullable: true
+            circulating_supply:
+              type: number
+              format: decimal
+              nullable: true
+            last_updated:
+              type: datetime
+            total_value_locked:
+              type: number
+              format: decimal
+              nullable: true
+            mcap_to_tvl_ratio:
+              type: number
+              format: decimal
+              nullable: true
+            fdv_to_tvl_ratio:
+              type: number
+              format: decimal
+              nullable: true
+            market_cap_rank:
+              type: number
+              format: decimal
+              nullable: true
+            fully_diluted_valuation:
+              type: object
+              nullable: true
+              additionalProperties:
+                type: number
+                format: decimal
+                nullable: true
+            price_change_24h:
+              type: number
+              format: decimal
+            price_change_percentage_24h:
+              type: number
+              format: decimal
+            price_change_percentage_7d:
+              type: number
+              format: decimal
+            price_change_percentage_14d:
+              type: number
+              format: decimal
+            price_change_percentage_30d:
+              type: number
+              format: decimal
+            price_change_percentage_60d:
+              type: number
+              format: decimal
+            price_change_percentage_200d:
+              type: number
+              format: decimal
+            price_change_percentage_1y:
+              type: number
+              format: decimal
+            market_cap_change_24h:
+              type: number
+              format: decimal
+            market_cap_change_percentage_24h:
+              type: number
+              format: decimal
+            roi:
+              type: object
+              properties:
+                times:
+                  type: number
+                  format: decimal
+                  nullable: true
+                currency:
+                  type: string
+                percentage:
+                  type: number
+                  format: decimal
+                  nullable: true
+          community_data:
+              type: object
+              nullable: true
+              properties:
+                  telegram_channel_user_count:
+                      type: number
+                      nullable: true
+                  facebook_likes:
+                      type: number
+                      nullable: true
+                  twitter_followers:
+                      type: number
+                      nullable: true
+                  reddit_average_posts_48h:
+                      type: number
+                      nullable: true
+                  reddit_average_comments_48h:
+                      type: number
+                      nullable: true
+                  reddit_subscribers:
+                      type: number
+                      nullable: true
+                  reddit_accounts_active_48h:
+                      type: number
+                      nullable: true
+          developer_data:
+              type: object
+              nullable: true
+              properties:
+                  forks:
+                      type: number
+                      nullable: true
+                  stars:
+                      type: number
+                      nullable: true
+                  subscribers:
+                      type: number
+                      nullable: true
+                  total_issues:
+                      type: number
+                      nullable: true
+                  closed_issues:
+                      type: number
+                      nullable: true
+                  pull_requests_merged:
+                      type: number
+                      nullable: true
+                  pull_request_contributors:
+                      type: number
+                      nullable: true
+                  code_additions_deletions_4_weeks:
+                      type: object
+                      nullable: true
+                      properties:
+                          additions:
+                              type: number
+                              nullable: true
+                          deletions:
+                              type: number
+                              nullable: true
+                  commit_count_4_weeks:
+                      type: number
+                      nullable: true
+                  last_4_weeks_commit_activity_series:
+                      type: object
+                      nullable: true
+                      items:
+                          type: string
+          public_interest_stats:
+              type: object
+              nullable: true
+              properties:
+                  alexa_rank:
+                      type: number
+                      format: double
+                      nullable: true
+                  bing_matches:
+                      type: number
+                      format: double
+                      nullable: true
+        community_data:
+          type: object
+        developer_data:
+          type: object
+        public_interest_stats:
+          type: object
+    CoinFullData:
+      allOf:
+      - $ref: '#/components/schemas/CoinData'
+      - type: object
+        properties:
+            asset_platform_id:
+                type: string
+                nullable: true
+            platforms:
                 type: object
+                nullable: true
                 additionalProperties:
-                    type: number
-                    format: decimal
-                    nullable: true
-        CoinList:
-            type: object
-            properties:
-                id:
                     type: string
-                symbol:
+            block_time_in_minutes:
+                type: number
+            hashing_algorithm:
+                type: string
+            categories:
+                type: array
+                nullable: true
+                items:
                     type: string
-                name:
-                    type: string
-        CoinData:
-            type: object
-            properties:
-                id:
-                    type: string
-                symbol:
-                    type: string
-                name:
-                    type: string
-                localization:
+            public_notice:
+                type: string
+                nullable: true
+            status_updates:
+                type: array
+                nullable: true
+                items:
                     type: object
-                    nullable: true
-                    additionalProperties:
-                        type: string
-                image:
+            tickers:
+                type: array
+                nullable: true
+                items:
                     type: object
                     properties:
-                        thumb:
+                        base:
                             type: string
-                        small:
+                        target:
                             type: string
-                        large:
-                            type: string
-                            nullable: true
-                market_data:
-                    type: object
-                    nullable: true
-                    properties:
-                        current_price:
-                            type: object
-                            nullable: true
-                            additionalProperties:
-                                type: number
-                                format: decimal
-                                nullable: true
-                        ath:
-                            type: object
-                            nullable: true
-                            additionalProperties:
-                                type: number
-                                format: decimal
-                                nullable: true
-                        ath_change_percentage:
-                            type: object
-                            nullable: true
-                            additionalProperties:
-                                type: number
-                                format: decimal
-                                nullable: true
-                        ath_date:
-                            type: datetime
-                        atl:
-                            type: object
-                            nullable: true
-                            additionalProperties:
-                                type: number
-                                format: decimal
-                                nullable: true
-                        atl_change_percentage:
-                            type: object
-                            nullable: true
-                            additionalProperties:
-                                type: number
-                                format: decimal
-                                nullable: true
-                        atl_date:
-                            type: datetime
-                        market_cap:
-                            type: object
-                            nullable: true
-                            additionalProperties:
-                                type: number
-                                format: decimal
-                                nullable: true
-                        total_volume:
-                            type: object
-                            nullable: true
-                            additionalProperties:
-                                type: number
-                                format: decimal
-                                nullable: true
-                        high_24h:
-                            type: object
-                            nullable: true
-                            additionalProperties:
-                                type: number
-                                format: decimal
-                                nullable: true
-                        low_24h:
-                            type: object
-                            nullable: true
-                            additionalProperties:
-                                type: number
-                                format: decimal
-                                nullable: true
-                        price_change_24h_in_currency:
-                            type: object
-                            nullable: true
-                            additionalProperties:
-                                type: number
-                                format: decimal
-                                nullable: true
-                        price_change_percentage_1h_in_currency:
-                            type: object
-                            nullable: true
-                            additionalProperties:
-                                type: number
-                                format: decimal
-                                nullable: true
-                        price_change_percentage_24h_in_currency:
-                            type: object
-                            nullable: true
-                            additionalProperties:
-                                type: number
-                                format: decimal
-                                nullable: true
-                        price_change_percentage_7d_in_currency:
-                            type: object
-                            nullable: true
-                            additionalProperties:
-                                type: number
-                                format: decimal
-                                nullable: true
-                        price_change_percentage_14d_in_currency:
-                            type: object
-                            nullable: true
-                            additionalProperties:
-                                type: number
-                                format: decimal
-                                nullable: true
-                        price_change_percentage_30d_in_currency:
-                            type: object
-                            nullable: true
-                            additionalProperties:
-                                type: number
-                                format: decimal
-                                nullable: true
-                        price_change_percentage_60d_in_currency:
-                            type: object
-                            nullable: true
-                            additionalProperties:
-                                type: number
-                                format: decimal
-                                nullable: true
-                        price_change_percentage_200d_in_currency:
-                            type: object
-                            nullable: true
-                            additionalProperties:
-                                type: number
-                                format: decimal
-                                nullable: true
-                        price_change_percentage_1y_in_currency:
-                            type: object
-                            nullable: true
-                            additionalProperties:
-                                type: number
-                                format: decimal
-                                nullable: true
-                        market_cap_change_24h_in_currency:
-                            type: object
-                            nullable: true
-                            additionalProperties:
-                                type: number
-                                format: decimal
-                                nullable: true
-                        market_cap_change_percentage_24h_in_currency:
-                            type: object
-                            nullable: true
-                            additionalProperties:
-                                type: number
-                                format: decimal
-                                nullable: true
-                        total_supply:
-                            type: number
-                            format: decimal
-                            nullable: true
-                        max_supply:
-                            type: number
-                            format: decimal
-                            nullable: true
-                        circulating_supply:
-                            type: number
-                            format: decimal
-                            nullable: true
-                        last_updated:
-                            type: datetime
-                        total_value_locked:
-                            type: number
-                            format: decimal
-                            nullable: true
-                        mcap_to_tvl_ratio:
-                            type: number
-                            format: decimal
-                            nullable: true
-                        fdv_to_tvl_ratio:
-                            type: number
-                            format: decimal
-                            nullable: true
-                        market_cap_rank:
-                            type: number
-                            format: decimal
-                            nullable: true
-                        fully_diluted_valuation:
-                            type: object
-                            nullable: true
-                            additionalProperties:
-                                type: number
-                                format: decimal
-                                nullable: true
-                        price_change_24h:
-                            type: number
-                            format: decimal
-                        price_change_percentage_24h:
-                            type: number
-                            format: decimal
-                        price_change_percentage_7d:
-                            type: number
-                            format: decimal
-                        price_change_percentage_14d:
-                            type: number
-                            format: decimal
-                        price_change_percentage_30d:
-                            type: number
-                            format: decimal
-                        price_change_percentage_60d:
-                            type: number
-                            format: decimal
-                        price_change_percentage_200d:
-                            type: number
-                            format: decimal
-                        price_change_percentage_1y:
-                            type: number
-                            format: decimal
-                        market_cap_change_24h:
-                            type: number
-                            format: decimal
-                        market_cap_change_percentage_24h:
-                            type: number
-                            format: decimal
-                        roi:
+                        market:
                             type: object
                             properties:
-                                times:
-                                    type: number
-                                    format: decimal
-                                    nullable: true
-                                currency:
+                                name:
                                     type: string
-                                percentage:
+                                identifier:
+                                    type: string
+                                has_trading_incentive:
+                                    type: boolean
+                        last:
+                            type: number
+                            format: double
+                        volume:
+                            type: number
+                            format: decimal
+                        converted_last:
+                            type: object
+                            properties:
+                                btc:
                                     type: number
                                     format: decimal
-                                    nullable: true
-                community_data:
-                    type: object
-                    nullable: true
-                    properties:
-                        telegram_channel_user_count:
-                            type: number
-                            nullable: true
-                        facebook_likes:
-                            type: number
-                            nullable: true
-                        twitter_followers:
-                            type: number
-                            nullable: true
-                        reddit_average_posts_48h:
-                            type: number
-                            nullable: true
-                        reddit_average_comments_48h:
-                            type: number
-                            nullable: true
-                        reddit_subscribers:
-                            type: number
-                            nullable: true
-                        reddit_accounts_active_48h:
-                            type: number
-                            nullable: true
-                developer_data:
-                    type: object
-                    nullable: true
-                    properties:
-                        forks:
-                            type: number
-                            nullable: true
-                        stars:
-                            type: number
-                            nullable: true
-                        subscribers:
-                            type: number
-                            nullable: true
-                        total_issues:
-                            type: number
-                            nullable: true
-                        closed_issues:
-                            type: number
-                            nullable: true
-                        pull_requests_merged:
-                            type: number
-                            nullable: true
-                        pull_request_contributors:
-                            type: number
-                            nullable: true
-                        code_additions_deletions_4_weeks:
+                                eth:
+                                    type: number
+                                    format: decimal
+                                usd:
+                                    type: number
+                                    format: decimal
+                        converted_volume:
                             type: object
-                            nullable: true
                             properties:
-                                additions:
+                                btc:
                                     type: number
-                                    nullable: true
-                                deletions:
+                                    format: decimal
+                                eth:
                                     type: number
-                                    nullable: true
-                        commit_count_4_weeks:
+                                    format: decimal
+                                usd:
+                                    type: number
+                                    format: decimal
+                        trust_score:
+                            type: string
+                            nullable: true
+                        bid_ask_spread_percentage:
                             type: number
+                            format: decimal
+                        timestamp:
+                            type: datetime
+                        last_traded_at:
+                            type: datetime
+                        last_fetch_at:
+                            type: datetime
+                        is_anomaly:
+                            type: boolean
+                        is_stale:
+                            type: boolean
+                        trade_url:
+                            type: string
+                        token_info_url:
+                            type: string
                             nullable: true
-                        last_4_weeks_commit_activity_series:
-                            type: object
-                            nullable: true
-                            items:
-                                type: string
-                public_interest_stats:
-                    type: object
+                        coin_id:
+                            type: string
+                        target_coin_id:
+                            type: string
+            last_updated:
+                    type: datetime
                     nullable: true
-                    properties:
-                        alexa_rank:
-                            type: number
-                            format: double
-                            nullable: true
-                        bing_matches:
-                            type: number
-                            format: double
-                            nullable: true
-        CoinFullData:
-            allOf:
-            -   $ref: '#/components/schemas/CoinData'
-            -   type: object
+            additional_notices:
+                type: array
+                nullable: true
+                items:
+                    type: string
+            description:
+                type: object
+                nullable: true
+                additionalProperties:
+                    type: string
+            links:
+                type: object
                 properties:
-                    asset_platform_id:
-                        type: string
-                        nullable: true
-                    platforms:
-                        type: object
-                        nullable: true
-                        additionalProperties:
+                    homepage:
+                        type: array
+                        nullable: null
+                        items:
                             type: string
-                    block_time_in_minutes:
+                    blockchain_site:
+                        type: array
+                        nullable: null
+                        items:
+                            type: string
+                    official_forum_url:
+                        type: array
+                        nullable: null
+                        items:
+                            type: string
+                    chat_url:
+                        type: array
+                        nullable: null
+                        items:
+                            type: string
+                    announcement_url:
+                        type: array
+                        nullable: null
+                        items:
+                            type: string
+                    twitter_screen_name:
+                        type: string
+                    facebook_username:
+                        type: string
+                    bitcointalk_thread_identifier:
                         type: number
-                    hashing_algorithm:
+                    telegram_channel_identifier:
                         type: string
-                    categories:
-                        type: array
-                        nullable: true
-                        items:
-                            type: string
-                    public_notice:
+                    subreddit_url:
                         type: string
                         nullable: true
-                    status_updates:
-                        type: array
-                        nullable: true
-                        items:
-                            type: object
-                    tickers:
-                        type: array
-                        nullable: true
-                        items:
-                            type: object
-                            properties:
-                                base:
-                                    type: string
-                                target:
-                                    type: string
-                                market:
-                                    type: object
-                                    properties:
-                                        name:
-                                            type: string
-                                        identifier:
-                                            type: string
-                                        has_trading_incentive:
-                                            type: boolean
-                                last:
-                                    type: number
-                                    format: double
-                                volume:
-                                    type: number
-                                    format: decimal
-                                converted_last:
-                                    type: object
-                                    properties:
-                                        btc:
-                                            type: number
-                                            format: decimal
-                                        eth:
-                                            type: number
-                                            format: decimal
-                                        usd:
-                                            type: number
-                                            format: decimal
-                                converted_volume:
-                                    type: object
-                                    properties:
-                                        btc:
-                                            type: number
-                                            format: decimal
-                                        eth:
-                                            type: number
-                                            format: decimal
-                                        usd:
-                                            type: number
-                                            format: decimal
-                                trust_score:
-                                    type: string
-                                    nullable: true
-                                bid_ask_spread_percentage:
-                                    type: number
-                                    format: decimal
-                                timestamp:
-                                    type: datetime
-                                last_traded_at:
-                                    type: datetime
-                                last_fetch_at:
-                                    type: datetime
-                                is_anomaly:
-                                    type: boolean
-                                is_stale:
-                                    type: boolean
-                                trade_url:
-                                    type: string
-                                token_info_url:
-                                    type: string
-                                    nullable: true
-                                coin_id:
-                                    type: string
-                                target_coin_id:
-                                    type: string
-                    last_updated:
-                        type: datetime
-                        nullable: true
-                    additional_notices:
-                        type: array
-                        nullable: true
-                        items:
-                            type: string
-                    description:
+                    repos_url:
                         type: object
                         nullable: true
-                        additionalProperties:
-                            type: string
+                        properties:
+                            github:
+                                type: array
+                                items:
+                                    type: string
+                            bitbucket:
+                                type: array
+                                items:
+                                    type: string
+            country_origin:
+                type: string
+            genesis_date:
+                type: string
+            sentiment_votes_up_percentage:
+                type: number
+                format: decimal
+                nullable: true
+            sentiment_votes_down_percentage:
+                type: number
+                format: decimal
+                nullable: true
+            ico_data:
+                type: object
+                nullable: true
+                properties:
+                    ico_start_date:
+                        type: datetime
+                    ico_end_date:
+                        type: datetime
+                    short_desc:
+                        type: string
+                    description:
+                        type: string
+                        nullable: true
                     links:
                         type: object
-                        properties:
-                            homepage:
-                                type: array
-                                nullable: null
-                                items:
-                                    type: string
-                            blockchain_site:
-                                type: array
-                                nullable: null
-                                items:
-                                    type: string
-                            official_forum_url:
-                                type: array
-                                nullable: null
-                                items:
-                                    type: string
-                            chat_url:
-                                type: array
-                                nullable: null
-                                items:
-                                    type: string
-                            announcement_url:
-                                type: array
-                                nullable: null
-                                items:
-                                    type: string
-                            twitter_screen_name:
-                                type: string
-                            facebook_username:
-                                type: string
-                            bitcointalk_thread_identifier:
-                                type: number
-                            telegram_channel_identifier:
-                                type: string
-                            subreddit_url:
-                                type: string
-                                nullable: true
-                            repos_url:
-                                type: object
-                                nullable: true
-                                properties:
-                                    github:
-                                        type: array
-                                        items:
-                                            type: string
-                                    bitbucket:
-                                        type: array
-                                        items:
-                                            type: string
+                    softcap_currency:
+                        type: string
+                    hardcap_currency:
+                        type: string
+                    total_raised_currency:
+                        type: string
+                    softcap_amount:
+                        type: decimal
+                        nullable: true
+                    hardcap_amount:
+                        type: decimal
+                        nullable: true
+                    total_raised:
+                        type: decimal
+                        nullable: true
+                    quote_pre_sale_currency:
+                        type: string
+                        nullable: true
+                    base_pre_sale_amount:
+                        type: decimal
+                        nullable: true
+                    quote_pre_sale_amount:
+                        type: decimal
+                        nullable: true
+                    quote_public_sale_currency:
+                        type: string
+                    base_public_sale_amount:
+                        type: decimal
+                    quote_public_sale_amount:
+                        type: decimal
+                    accepting_currencies:
+                        type: string
                     country_origin:
                         type: string
-                    genesis_date:
+                    pre_sale_start_date:
+                        type: datetime
+                        nullable: true
+                    pre_sale_end_date:
+                        type: datetime
+                        nullable: true
+                    whitelist_url:
                         type: string
-                    sentiment_votes_up_percentage:
+                        nullable: true
+                    whitelist_start_date:
+                        type: datetime
+                        nullable: true
+                    whitelist_end_date:
+                        type: datetime
+                        nullable: true
+                    whitelist_available:
+                        type: string
+                        nullable: true
+                    bounty_detail_url:
+                        type: string
+                    amount_for_sale:
                         type: number
                         format: decimal
                         nullable: true
-                    sentiment_votes_down_percentage:
-                        type: number
-                        format: decimal
+                    kyc_required:
+                        type: boolean
+                    pre_sale_available:
+                        type: string
                         nullable: true
-                    ico_data:
-                        type: object
-                        nullable: true
-                        properties:
-                            ico_start_date:
-                                type: datetime
-                            ico_end_date:
-                                type: datetime
-                            short_desc:
-                                type: string
-                            description:
-                                type: string
-                                nullable: true
-                            links:
-                                type: object
-                            softcap_currency:
-                                type: string
-                            hardcap_currency:
-                                type: string
-                            total_raised_currency:
-                                type: string
-                            softcap_amount:
-                                type: decimal
-                                nullable: true
-                            hardcap_amount:
-                                type: decimal
-                                nullable: true
-                            total_raised:
-                                type: decimal
-                                nullable: true
-                            quote_pre_sale_currency:
-                                type: string
-                                nullable: true
-                            base_pre_sale_amount:
-                                type: decimal
-                                nullable: true
-                            quote_pre_sale_amount:
-                                type: decimal
-                                nullable: true
-                            quote_public_sale_currency:
-                                type: string
-                            base_public_sale_amount:
-                                type: decimal
-                            quote_public_sale_amount:
-                                type: decimal
-                            accepting_currencies:
-                                type: string
-                            country_origin:
-                                type: string
-                            pre_sale_start_date:
-                                type: datetime
-                                nullable: true
-                            pre_sale_end_date:
-                                type: datetime
-                                nullable: true
-                            whitelist_url:
-                                type: string
-                                nullable: true
-                            whitelist_start_date:
-                                type: datetime
-                                nullable: true
-                            whitelist_end_date:
-                                type: datetime
-                                nullable: true
-                            whitelist_available:
-                                type: string
-                                nullable: true
-                            bounty_detail_url:
-                                type: string
-                            amount_for_sale:
-                                type: number
-                                format: decimal
-                                nullable: true
-                            kyc_required:
-                                type: boolean
-                            pre_sale_available:
-                                type: string
-                                nullable: true
-                            pre_sale_ended:
-                                type: boolean
-                    market_cap_rank:
-                        type: number
-                        format: decimal
-                        nullable: true
-                    coingecko_rank:
-                        type: number
-                        format: decimal
-                        nullable: true
-                    coingecko_score:
-                        type: number
-                        format: decimal
-                    developer_score:
-                        type: number
-                        format: decimal
-                    community_score:
-                        type: number
-                        format: decimal
-                    liquidity_score:
-                        type: number
-                        format: decimal
-                    public_interest_score:
-                        type: number
-                        format: decimal
+                    pre_sale_ended:
+                        type: boolean
+            market_cap_rank:
+                type: number
+                format: decimal
+                nullable: true
+            coingecko_rank:
+                type: number
+                format: decimal
+                nullable: true
+            coingecko_score:
+                type: number
+                format: decimal
+            developer_score:
+                type: number
+                format: decimal
+            community_score:
+                type: number
+                format: decimal
+            liquidity_score:
+                type: number
+                format: decimal
+            public_interest_score:
+                type: number
+                format: decimal
+    Range:
+      type: object
+      nullable: true
+      properties:
+        prices:
+          nullable: false
+          type: array
+          items:
+            $ref: '#/components/schemas/TimestampedValue'
+        market_caps:
+          nullable: false
+          type: array
+          items:
+            $ref: '#/components/schemas/TimestampedValue'
+        total_volumes:
+          nullable: false
+          type: array
+          items:
+            $ref: '#/components/schemas/TimestampedValue'
+    TimestampedValue:
+      type: array
+      nullable: false
+      items:
+        oneOf:
+          - type: number
+          - $ref: '#/components/schemas/UnixTimeStampSeconds'
+    UnixTimeStampSeconds:
+      type: integer
+      format: int64
+      minimum: 0
