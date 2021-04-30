@@ -72,11 +72,11 @@ jobs:
       run: dotnet test ${{env.SOLUTION_PATH}} --no-restore --verbosity normal
 
     - name: Package
-      run: dotnet pack ${{env.PROJECT_PATH}} --no-build --configuration Release --output ./nuget/ -p:PackageVersion=${{ steps.bumpSemver.outputs.new_tag }}
+      run: dotnet pack ${{env.PROJECT_PATH}} --no-build --configuration Release --output ./nuget/ -p:PackageVersion=${{ steps.bumpSemver.outputs.new_tag }} --include-symbols --include-source
 
     - name: Publish
       # https://github.com/NuGet/Home/issues/8580
-      run: dotnet nuget push ./nuget/*.nupkg --api-key ${{secrets.GITHUB_TOKEN}} --source "https://nuget.pkg.github.com/trakx/index.json"
+      run: dotnet nuget push ./nuget/*.symbols.nupkg --api-key ${{secrets.GITHUB_TOKEN}} --source "https://nuget.pkg.github.com/trakx/index.json"
 
     - name: push version tag
       uses: anothrNick/github-tag-action@1.26.0
