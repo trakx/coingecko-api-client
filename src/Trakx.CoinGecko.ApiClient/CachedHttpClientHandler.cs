@@ -2,6 +2,7 @@
 using System.Collections.Concurrent;
 using System.Net;
 using System.Net.Http;
+using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using Ardalis.GuardClauses;
@@ -12,7 +13,9 @@ namespace Trakx.CoinGecko.ApiClient
 {
     public class CachedHttpClientHandler : DelegatingHandler
     {
-        private readonly ILogger _logger;
+        private static readonly ILogger Logger =
+            Log.Logger.ForContext(MethodBase.GetCurrentMethod()!.DeclaringType);
+
         private readonly IMemoryCache _cache;
         private readonly CoinGeckoApiConfiguration _apiConfiguration;
         private static readonly ConcurrentDictionary<string, object> Requests = new ConcurrentDictionary<string, object>();
@@ -23,10 +26,9 @@ namespace Trakx.CoinGecko.ApiClient
         /// An <see cref="DelegatingHandler"></see> with a throttle to limit the maximum rate at which queries are sent
         /// and also periodically caching the results being retrieved to avoid unnecessary requests to coin gecko external api.
         /// </summary>
-        public CachedHttpClientHandler(IMemoryCache cache, ILogger logger, 
+        public CachedHttpClientHandler(IMemoryCache cache,
             CoinGeckoApiConfiguration apiConfiguration)
         {
-            _logger = logger;
             _cache = cache;
             _apiConfiguration = apiConfiguration;
             _millisecondsDelay = apiConfiguration.InitialRetryDelayInMilliseconds ?? 100;
@@ -88,7 +90,7 @@ namespace Trakx.CoinGecko.ApiClient
             {
                 if (_cache.TryGetValue(key, out content))
                 {
-                    _logger.Debug($"Loaded {request.Method} http response to {request.RequestUri} from CACHE.");
+                    Logger.Debug($"Loaded {request.Method} http response to {request.RequestUri} from CACHE.");
                     return new HttpResponseMessage(HttpStatusCode.OK)
                     {
                         Content = new StringContent(content)
@@ -105,7 +107,7 @@ namespace Trakx.CoinGecko.ApiClient
                     AbsoluteExpiration = DateTime.UtcNow.AddSeconds(_apiConfiguration.CacheDurationInSeconds ?? 10),
                     Priority = CacheItemPriority.Normal
                 };
-                _logger.Debug($"Cached {request.Method} http response to {request.RequestUri}.");
+                Logger.Debug($"Cached {request.Method} http response to {request.RequestUri}.");
                 _cache.Set(key, content, cacheExpirationOptions);
 
                 return response;
