@@ -38,9 +38,8 @@ namespace Trakx.CoinGecko.ApiClient
 
         private static void AddCommonDependencies(IServiceCollection services)
         {
-            services.AddSingleton(s => new ClientConfigurator(s));
+            services.AddSingleton<ClientConfigurator>();
             services.AddSingleton<IDateTimeProvider, DateTimeProvider>();
-            services.AddSingleton<IClientFactory, ClientFactory>();
         }
 
         private static void LogFailure(ILogger logger, DelegateResult<HttpResponseMessage> result, TimeSpan timeSpan, int retryCount, Context context)

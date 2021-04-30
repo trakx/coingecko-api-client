@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
@@ -12,7 +13,9 @@ namespace Trakx.CoinGecko.ApiClient
 {
     public class CoinGeckoClient : ICoinGeckoClient
     {
-        private readonly ILogger _logger;
+        private static readonly ILogger Logger =
+            Log.Logger.ForContext(MethodBase.GetCurrentMethod()!.DeclaringType);
+
         private readonly ICoinsClient _coinsClient;
         private readonly ISimpleClient _simpleClient;
         private Dictionary<string, string>? _symbolsByNames;
@@ -30,12 +33,11 @@ namespace Trakx.CoinGecko.ApiClient
 
         public Dictionary<string, CoinFullData> CoinFullDataByIds { get; }
 
-        public CoinGeckoClient(ICoinsClient coinsClient, ISimpleClient simpleClient, ILogger logger)
+        public CoinGeckoClient(ICoinsClient coinsClient, ISimpleClient simpleClient)
         {
             _coinsClient = coinsClient;
             _simpleClient = simpleClient;
-            _logger = logger;
-            
+
             CoinFullDataByIds = new Dictionary<string, CoinFullData>();
         }
 
@@ -48,7 +50,7 @@ namespace Trakx.CoinGecko.ApiClient
                 .PriceAsync($"{coinGeckoId},{quoteCurrencyId}", "usd")
                 .ConfigureAwait(false);
 
-            _logger.Debug(JsonSerializer.Serialize(tickerDetails));
+            Logger.Debug(JsonSerializer.Serialize(tickerDetails));
 
             var price = tickerDetails.Result[coinGeckoId]["usd"];
             var conversionToQuoteCurrency = quoteCurrencyId == "usd"
@@ -83,7 +85,7 @@ namespace Trakx.CoinGecko.ApiClient
             }
             catch (Exception e)
             {
-                _logger.Debug(e, "Failed to retrieve price for {0} as of {1:yyyyMMdd}", id, asOf);
+                Logger.Debug(e, "Failed to retrieve price for {0} as of {1:yyyyMMdd}", id, asOf);
                 return null;
             }
         }
@@ -99,7 +101,7 @@ namespace Trakx.CoinGecko.ApiClient
 
             if (fxRate != null) return (decimal) fxRate;
 
-            _logger.Debug($"Current price for '{Constants.Usd}' in coin id '{quoteCurrencyId} for date '{date:dd-MM-yyyy}' is missing.");
+            Logger.Debug($"Current price for '{Constants.Usd}' in coin id '{quoteCurrencyId} for date '{date:dd-MM-yyyy}' is missing.");
             throw new FailedToRetrievePriceException($"Failed to retrieve price of {quoteCurrencyId} as of {date}");
 
         }
@@ -168,7 +170,7 @@ namespace Trakx.CoinGecko.ApiClient
             }
             catch (Exception exception)
             {
-                _logger.Warning(exception, "Failed to retrieve coin data for {0}", coinId);
+                Logger.Warning(exception, "Failed to retrieve coin data for {0}", coinId);
                 return default;
             }
         }

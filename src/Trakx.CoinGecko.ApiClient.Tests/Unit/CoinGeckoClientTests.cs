@@ -5,7 +5,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
 using NSubstitute;
-using Serilog;
 using Trakx.Utils.Testing;
 using Xunit;
 using Xunit.Abstractions;
@@ -24,10 +23,9 @@ namespace Trakx.CoinGecko.ApiClient.Tests.Unit
         {
             _simpleClient = Substitute.For<ISimpleClient>();
             _coinsClient = Substitute.For<ICoinsClient>();
-            ILogger logger = Substitute.For<ILogger>();
             _mockCreator = new MockCreator(output);
 
-            _coinGeckoClient = new CoinGeckoClient(_coinsClient, _simpleClient, logger);
+            _coinGeckoClient = new CoinGeckoClient(_coinsClient, _simpleClient);
         }
 
         [Fact]
