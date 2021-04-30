@@ -68,7 +68,7 @@ namespace Trakx.CoinGecko.ApiClient.Tests.Integration
         public async Task GetAllPrices_should_return_a_valid_list_of_prices_when_passing_valid_ids_and_currencies()
         {
             var result = await _coinsClient.GetAllPrices(
-                new[] { _coinGeckoId, Constants.Bitcoin }, 
+                new[] { _coinGeckoId, Constants.Bitcoin },
                 new[] { Constants.Usd });
             result.Keys.Should().Contain(_coinGeckoId);
             result.Keys.Should().Contain(Constants.Bitcoin);

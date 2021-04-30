@@ -103,7 +103,6 @@ namespace Trakx.CoinGecko.ApiClient.Tests.Integration
             };
 
             var serviceCollection = new ServiceCollection();
-            serviceCollection.AddSingleton(configuration);
             serviceCollection.AddCoinGeckoClient(configuration);
             
             Log.Logger = new LoggerConfiguration()

@@ -2,7 +2,6 @@
 using System.Net.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
 using Polly;
 using Serilog;
 using Trakx.Utils.DateTimeHelpers;
@@ -15,9 +14,10 @@ namespace Trakx.CoinGecko.ApiClient
             this IServiceCollection services, IConfiguration configuration)
         {
             services.AddOptions();
-            services.Configure<CoinGeckoApiConfiguration>(
-                configuration.GetSection(nameof(CoinGeckoApiConfiguration)));
-            AddCommonDependencies(services);
+            services.Configure<CoinGeckoApiConfiguration>(configuration.GetSection(nameof(CoinGeckoApiConfiguration)));
+            var typedConfig = configuration.GetSection(nameof(CoinGeckoApiConfiguration))
+                .Get<CoinGeckoApiConfiguration>();
+            AddCoinGeckoClient(services, typedConfig);
 
             return services;
         }
@@ -25,9 +25,7 @@ namespace Trakx.CoinGecko.ApiClient
         public static IServiceCollection AddCoinGeckoClient(
             this IServiceCollection services, CoinGeckoApiConfiguration apiConfiguration)
         {
-            var options = Options.Create(apiConfiguration);
-            services.AddSingleton(options);
-
+            services.AddSingleton(apiConfiguration);
             services.AddSingleton<ICoinGeckoClient, CoinGeckoClient>();
             services.AddMemoryCache();
             services.AddClients(apiConfiguration);
@@ -40,9 +38,8 @@ namespace Trakx.CoinGecko.ApiClient
 
         private static void AddCommonDependencies(IServiceCollection services)
         {
-            services.AddSingleton(s => new ClientConfigurator(s));
+            services.AddSingleton<ClientConfigurator>();
             services.AddSingleton<IDateTimeProvider, DateTimeProvider>();
-            services.AddSingleton<IClientFactory, ClientFactory>();
         }
 
         private static void LogFailure(ILogger logger, DelegateResult<HttpResponseMessage> result, TimeSpan timeSpan, int retryCount, Context context)
