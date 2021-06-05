@@ -1,17 +1,18 @@
 ﻿namespace Trakx.CoinGecko.ApiClient
 {
-    public class CoinGeckoApiConfiguration
+    public record CoinGeckoApiConfiguration
     {
-        
-        public string BaseUrl { get; set; }
+#pragma warning disable CS8618
+        public string BaseUrl { get; init; }
+#pragma warning restore CS8618
 
-        public int? MaxRetryCount { get; set; }
+        public int? MaxRetryCount { get; init; }
 
-        public int? InitialRetryDelayInMilliseconds { get; set; }
+        public int? InitialRetryDelayInMilliseconds { get; init; }
 
-        public  int? ThrottleDelayPerSecond { get; set; }
+        public  int? ThrottleDelayPerSecond { get; init; }
 
-        public int? CacheDurationInSeconds { get; set; }
+        public int? CacheDurationInSeconds { get; init; }
 
     }
 }
