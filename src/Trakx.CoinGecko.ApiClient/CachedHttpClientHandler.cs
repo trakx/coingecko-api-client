@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using System.Net;
 using System.Net.Http;
 using System.Reflection;
@@ -18,7 +17,6 @@ namespace Trakx.CoinGecko.ApiClient
 
         private readonly IMemoryCache _cache;
         private readonly CoinGeckoApiConfiguration _apiConfiguration;
-        private static readonly ConcurrentDictionary<string, object> Requests = new ConcurrentDictionary<string, object>();
         private readonly SemaphoreSlim _semaphore;
         private readonly int _millisecondsDelay;
 
@@ -52,7 +50,7 @@ namespace Trakx.CoinGecko.ApiClient
             await _semaphore.WaitAsync(cancellationToken).ConfigureAwait(false);
             try
             {
-                return TryGetOrSetRequestFromCache(request, cancellationToken);
+                return await TryGetOrSetRequestFromCache(request, cancellationToken).ConfigureAwait(false);
             }
             finally
             {
@@ -68,50 +66,41 @@ namespace Trakx.CoinGecko.ApiClient
         /// <param name="request">Http request that should be performed</param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        private HttpResponseMessage TryGetOrSetRequestFromCache(HttpRequestMessage request, 
+        private async Task<HttpResponseMessage> TryGetOrSetRequestFromCache(HttpRequestMessage request, 
             CancellationToken cancellationToken)
         {
             // Data cache is only applicable for GET operations
             if (request.Method != HttpMethod.Get)
             {
-                return base.SendAsync(request, cancellationToken)
-                    .ConfigureAwait(false).GetAwaiter().GetResult();
-
+                return await base.SendAsync(request, cancellationToken)
+                    .ConfigureAwait(false);
             }
 
-            string content;
-            var key = $"[{request.Method}]{request.RequestUri}";
-            if (!Requests.ContainsKey(key))
-            {
-                Requests[key] = new object();
-            }
+            var key = $"[{request.Method}]{request.RequestUri}|{request.Content?.ReadAsStringAsync(cancellationToken).GetAwaiter().GetResult()}";
 
-            lock (Requests[key])
+            var cachedResponse = await _cache.GetOrCreateAsync(key, async e =>
             {
-                if (_cache.TryGetValue(key, out content))
+                try
                 {
-                    Logger.Debug($"Loaded {request.Method} http response to {request.RequestUri} from CACHE.");
-                    return new HttpResponseMessage(HttpStatusCode.OK)
-                    {
-                        Content = new StringContent(content)
-                    };
+                    var response = await base.SendAsync(request, cancellationToken)
+                        .ConfigureAwait(false);
+                    
+                    e.Value = response;
+                    e.AbsoluteExpirationRelativeToNow = response.IsSuccessStatusCode 
+                        ? TimeSpan.FromSeconds(_apiConfiguration.CacheDurationInSeconds ?? 10)
+                        : TimeSpan.FromTicks(1);
+
+                    return response;
                 }
-
-                var response = base.SendAsync(request, cancellationToken)
-                    .ConfigureAwait(false).GetAwaiter().GetResult();
-                content = response.Content.ReadAsStringAsync(cancellationToken)
-                    .ConfigureAwait(false).GetAwaiter().GetResult();
-                var cacheExpirationOptions = new MemoryCacheEntryOptions
+                catch (Exception exception)
                 {
-                    // Set to use 'AbsoluteExpiration' as 'SlidingExpiration' was not working as expected (i.e. set to 30 seconds and it never got expired)
-                    AbsoluteExpiration = DateTime.UtcNow.AddSeconds(_apiConfiguration.CacheDurationInSeconds ?? 10),
-                    Priority = CacheItemPriority.Normal
-                };
-                Logger.Debug($"Cached {request.Method} http response to {request.RequestUri}.");
-                _cache.Set(key, content, cacheExpirationOptions);
+                    e.AbsoluteExpirationRelativeToNow = TimeSpan.FromTicks(1);
+                    Logger.Warning(exception, "Failed to get response from {uri}", request.RequestUri?.ToString() ?? "unknown URI");
+                    return new HttpResponseMessage(HttpStatusCode.InternalServerError);
+                }
+            }).ConfigureAwait(false);
 
-                return response;
-            }
+            return cachedResponse;
         }
 
         /// <inheritdoc />

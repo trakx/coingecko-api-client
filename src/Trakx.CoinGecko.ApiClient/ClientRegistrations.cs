@@ -22,9 +22,8 @@ namespace Trakx.CoinGecko.ApiClient
                     Policy<HttpResponseMessage>
                     .Handle<HttpRequestException>()
                     .OrResult(msg => msg.StatusCode == System.Net.HttpStatusCode.TooManyRequests)
-                    .OrResult(msg => msg.StatusCode == System.Net.HttpStatusCode.Unauthorized)
-                    .OrResult(msg => msg.StatusCode == System.Net.HttpStatusCode.Forbidden)
-                    .Or<HttpRequestException>()
+                    .OrResult(msg => msg.StatusCode == System.Net.HttpStatusCode.RequestTimeout)
+                    .OrResult(msg => msg.StatusCode == System.Net.HttpStatusCode.ServiceUnavailable)s
                     .OrTransientHttpStatusCode()
                     .WaitAndRetryAsync(delay,
                         onRetry: (result, timeSpan, retryCount, context) =>
@@ -41,9 +40,8 @@ namespace Trakx.CoinGecko.ApiClient
                     Policy<HttpResponseMessage>
                     .Handle<HttpRequestException>()
                     .OrResult(msg => msg.StatusCode == System.Net.HttpStatusCode.TooManyRequests)
-                    .OrResult(msg => msg.StatusCode == System.Net.HttpStatusCode.Unauthorized)
-                    .OrResult(msg => msg.StatusCode == System.Net.HttpStatusCode.Forbidden)
-                    .Or<HttpRequestException>()
+                    .OrResult(msg => msg.StatusCode == System.Net.HttpStatusCode.RequestTimeout)
+                    .OrResult(msg => msg.StatusCode == System.Net.HttpStatusCode.ServiceUnavailable)s
                     .OrTransientHttpStatusCode()
                     .WaitAndRetryAsync(delay,
                         onRetry: (result, timeSpan, retryCount, context) =>
@@ -60,9 +58,8 @@ namespace Trakx.CoinGecko.ApiClient
                     Policy<HttpResponseMessage>
                     .Handle<HttpRequestException>()
                     .OrResult(msg => msg.StatusCode == System.Net.HttpStatusCode.TooManyRequests)
-                    .OrResult(msg => msg.StatusCode == System.Net.HttpStatusCode.Unauthorized)
-                    .OrResult(msg => msg.StatusCode == System.Net.HttpStatusCode.Forbidden)
-                    .Or<HttpRequestException>()
+                    .OrResult(msg => msg.StatusCode == System.Net.HttpStatusCode.RequestTimeout)
+                    .OrResult(msg => msg.StatusCode == System.Net.HttpStatusCode.ServiceUnavailable)s
                     .OrTransientHttpStatusCode()
                     .WaitAndRetryAsync(delay,
                         onRetry: (result, timeSpan, retryCount, context) =>
@@ -79,9 +76,8 @@ namespace Trakx.CoinGecko.ApiClient
                     Policy<HttpResponseMessage>
                     .Handle<HttpRequestException>()
                     .OrResult(msg => msg.StatusCode == System.Net.HttpStatusCode.TooManyRequests)
-                    .OrResult(msg => msg.StatusCode == System.Net.HttpStatusCode.Unauthorized)
-                    .OrResult(msg => msg.StatusCode == System.Net.HttpStatusCode.Forbidden)
-                    .Or<HttpRequestException>()
+                    .OrResult(msg => msg.StatusCode == System.Net.HttpStatusCode.RequestTimeout)
+                    .OrResult(msg => msg.StatusCode == System.Net.HttpStatusCode.ServiceUnavailable)s
                     .OrTransientHttpStatusCode()
                     .WaitAndRetryAsync(delay,
                         onRetry: (result, timeSpan, retryCount, context) =>
@@ -98,9 +94,8 @@ namespace Trakx.CoinGecko.ApiClient
                     Policy<HttpResponseMessage>
                     .Handle<HttpRequestException>()
                     .OrResult(msg => msg.StatusCode == System.Net.HttpStatusCode.TooManyRequests)
-                    .OrResult(msg => msg.StatusCode == System.Net.HttpStatusCode.Unauthorized)
-                    .OrResult(msg => msg.StatusCode == System.Net.HttpStatusCode.Forbidden)
-                    .Or<HttpRequestException>()
+                    .OrResult(msg => msg.StatusCode == System.Net.HttpStatusCode.RequestTimeout)
+                    .OrResult(msg => msg.StatusCode == System.Net.HttpStatusCode.ServiceUnavailable)s
                     .OrTransientHttpStatusCode()
                     .WaitAndRetryAsync(delay,
                         onRetry: (result, timeSpan, retryCount, context) =>
@@ -117,9 +112,8 @@ namespace Trakx.CoinGecko.ApiClient
                     Policy<HttpResponseMessage>
                     .Handle<HttpRequestException>()
                     .OrResult(msg => msg.StatusCode == System.Net.HttpStatusCode.TooManyRequests)
-                    .OrResult(msg => msg.StatusCode == System.Net.HttpStatusCode.Unauthorized)
-                    .OrResult(msg => msg.StatusCode == System.Net.HttpStatusCode.Forbidden)
-                    .Or<HttpRequestException>()
+                    .OrResult(msg => msg.StatusCode == System.Net.HttpStatusCode.RequestTimeout)
+                    .OrResult(msg => msg.StatusCode == System.Net.HttpStatusCode.ServiceUnavailable)s
                     .OrTransientHttpStatusCode()
                     .WaitAndRetryAsync(delay,
                         onRetry: (result, timeSpan, retryCount, context) =>
@@ -136,9 +130,8 @@ namespace Trakx.CoinGecko.ApiClient
                     Policy<HttpResponseMessage>
                     .Handle<HttpRequestException>()
                     .OrResult(msg => msg.StatusCode == System.Net.HttpStatusCode.TooManyRequests)
-                    .OrResult(msg => msg.StatusCode == System.Net.HttpStatusCode.Unauthorized)
-                    .OrResult(msg => msg.StatusCode == System.Net.HttpStatusCode.Forbidden)
-                    .Or<HttpRequestException>()
+                    .OrResult(msg => msg.StatusCode == System.Net.HttpStatusCode.RequestTimeout)
+                    .OrResult(msg => msg.StatusCode == System.Net.HttpStatusCode.ServiceUnavailable)s
                     .OrTransientHttpStatusCode()
                     .WaitAndRetryAsync(delay,
                         onRetry: (result, timeSpan, retryCount, context) =>
@@ -155,9 +148,8 @@ namespace Trakx.CoinGecko.ApiClient
                     Policy<HttpResponseMessage>
                     .Handle<HttpRequestException>()
                     .OrResult(msg => msg.StatusCode == System.Net.HttpStatusCode.TooManyRequests)
-                    .OrResult(msg => msg.StatusCode == System.Net.HttpStatusCode.Unauthorized)
-                    .OrResult(msg => msg.StatusCode == System.Net.HttpStatusCode.Forbidden)
-                    .Or<HttpRequestException>()
+                    .OrResult(msg => msg.StatusCode == System.Net.HttpStatusCode.RequestTimeout)
+                    .OrResult(msg => msg.StatusCode == System.Net.HttpStatusCode.ServiceUnavailable)s
                     .OrTransientHttpStatusCode()
                     .WaitAndRetryAsync(delay,
                         onRetry: (result, timeSpan, retryCount, context) =>
@@ -174,9 +166,8 @@ namespace Trakx.CoinGecko.ApiClient
                     Policy<HttpResponseMessage>
                     .Handle<HttpRequestException>()
                     .OrResult(msg => msg.StatusCode == System.Net.HttpStatusCode.TooManyRequests)
-                    .OrResult(msg => msg.StatusCode == System.Net.HttpStatusCode.Unauthorized)
-                    .OrResult(msg => msg.StatusCode == System.Net.HttpStatusCode.Forbidden)
-                    .Or<HttpRequestException>()
+                    .OrResult(msg => msg.StatusCode == System.Net.HttpStatusCode.RequestTimeout)
+                    .OrResult(msg => msg.StatusCode == System.Net.HttpStatusCode.ServiceUnavailable)s
                     .OrTransientHttpStatusCode()
                     .WaitAndRetryAsync(delay,
                         onRetry: (result, timeSpan, retryCount, context) =>
@@ -193,9 +184,8 @@ namespace Trakx.CoinGecko.ApiClient
                     Policy<HttpResponseMessage>
                     .Handle<HttpRequestException>()
                     .OrResult(msg => msg.StatusCode == System.Net.HttpStatusCode.TooManyRequests)
-                    .OrResult(msg => msg.StatusCode == System.Net.HttpStatusCode.Unauthorized)
-                    .OrResult(msg => msg.StatusCode == System.Net.HttpStatusCode.Forbidden)
-                    .Or<HttpRequestException>()
+                    .OrResult(msg => msg.StatusCode == System.Net.HttpStatusCode.RequestTimeout)
+                    .OrResult(msg => msg.StatusCode == System.Net.HttpStatusCode.ServiceUnavailable)s
                     .OrTransientHttpStatusCode()
                     .WaitAndRetryAsync(delay,
                         onRetry: (result, timeSpan, retryCount, context) =>
@@ -212,9 +202,8 @@ namespace Trakx.CoinGecko.ApiClient
                     Policy<HttpResponseMessage>
                     .Handle<HttpRequestException>()
                     .OrResult(msg => msg.StatusCode == System.Net.HttpStatusCode.TooManyRequests)
-                    .OrResult(msg => msg.StatusCode == System.Net.HttpStatusCode.Unauthorized)
-                    .OrResult(msg => msg.StatusCode == System.Net.HttpStatusCode.Forbidden)
-                    .Or<HttpRequestException>()
+                    .OrResult(msg => msg.StatusCode == System.Net.HttpStatusCode.RequestTimeout)
+                    .OrResult(msg => msg.StatusCode == System.Net.HttpStatusCode.ServiceUnavailable)s
                     .OrTransientHttpStatusCode()
                     .WaitAndRetryAsync(delay,
                         onRetry: (result, timeSpan, retryCount, context) =>
@@ -231,9 +220,8 @@ namespace Trakx.CoinGecko.ApiClient
                     Policy<HttpResponseMessage>
                     .Handle<HttpRequestException>()
                     .OrResult(msg => msg.StatusCode == System.Net.HttpStatusCode.TooManyRequests)
-                    .OrResult(msg => msg.StatusCode == System.Net.HttpStatusCode.Unauthorized)
-                    .OrResult(msg => msg.StatusCode == System.Net.HttpStatusCode.Forbidden)
-                    .Or<HttpRequestException>()
+                    .OrResult(msg => msg.StatusCode == System.Net.HttpStatusCode.RequestTimeout)
+                    .OrResult(msg => msg.StatusCode == System.Net.HttpStatusCode.ServiceUnavailable)s
                     .OrTransientHttpStatusCode()
                     .WaitAndRetryAsync(delay,
                         onRetry: (result, timeSpan, retryCount, context) =>
@@ -250,9 +238,8 @@ namespace Trakx.CoinGecko.ApiClient
                     Policy<HttpResponseMessage>
                     .Handle<HttpRequestException>()
                     .OrResult(msg => msg.StatusCode == System.Net.HttpStatusCode.TooManyRequests)
-                    .OrResult(msg => msg.StatusCode == System.Net.HttpStatusCode.Unauthorized)
-                    .OrResult(msg => msg.StatusCode == System.Net.HttpStatusCode.Forbidden)
-                    .Or<HttpRequestException>()
+                    .OrResult(msg => msg.StatusCode == System.Net.HttpStatusCode.RequestTimeout)
+                    .OrResult(msg => msg.StatusCode == System.Net.HttpStatusCode.ServiceUnavailable)s
                     .OrTransientHttpStatusCode()
                     .WaitAndRetryAsync(delay,
                         onRetry: (result, timeSpan, retryCount, context) =>

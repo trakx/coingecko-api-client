@@ -94,7 +94,8 @@ namespace Trakx.CoinGecko.ApiClient
         {
             Guard.Against.NullOrWhiteSpace(quoteCurrencyId, nameof(quoteCurrencyId));
 
-            var quoteResponse = await _coinsClient.HistoryAsync(quoteCurrencyId, date, false.ToString()).ConfigureAwait(false);
+            var quoteResponse = await _coinsClient.HistoryAsync(quoteCurrencyId, date, false.ToString())
+                .ConfigureAwait(false);
 
             var fxRate = quoteResponse.Result.Market_data.Current_price.ContainsKey(Constants.Usd) ?
                 quoteResponse.Result.Market_data.Current_price[Constants.Usd] : default;
@@ -183,8 +184,8 @@ namespace Trakx.CoinGecko.ApiClient
 
         public async Task<IDictionary<string, IDictionary<string, decimal?>>> GetAllPrices(string[] ids, string[]? vsCurrencies = null)
         {
-            var coinsPrice = await _simpleClient.PriceAsync(string.Join(",", ids),
-                string.Join(",", vsCurrencies ?? new[] { Constants.Usd })).ConfigureAwait(false);
+            var coinsPrice = await _simpleClient.PriceAsync(ids.ToCsvList(true, true, quoted:false),
+                (vsCurrencies ?? new[] { Constants.Usd }).ToCsvList(true, true, quoted:false)).ConfigureAwait(false);
             return coinsPrice.Result;
         }
 
