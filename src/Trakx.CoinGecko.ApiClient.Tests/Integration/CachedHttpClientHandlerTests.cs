@@ -11,12 +11,12 @@ using Xunit.Abstractions;
 
 namespace Trakx.CoinGecko.ApiClient.Tests.Integration
 {
-    public class ThrottledClientTests
+    public class CachedHttpClientHandlerTests
     {
         private readonly ICoinGeckoClient _client;
         private readonly int _throttleDelay;
 
-        public ThrottledClientTests(ITestOutputHelper output)
+        public CachedHttpClientHandlerTests(ITestOutputHelper output)
         {
             var serviceCollection = new ServiceCollection();
             _throttleDelay = 100;
