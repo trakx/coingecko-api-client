@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Net.Http;
+using System.Threading;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Polly;
@@ -27,6 +28,7 @@ namespace Trakx.CoinGecko.ApiClient
         {
             services.AddSingleton(apiConfiguration);
             services.AddSingleton<ICoinGeckoClient, CoinGeckoClient>();
+            services.AddSingleton<ISemaphore>(new Semaphore(new SemaphoreSlim(1, 1)));
             services.AddMemoryCache();
             services.AddClients(apiConfiguration);
             services.AddTransient<CachedHttpClientHandler>();

@@ -36,6 +36,7 @@ namespace <#= nameSpace #>
             #>
                         
             services.AddHttpClient<I<#= name #>, <#= name #>>("<#= nameSpace #>.<#= name #>")
+                .AddHttpMessageHandler<CachedHttpClientHandler>()
                 .AddPolicyHandler((s, request) => 
                     Policy<HttpResponseMessage>
                     .Handle<HttpRequestException>()
@@ -49,8 +50,7 @@ namespace <#= nameSpace #>
                             var logger = Log.Logger.ForContext<<#= name #>>();
                             LogFailure(logger, result, timeSpan, retryCount, context);
                         })
-                    .WithPolicyKey("<#= nameSpace #>.<#= name #>"))
-                .AddHttpMessageHandler<CachedHttpClientHandler>();
+                    .WithPolicyKey("<#= nameSpace #>.<#= name #>"));
 
         <#
         }

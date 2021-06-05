@@ -4,8 +4,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
-using NSubstitute;
-using Serilog;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -27,7 +25,6 @@ namespace Trakx.CoinGecko.ApiClient.Tests.Integration
             };
             serviceCollection.AddCoinGeckoClient(config);
             serviceCollection.AddMemoryCache();
-            serviceCollection.AddSingleton(Substitute.For<ILogger>());
             serviceCollection.AddSingleton(config);
             var serviceProvider = serviceCollection.BuildServiceProvider();
 

@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace Trakx.CoinGecko.ApiClient.Tests.Integration
 {
@@ -14,8 +15,8 @@ namespace Trakx.CoinGecko.ApiClient.Tests.Integration
 
         private readonly ICoinsClient _coinsClient;
 
-        public CoinsClientTests(CoinGeckoApiFixture apiFixture) 
-            : base(apiFixture)
+        public CoinsClientTests(CoinGeckoApiFixture apiFixture, ITestOutputHelper output) 
+            : base(apiFixture, output)
         {
             _coinsClient = ServiceProvider.GetRequiredService<ICoinsClient>();
         }

@@ -2,7 +2,9 @@ using System;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
+using Polly;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace Trakx.CoinGecko.ApiClient.Tests.Integration
 {
@@ -14,10 +16,11 @@ namespace Trakx.CoinGecko.ApiClient.Tests.Integration
         private readonly string _quoteCurrencyId;
         private readonly DateTime _asOf;
 
-        public CoinGeckoClientTests(CoinGeckoApiFixture apiFixture)
-            : base(apiFixture)
+        public CoinGeckoClientTests(CoinGeckoApiFixture apiFixture, ITestOutputHelper output)
+            : base(apiFixture, output)
         {
             _coinsClient = ServiceProvider.GetRequiredService<ICoinGeckoClient>();
+            
             _coinGeckoId = Constants.BitConnect;
             _quoteCurrencyId = Constants.UsdCoin;
             _asOf = DateTime.Today.AddDays(-5);
