@@ -23,7 +23,7 @@
     <PackageReference Include="NSwag.ApiDescription.Client" Version="13.11.3" />
     <PackageReference Include="Polly.Caching.Memory" Version="3.0.2" />
     <PackageReference Include="Polly.Contrib.WaitAndRetry" Version="1.1.1" />
-    <PackageReference Include="NSwag.MSBuild" Version="13.11.3" >
+    <PackageReference Include="NSwag.MSBuild" Version="13.11.3">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>

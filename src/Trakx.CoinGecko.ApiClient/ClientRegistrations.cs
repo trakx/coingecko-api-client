@@ -23,7 +23,7 @@ namespace Trakx.CoinGecko.ApiClient
                     .Handle<HttpRequestException>()
                     .OrResult(msg => msg.StatusCode == System.Net.HttpStatusCode.TooManyRequests)
                     .OrResult(msg => msg.StatusCode == System.Net.HttpStatusCode.RequestTimeout)
-                    .OrResult(msg => msg.StatusCode == System.Net.HttpStatusCode.ServiceUnavailable)s
+                    .OrResult(msg => msg.StatusCode == System.Net.HttpStatusCode.ServiceUnavailable)
                     .OrTransientHttpStatusCode()
                     .WaitAndRetryAsync(delay,
                         onRetry: (result, timeSpan, retryCount, context) =>
@@ -41,7 +41,7 @@ namespace Trakx.CoinGecko.ApiClient
                     .Handle<HttpRequestException>()
                     .OrResult(msg => msg.StatusCode == System.Net.HttpStatusCode.TooManyRequests)
                     .OrResult(msg => msg.StatusCode == System.Net.HttpStatusCode.RequestTimeout)
-                    .OrResult(msg => msg.StatusCode == System.Net.HttpStatusCode.ServiceUnavailable)s
+                    .OrResult(msg => msg.StatusCode == System.Net.HttpStatusCode.ServiceUnavailable)
                     .OrTransientHttpStatusCode()
                     .WaitAndRetryAsync(delay,
                         onRetry: (result, timeSpan, retryCount, context) =>
@@ -59,7 +59,7 @@ namespace Trakx.CoinGecko.ApiClient
                     .Handle<HttpRequestException>()
                     .OrResult(msg => msg.StatusCode == System.Net.HttpStatusCode.TooManyRequests)
                     .OrResult(msg => msg.StatusCode == System.Net.HttpStatusCode.RequestTimeout)
-                    .OrResult(msg => msg.StatusCode == System.Net.HttpStatusCode.ServiceUnavailable)s
+                    .OrResult(msg => msg.StatusCode == System.Net.HttpStatusCode.ServiceUnavailable)
                     .OrTransientHttpStatusCode()
                     .WaitAndRetryAsync(delay,
                         onRetry: (result, timeSpan, retryCount, context) =>
@@ -77,7 +77,7 @@ namespace Trakx.CoinGecko.ApiClient
                     .Handle<HttpRequestException>()
                     .OrResult(msg => msg.StatusCode == System.Net.HttpStatusCode.TooManyRequests)
                     .OrResult(msg => msg.StatusCode == System.Net.HttpStatusCode.RequestTimeout)
-                    .OrResult(msg => msg.StatusCode == System.Net.HttpStatusCode.ServiceUnavailable)s
+                    .OrResult(msg => msg.StatusCode == System.Net.HttpStatusCode.ServiceUnavailable)
                     .OrTransientHttpStatusCode()
                     .WaitAndRetryAsync(delay,
                         onRetry: (result, timeSpan, retryCount, context) =>
@@ -95,7 +95,7 @@ namespace Trakx.CoinGecko.ApiClient
                     .Handle<HttpRequestException>()
                     .OrResult(msg => msg.StatusCode == System.Net.HttpStatusCode.TooManyRequests)
                     .OrResult(msg => msg.StatusCode == System.Net.HttpStatusCode.RequestTimeout)
-                    .OrResult(msg => msg.StatusCode == System.Net.HttpStatusCode.ServiceUnavailable)s
+                    .OrResult(msg => msg.StatusCode == System.Net.HttpStatusCode.ServiceUnavailable)
                     .OrTransientHttpStatusCode()
                     .WaitAndRetryAsync(delay,
                         onRetry: (result, timeSpan, retryCount, context) =>
@@ -113,7 +113,7 @@ namespace Trakx.CoinGecko.ApiClient
                     .Handle<HttpRequestException>()
                     .OrResult(msg => msg.StatusCode == System.Net.HttpStatusCode.TooManyRequests)
                     .OrResult(msg => msg.StatusCode == System.Net.HttpStatusCode.RequestTimeout)
-                    .OrResult(msg => msg.StatusCode == System.Net.HttpStatusCode.ServiceUnavailable)s
+                    .OrResult(msg => msg.StatusCode == System.Net.HttpStatusCode.ServiceUnavailable)
                     .OrTransientHttpStatusCode()
                     .WaitAndRetryAsync(delay,
                         onRetry: (result, timeSpan, retryCount, context) =>
@@ -131,7 +131,7 @@ namespace Trakx.CoinGecko.ApiClient
                     .Handle<HttpRequestException>()
                     .OrResult(msg => msg.StatusCode == System.Net.HttpStatusCode.TooManyRequests)
                     .OrResult(msg => msg.StatusCode == System.Net.HttpStatusCode.RequestTimeout)
-                    .OrResult(msg => msg.StatusCode == System.Net.HttpStatusCode.ServiceUnavailable)s
+                    .OrResult(msg => msg.StatusCode == System.Net.HttpStatusCode.ServiceUnavailable)
                     .OrTransientHttpStatusCode()
                     .WaitAndRetryAsync(delay,
                         onRetry: (result, timeSpan, retryCount, context) =>
@@ -149,7 +149,7 @@ namespace Trakx.CoinGecko.ApiClient
                     .Handle<HttpRequestException>()
                     .OrResult(msg => msg.StatusCode == System.Net.HttpStatusCode.TooManyRequests)
                     .OrResult(msg => msg.StatusCode == System.Net.HttpStatusCode.RequestTimeout)
-                    .OrResult(msg => msg.StatusCode == System.Net.HttpStatusCode.ServiceUnavailable)s
+                    .OrResult(msg => msg.StatusCode == System.Net.HttpStatusCode.ServiceUnavailable)
                     .OrTransientHttpStatusCode()
                     .WaitAndRetryAsync(delay,
                         onRetry: (result, timeSpan, retryCount, context) =>
@@ -167,7 +167,7 @@ namespace Trakx.CoinGecko.ApiClient
                     .Handle<HttpRequestException>()
                     .OrResult(msg => msg.StatusCode == System.Net.HttpStatusCode.TooManyRequests)
                     .OrResult(msg => msg.StatusCode == System.Net.HttpStatusCode.RequestTimeout)
-                    .OrResult(msg => msg.StatusCode == System.Net.HttpStatusCode.ServiceUnavailable)s
+                    .OrResult(msg => msg.StatusCode == System.Net.HttpStatusCode.ServiceUnavailable)
                     .OrTransientHttpStatusCode()
                     .WaitAndRetryAsync(delay,
                         onRetry: (result, timeSpan, retryCount, context) =>
@@ -185,7 +185,7 @@ namespace Trakx.CoinGecko.ApiClient
                     .Handle<HttpRequestException>()
                     .OrResult(msg => msg.StatusCode == System.Net.HttpStatusCode.TooManyRequests)
                     .OrResult(msg => msg.StatusCode == System.Net.HttpStatusCode.RequestTimeout)
-                    .OrResult(msg => msg.StatusCode == System.Net.HttpStatusCode.ServiceUnavailable)s
+                    .OrResult(msg => msg.StatusCode == System.Net.HttpStatusCode.ServiceUnavailable)
                     .OrTransientHttpStatusCode()
                     .WaitAndRetryAsync(delay,
                         onRetry: (result, timeSpan, retryCount, context) =>
@@ -203,7 +203,7 @@ namespace Trakx.CoinGecko.ApiClient
                     .Handle<HttpRequestException>()
                     .OrResult(msg => msg.StatusCode == System.Net.HttpStatusCode.TooManyRequests)
                     .OrResult(msg => msg.StatusCode == System.Net.HttpStatusCode.RequestTimeout)
-                    .OrResult(msg => msg.StatusCode == System.Net.HttpStatusCode.ServiceUnavailable)s
+                    .OrResult(msg => msg.StatusCode == System.Net.HttpStatusCode.ServiceUnavailable)
                     .OrTransientHttpStatusCode()
                     .WaitAndRetryAsync(delay,
                         onRetry: (result, timeSpan, retryCount, context) =>
@@ -221,7 +221,7 @@ namespace Trakx.CoinGecko.ApiClient
                     .Handle<HttpRequestException>()
                     .OrResult(msg => msg.StatusCode == System.Net.HttpStatusCode.TooManyRequests)
                     .OrResult(msg => msg.StatusCode == System.Net.HttpStatusCode.RequestTimeout)
-                    .OrResult(msg => msg.StatusCode == System.Net.HttpStatusCode.ServiceUnavailable)s
+                    .OrResult(msg => msg.StatusCode == System.Net.HttpStatusCode.ServiceUnavailable)
                     .OrTransientHttpStatusCode()
                     .WaitAndRetryAsync(delay,
                         onRetry: (result, timeSpan, retryCount, context) =>
@@ -239,7 +239,7 @@ namespace Trakx.CoinGecko.ApiClient
                     .Handle<HttpRequestException>()
                     .OrResult(msg => msg.StatusCode == System.Net.HttpStatusCode.TooManyRequests)
                     .OrResult(msg => msg.StatusCode == System.Net.HttpStatusCode.RequestTimeout)
-                    .OrResult(msg => msg.StatusCode == System.Net.HttpStatusCode.ServiceUnavailable)s
+                    .OrResult(msg => msg.StatusCode == System.Net.HttpStatusCode.ServiceUnavailable)
                     .OrTransientHttpStatusCode()
                     .WaitAndRetryAsync(delay,
                         onRetry: (result, timeSpan, retryCount, context) =>
