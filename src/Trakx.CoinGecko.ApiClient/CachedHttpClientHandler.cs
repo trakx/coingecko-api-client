@@ -84,13 +84,13 @@ namespace Trakx.CoinGecko.ApiClient
                 {
                     var response = await base.SendAsync(request, cancellationToken)
                         .ConfigureAwait(false);
-                    
-                    e.Value = response;
+                    var content = await response.Content.ReadAsStringAsync(cancellationToken);
+                    e.Value = content;
                     e.AbsoluteExpirationRelativeToNow = response.IsSuccessStatusCode 
                         ? TimeSpan.FromSeconds(_apiConfiguration.CacheDurationInSeconds ?? 10)
                         : TimeSpan.FromTicks(1);
 
-                    return response;
+                    return new HttpResponseMessage(response.StatusCode)  { Content = new StringContent(content), };
                 }
                 catch (Exception exception)
                 {
