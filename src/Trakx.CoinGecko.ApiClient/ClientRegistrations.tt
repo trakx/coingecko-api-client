@@ -36,12 +36,13 @@ namespace <#= nameSpace #>
             #>
                         
             services.AddHttpClient<I<#= name #>, <#= name #>>("<#= nameSpace #>.<#= name #>")
+                .AddHttpMessageHandler<CachedHttpClientHandler>()
                 .AddPolicyHandler((s, request) => 
                     Policy<HttpResponseMessage>
                     .Handle<HttpRequestException>()
                     .OrResult(msg => msg.StatusCode == System.Net.HttpStatusCode.TooManyRequests)
                     .OrResult(msg => msg.StatusCode == System.Net.HttpStatusCode.RequestTimeout)
-                    .OrResult(msg => msg.StatusCode == System.Net.HttpStatusCode.ServiceUnavailable)s
+                    .OrResult(msg => msg.StatusCode == System.Net.HttpStatusCode.ServiceUnavailable)
                     .OrTransientHttpStatusCode()
                     .WaitAndRetryAsync(delay,
                         onRetry: (result, timeSpan, retryCount, context) =>
@@ -49,8 +50,7 @@ namespace <#= nameSpace #>
                             var logger = Log.Logger.ForContext<<#= name #>>();
                             LogFailure(logger, result, timeSpan, retryCount, context);
                         })
-                    .WithPolicyKey("<#= nameSpace #>.<#= name #>"))
-                .AddHttpMessageHandler<CachedHttpClientHandler>();
+                    .WithPolicyKey("<#= nameSpace #>.<#= name #>"));
 
         <#
         }

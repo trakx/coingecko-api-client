@@ -1,15 +1,49 @@
 ﻿using System;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using Ardalis.GuardClauses;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Razor.TagHelpers;
 using Microsoft.Extensions.Caching.Memory;
 using Serilog;
 
 namespace Trakx.CoinGecko.ApiClient
 {
+    public interface ISemaphore : IDisposable
+    {
+        Task WaitAsync(CancellationToken cancellationToken);
+        int Release(int count);
+    }
+
+    public class Semaphore : ISemaphore
+    {
+        private readonly SemaphoreSlim _semaphoreImplementation;
+
+        public Semaphore(SemaphoreSlim semaphoreImplementation)
+        {
+            _semaphoreImplementation = semaphoreImplementation;
+        }
+
+        public void Dispose()
+        {
+            _semaphoreImplementation.Dispose();
+        }
+
+        public async Task WaitAsync(CancellationToken cancellationToken)
+        {
+            await _semaphoreImplementation.WaitAsync(cancellationToken);
+        }
+
+        public int Release(int count)
+        {
+            return _semaphoreImplementation.Release(count);
+        }
+    }
+
     public class CachedHttpClientHandler : DelegatingHandler
     {
         private static readonly ILogger Logger =
@@ -17,7 +51,7 @@ namespace Trakx.CoinGecko.ApiClient
 
         private readonly IMemoryCache _cache;
         private readonly CoinGeckoApiConfiguration _apiConfiguration;
-        private readonly SemaphoreSlim _semaphore;
+        private readonly ISemaphore _semaphore;
         private readonly int _millisecondsDelay;
 
         /// <summary>
@@ -25,12 +59,13 @@ namespace Trakx.CoinGecko.ApiClient
         /// and also periodically caching the results being retrieved to avoid unnecessary requests to coin gecko external api.
         /// </summary>
         public CachedHttpClientHandler(IMemoryCache cache,
+            ISemaphore semaphore,
             CoinGeckoApiConfiguration apiConfiguration)
         {
             _cache = cache;
             _apiConfiguration = apiConfiguration;
             _millisecondsDelay = apiConfiguration.InitialRetryDelayInMilliseconds ?? 100;
-            _semaphore = new SemaphoreSlim(1, 1);
+            _semaphore = semaphore;
         }
 
         /// <summary>
@@ -84,19 +119,26 @@ namespace Trakx.CoinGecko.ApiClient
                 {
                     var response = await base.SendAsync(request, cancellationToken)
                         .ConfigureAwait(false);
-                    
-                    e.Value = response;
+                    var content = await response.Content.ReadAsStringAsync(cancellationToken);
+                    e.Value = content;
                     e.AbsoluteExpirationRelativeToNow = response.IsSuccessStatusCode 
                         ? TimeSpan.FromSeconds(_apiConfiguration.CacheDurationInSeconds ?? 10)
                         : TimeSpan.FromTicks(1);
 
-                    return response;
+                    return new HttpResponseMessage(response.StatusCode)  { Content = new StringContent(content), };
                 }
-                catch (Exception exception)
+                catch (ApiException exception)
                 {
                     e.AbsoluteExpirationRelativeToNow = TimeSpan.FromTicks(1);
+                    if(exception.StatusCode == (int)HttpStatusCode.TooManyRequests
+                    && exception.Headers.TryGetValue("Retry-After", out var value))
+                    {
+                        var millisecondsDelay = int.Parse(value?.First() ?? "0");
+                        await Task.Delay(millisecondsDelay, cancellationToken);
+                    }
+
                     Logger.Warning(exception, "Failed to get response from {uri}", request.RequestUri?.ToString() ?? "unknown URI");
-                    return new HttpResponseMessage(HttpStatusCode.InternalServerError);
+                    return new HttpResponseMessage((HttpStatusCode)exception.StatusCode);
                 }
             }).ConfigureAwait(false);
 

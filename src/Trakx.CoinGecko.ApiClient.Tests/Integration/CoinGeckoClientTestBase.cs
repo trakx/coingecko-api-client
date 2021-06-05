@@ -6,19 +6,23 @@ using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using Serilog;
-using Serilog.Filters;
+using Serilog.Core;
+using Serilog.Sinks.XUnit;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace Trakx.CoinGecko.ApiClient.Tests.Integration
 {
     [Collection(nameof(ApiTestCollection))]
     public class CoinGeckoClientTestBase
     {
+        protected ServiceProvider ServiceProvider { get; }
+        protected ILogger Logger { get; }
 
-        protected ServiceProvider ServiceProvider;
-
-        public CoinGeckoClientTestBase(CoinGeckoApiFixture apiFixture)
+        protected CoinGeckoClientTestBase(CoinGeckoApiFixture apiFixture, ITestOutputHelper output)
         {
+            Logger = new LoggerConfiguration().WriteTo.TestOutput(output).CreateLogger()
+                .ForContext(MethodBase.GetCurrentMethod()!.DeclaringType);
             ServiceProvider = apiFixture.ServiceProvider;
         }
 
@@ -77,7 +81,6 @@ namespace Trakx.CoinGecko.ApiClient.Tests.Integration
             }
         }
 
-
     }
 
     [CollectionDefinition(nameof(ApiTestCollection))]
@@ -90,33 +93,26 @@ namespace Trakx.CoinGecko.ApiClient.Tests.Integration
 
     public class CoinGeckoApiFixture : IDisposable
     {
-
-        internal const string LogOutputTemplate = "{Timestamp:HH:mm:ss} [{Level:u3}] {Message} ({SourceContext}){NewLine}{Exception}";
-
         public ServiceProvider ServiceProvider { get; }
 
-        public CoinGeckoApiFixture()
+        public CoinGeckoApiFixture( )
         {
-                var configuration = new CoinGeckoApiConfiguration
+            var configuration = new CoinGeckoApiConfiguration
             {
-                BaseUrl = "https://api.coingecko.com/api/v3"
+                BaseUrl = "https://api.coingecko.com/api/v3",
+                MaxRetryCount = 2,
+                ThrottleDelayPerSecond = 100,
+                CacheDurationInSeconds = 10,
+                InitialRetryDelayInMilliseconds = 100
             };
 
             var serviceCollection = new ServiceCollection();
+            
+            serviceCollection.AddSingleton(configuration);
             serviceCollection.AddCoinGeckoClient(configuration);
             
-            Log.Logger = new LoggerConfiguration()
-                .WriteTo.Console(outputTemplate: LogOutputTemplate)
-                .MinimumLevel.Debug()
-                .Filter.ByExcluding(Matching.FromSource("Microsoft"))
-                .CreateLogger()
-                .ForContext(MethodBase.GetCurrentMethod()!.DeclaringType);
-
-            serviceCollection.AddSingleton(Log.Logger);
-
             ServiceProvider = serviceCollection.BuildServiceProvider();
         }
-
 
         protected virtual void Dispose(bool disposing)
         {
