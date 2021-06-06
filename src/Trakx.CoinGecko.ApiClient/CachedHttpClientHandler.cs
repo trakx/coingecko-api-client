@@ -6,8 +6,6 @@ using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using Ardalis.GuardClauses;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Razor.TagHelpers;
 using Microsoft.Extensions.Caching.Memory;
 using Serilog;
 
@@ -79,19 +77,18 @@ namespace Trakx.CoinGecko.ApiClient
         protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request,
             CancellationToken cancellationToken)
         {
-
             Guard.Against.Null(request, nameof(request));
 
-            await _semaphore.WaitAsync(cancellationToken).ConfigureAwait(false);
-            try
-            {
-                return await TryGetOrSetRequestFromCache(request, cancellationToken).ConfigureAwait(false);
-            }
-            finally
-            {
-                await Task.Delay(_millisecondsDelay, cancellationToken).ConfigureAwait(false);
-                _semaphore.Release(1);
-            }
+            return await TryGetOrSetRequestFromCache(request, cancellationToken)
+                .ConfigureAwait(false);
+        }
+
+        protected override HttpResponseMessage Send(HttpRequestMessage request, CancellationToken cancellationToken)
+        {
+            Guard.Against.Null(request, nameof(request));
+
+            return TryGetOrSetRequestFromCache(request, cancellationToken)
+                .ConfigureAwait(false).GetAwaiter().GetResult();
         }
 
         /// <summary>
@@ -107,25 +104,35 @@ namespace Trakx.CoinGecko.ApiClient
             // Data cache is only applicable for GET operations
             if (request.Method != HttpMethod.Get)
             {
-                return await base.SendAsync(request, cancellationToken)
-                    .ConfigureAwait(false);
+                try
+                {
+                    await _semaphore.WaitAsync(cancellationToken).ConfigureAwait(false);
+                    return await base.SendAsync(request, cancellationToken)
+                        .ConfigureAwait(false);
+                }
+                finally
+                {
+                    await Task.Delay(_millisecondsDelay, cancellationToken).ConfigureAwait(false);
+                    _semaphore.Release(1);
+                }
             }
 
             var key = $"[{request.Method}]{request.RequestUri}|{request.Content?.ReadAsStringAsync(cancellationToken).GetAwaiter().GetResult()}";
 
-            var cachedResponse = await _cache.GetOrCreateAsync(key, async e =>
+            var (message, cachedContent) = await _cache.GetOrCreateAsync(key, async e =>
             {
                 try
                 {
+                    await _semaphore.WaitAsync(cancellationToken).ConfigureAwait(false);
                     var response = await base.SendAsync(request, cancellationToken)
                         .ConfigureAwait(false);
                     var content = await response.Content.ReadAsStringAsync(cancellationToken);
-                    e.Value = content;
+
                     e.AbsoluteExpirationRelativeToNow = response.IsSuccessStatusCode 
                         ? TimeSpan.FromSeconds(_apiConfiguration.CacheDurationInSeconds ?? 10)
                         : TimeSpan.FromTicks(1);
 
-                    return new HttpResponseMessage(response.StatusCode)  { Content = new StringContent(content), };
+                    return (response, content);
                 }
                 catch (ApiException exception)
                 {
@@ -138,11 +145,16 @@ namespace Trakx.CoinGecko.ApiClient
                     }
 
                     Logger.Warning(exception, "Failed to get response from {uri}", request.RequestUri?.ToString() ?? "unknown URI");
-                    return new HttpResponseMessage((HttpStatusCode)exception.StatusCode);
+                    return (new HttpResponseMessage((HttpStatusCode)exception.StatusCode), exception.Message);
+                }
+                finally
+                {
+                    await Task.Delay(_millisecondsDelay, cancellationToken).ConfigureAwait(false);
+                    _semaphore.Release(1);
                 }
             }).ConfigureAwait(false);
 
-            return cachedResponse;
+            return new HttpResponseMessage(message.StatusCode){Content = new StringContent(cachedContent)};
         }
 
         /// <inheritdoc />
