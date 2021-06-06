@@ -1,14 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
 using System.Reflection;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using Ardalis.GuardClauses;
-using Polly;
-using Polly.Retry;
 using Serilog;
 using Trakx.Utils.Extensions;
 
@@ -23,7 +20,6 @@ namespace Trakx.CoinGecko.ApiClient
         private readonly ISimpleClient _simpleClient;
         private Dictionary<string, string>? _symbolsByNames;
         private Dictionary<string, string>? _idsBySymbolName;
-        private readonly  AsyncRetryPolicy _retry;
 
         public Dictionary<string, string> IdsBySymbolName
         {
@@ -43,35 +39,16 @@ namespace Trakx.CoinGecko.ApiClient
             _simpleClient = simpleClient;
 
             CoinFullDataByIds = new Dictionary<string, CoinFullData>();
-            _retry = Policy
-                .Handle<ApiException>()
-                .WaitAndRetryAsync(10, (_, exception, _) =>
-                {
-                    if(exception is ApiException apiException
-                       && apiException.StatusCode == (int)HttpStatusCode.TooManyRequests
-                       && apiException.Headers.TryGetValue("Retry-After", out var value))
-                    {
-                        var millisecondsDelay = int.Parse(value?.First() ?? "0"); 
-                        return TimeSpan.FromSeconds(millisecondsDelay);
-                    } 
-                    return TimeSpan.Zero;
-                }, (exception, i, timeSpan, context) =>
-                {
-                    Logger.Warning(exception, "Failed to retrieve CoingGecko results after {i} attemtpts, retrying in {timeSpan}", i, 
-                        timeSpan);
-                    return Task.CompletedTask;
-                });
         }
-        
+
         /// <inheritdoc />
         public async Task<decimal?> GetLatestPrice(string coinGeckoId, string quoteCurrencyId = "usd-coin")
         {
             Guard.Against.NullOrEmpty(quoteCurrencyId, nameof(quoteCurrencyId));
 
-            var tickerDetails = (await _retry.ExecuteAndCaptureAsync(async () => 
-                        await _simpleClient
-                        .PriceAsync($"{coinGeckoId},{quoteCurrencyId}", "usd").ConfigureAwait(false))
-                    .ConfigureAwait(false)).Result;
+            var tickerDetails = await _simpleClient
+                .PriceAsync($"{coinGeckoId},{quoteCurrencyId}", "usd")
+                .ConfigureAwait(false);
 
             Logger.Debug(JsonSerializer.Serialize(tickerDetails));
 
@@ -102,9 +79,7 @@ namespace Trakx.CoinGecko.ApiClient
 
                 var fxRate = await GetUsdFxRate(quoteCurrencyId, date);
 
-                var historicalPrice = (await _retry.ExecuteAndCaptureAsync(async () => 
-                    await _coinsClient.HistoryAsync(id, date, false.ToString()).ConfigureAwait(false))
-                    .ConfigureAwait(false)).Result;
+                var historicalPrice = await _coinsClient.HistoryAsync(id, date, false.ToString()).ConfigureAwait(false);
 
                 return historicalPrice.Result.Market_data.Current_price[Constants.Usd] / fxRate;
             }
@@ -119,10 +94,8 @@ namespace Trakx.CoinGecko.ApiClient
         {
             Guard.Against.NullOrWhiteSpace(quoteCurrencyId, nameof(quoteCurrencyId));
 
-            var quoteResponse = (await _retry.ExecuteAndCaptureAsync(async () => 
-                    await _coinsClient.HistoryAsync(quoteCurrencyId, date, false.ToString())
-                    .ConfigureAwait(false))
-                .ConfigureAwait(false)).Result;
+            var quoteResponse = await _coinsClient.HistoryAsync(quoteCurrencyId, date, false.ToString())
+                .ConfigureAwait(false);
 
             var fxRate = quoteResponse.Result.Market_data.Current_price.ContainsKey(Constants.Usd) ?
                 quoteResponse.Result.Market_data.Current_price[Constants.Usd] : default;
@@ -138,10 +111,8 @@ namespace Trakx.CoinGecko.ApiClient
         public async Task<MarketData> GetMarketDataAsOfFromId(string id, DateTime asOf, string quoteCurrencyId = "usd-coin")
         {
             var date = asOf.ToString("dd-MM-yyyy");
-            var fullData = (await _retry.ExecuteAndCaptureAsync(async () => 
-                await _coinsClient.HistoryAsync(id, date, false.ToString())
-                .ConfigureAwait(false))
-                .ConfigureAwait(false)).Result;
+            var fullData = await _coinsClient.HistoryAsync(id, date, false.ToString())
+                .ConfigureAwait(false);
             var fxRate = await GetUsdFxRate(quoteCurrencyId, date);
             var marketData = new MarketData
             {
@@ -191,10 +162,9 @@ namespace Trakx.CoinGecko.ApiClient
 
             try
             {
-                data = _retry.ExecuteAndCaptureAsync(async () => 
-                        await _coinsClient.CoinsAsync(coinId, "false",
-                            false, false, false, false, false))
-                    .GetAwaiter().GetResult().Result.Result;
+                data = _coinsClient.CoinsAsync(coinId, "false",
+                        false, false, false, false, false)
+                    .GetAwaiter().GetResult().Result;
 
                 CoinFullDataByIds[coinId] = data;
                 return data;
@@ -208,31 +178,23 @@ namespace Trakx.CoinGecko.ApiClient
 
         public async Task<IReadOnlyList<CoinList>> GetCoinList()
         {
-            var coinList = (await _retry.ExecuteAndCaptureAsync(async () =>
-                    await _coinsClient.ListAllAsync().ConfigureAwait(false))
-                .ConfigureAwait(false)).Result;
-                
-                return coinList.Result;
+            var coinList = await _coinsClient.ListAllAsync().ConfigureAwait(false);
+            return coinList.Result;
         }
 
         public async Task<IDictionary<string, IDictionary<string, decimal?>>> GetAllPrices(string[] ids, string[]? vsCurrencies = null)
         {
-            var coinsPrice = (await _retry.ExecuteAndCaptureAsync(async () =>
-                    await _simpleClient.PriceAsync(ids.ToCsvList(true, true, quoted: false),
-                            (vsCurrencies ?? new[] {Constants.Usd}).ToCsvList(true, true, quoted: false))
-                        .ConfigureAwait(false))
-                .ConfigureAwait(false)).Result;
+            var coinsPrice = await _simpleClient.PriceAsync(ids.ToCsvList(true, true, quoted:false),
+                (vsCurrencies ?? new[] { Constants.Usd }).ToCsvList(true, true, quoted:false)).ConfigureAwait(false);
             return coinsPrice.Result;
         }
 
         public async Task<IDictionary<DateTimeOffset, MarketData>> GetMarketDataForDateRange(string id, string vsCurrency, DateTimeOffset start, DateTimeOffset end,
             CancellationToken cancellationToken)
         {
-            var range = (await _retry.ExecuteAndCaptureAsync(async () => 
-                await _coinsClient
+            var range = await _coinsClient
                 .RangeAsync(id, vsCurrency, start.ToUnixTimeSeconds(), end.ToUnixTimeSeconds(), CancellationToken.None)
-                .ConfigureAwait(false))
-                .ConfigureAwait(false)).Result;
+                .ConfigureAwait(false);
             
             var result = Enumerable.Range(0, range.Result.Prices.Count).Select(i =>
                 new { Index = i, Date = DateTimeOffset.FromUnixTimeMilliseconds((long)range.Result.Prices[i][0]) })
