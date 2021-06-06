@@ -52,7 +52,7 @@ namespace Trakx.CoinGecko.ApiClient
                        && apiException.Headers.TryGetValue("Retry-After", out var value))
                     {
                         var millisecondsDelay = int.Parse(value?.First() ?? "0"); 
-                        return TimeSpan.FromMilliseconds(millisecondsDelay);
+                        return TimeSpan.FromSeconds(millisecondsDelay);
                     } 
                     return TimeSpan.Zero;
                 }, (exception, i, timeSpan, context) =>
