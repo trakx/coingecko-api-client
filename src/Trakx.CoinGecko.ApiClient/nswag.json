@@ -10,8 +10,8 @@
   "codeGenerators": {
     "openApiToCSharpClient": {
       "clientBaseClass": "AuthorisedClient",
-      "configurationClass": "ClientConfigurator",
-            "generateClientClasses": true,
+      "configurationClass": "ClientConfigurator", 
+      "generateClientClasses": true,
       "generateClientInterfaces": true,
       "injectHttpClient": true,
       "disposeHttpClient": true,

@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Linq;
 using System.Net.Http;
 using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Polly;
@@ -44,20 +46,32 @@ namespace Trakx.CoinGecko.ApiClient
             services.AddSingleton<IDateTimeProvider, DateTimeProvider>();
         }
 
-        private static void LogFailure(ILogger logger, DelegateResult<HttpResponseMessage> result, TimeSpan timeSpan, int retryCount, Context context)
+        private static async Task LogFailure(ILogger logger, DelegateResult<HttpResponseMessage> result, TimeSpan timeSpan, int retryCount, Context context)
         {
             if (result.Exception != null)
             {
-                logger.Warning(result.Exception, "An exception occurred on retry {RetryAttempt} for {PolicyKey}. Retrying in {SleepDuration}ms.",
+                logger.Warning(result.Exception, "An exception occurred on retry {RetryAttempt} for {PolicyKey} - Retrying in {SleepDuration}ms",
                     retryCount, context.PolicyKey, timeSpan.TotalMilliseconds);
             }
             else
             {
-                logger.Warning("A non success code {StatusCode} with reason {Reason} and content {Content} was received on retry {RetryAttempt} for {PolicyKey}. Retrying in {SleepDuration}ms.",
+                var content = await result.Result.Content.ReadAsStringAsync();
+                logger.Warning("A non success code {StatusCode} with reason {Reason} and content {Content} was received on retry {RetryAttempt} for {PolicyKey} - Retrying in {SleepDuration}ms",
                     (int)result.Result.StatusCode, result.Result.ReasonPhrase,
-                    result.Result.Content.ReadAsStringAsync().GetAwaiter().GetResult(),
-                    retryCount, context.PolicyKey, timeSpan.TotalMilliseconds);
+                    content, retryCount, context.PolicyKey, timeSpan.TotalMilliseconds);
             }
+        }
+        
+        private static TimeSpan GetServerWaitDuration(DelegateResult<HttpResponseMessage> response, TimeSpan minDelay)
+        {
+            var retryAfter = response.Result?.Headers?.RetryAfter;
+            if (retryAfter == null)  return TimeSpan.Zero;
+
+            var waitDuration = retryAfter.Date.HasValue
+                ? retryAfter.Date.Value - DateTime.UtcNow
+                : retryAfter.Delta.GetValueOrDefault(TimeSpan.Zero);
+            
+            return new[] { waitDuration, minDelay}.Max();
         }
     }
 }

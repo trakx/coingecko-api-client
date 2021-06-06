@@ -45,7 +45,7 @@ namespace Trakx.CoinGecko.ApiClient
             CoinFullDataByIds = new Dictionary<string, CoinFullData>();
             _retry = Policy
                 .Handle<ApiException>()
-                .WaitAndRetryForeverAsync((i, exception, arg3) =>
+                .WaitAndRetryAsync(10, (_, exception, _) =>
                 {
                     if(exception is ApiException apiException
                        && apiException.StatusCode == (int)HttpStatusCode.TooManyRequests
@@ -57,7 +57,7 @@ namespace Trakx.CoinGecko.ApiClient
                     return TimeSpan.Zero;
                 }, (exception, i, timeSpan, context) =>
                 {
-                    Logger.Warning(exception, "Failed to retrieve CoingGecko results, retrying in {timeSpan}",
+                    Logger.Warning(exception, "Failed to retrieve CoingGecko results after {i} attemtpts, retrying in {timeSpan}", i, 
                         timeSpan);
                     return Task.CompletedTask;
                 });
