@@ -20,9 +20,9 @@ namespace Trakx.CoinGecko.ApiClient.Tests.Integration
             : base(apiFixture, output)
         {
             _coinsClient = ServiceProvider.GetRequiredService<ICoinGeckoClient>();
-            
-            _coinGeckoId = Constants.BitConnect;
-            _quoteCurrencyId = Constants.UsdCoin;
+
+            _coinGeckoId = Constants.Coins.Bitcoin;
+            _quoteCurrencyId = Constants.Coins.UsdCoin;
             _asOf = DateTime.Today.AddDays(-5);
         }
 
@@ -57,7 +57,7 @@ namespace Trakx.CoinGecko.ApiClient.Tests.Integration
         public async Task GetCoinGeckoIdFromSymbol_should_return_valid_data_when_passing_valid_id()
         {
             var result = await _coinsClient.GetCoinGeckoIdFromSymbol("btc");
-            result.Should().Be(Constants.Bitcoin);
+            result.Should().Be(Constants.Coins.Bitcoin);
         }
 
         [Fact]
@@ -71,16 +71,32 @@ namespace Trakx.CoinGecko.ApiClient.Tests.Integration
         public async Task GetAllPrices_should_return_a_valid_list_of_prices_when_passing_valid_ids_and_currencies()
         {
             var result = await _coinsClient.GetAllPrices(
-                new[] { _coinGeckoId, Constants.Bitcoin },
-                new[] { Constants.Usd });
+                new[] { _coinGeckoId, Constants.Coins.Aave },
+                new[] { Constants.Currencies.Usd });
             result.Keys.Should().Contain(_coinGeckoId);
-            result.Keys.Should().Contain(Constants.Bitcoin);
+            result.Keys.Should().Contain(Constants.Coins.Aave);
             foreach (var prices in result.Values)
             {
-                prices.Keys.Should().OnlyContain(f => f == Constants.Usd);
+                prices.Keys.Should().OnlyContain(f => f == Constants.Currencies.Usd);
                 prices.Values.Should().OnlyContain(f => f > 0);
             }
         }
 
+        [Fact]
+        public async Task GetAllPricesExtended_should_return_marketCap_and_dailyVolume()
+        {
+            var result = await _coinsClient.GetAllPricesExtended(
+                new[] { Constants.Coins.Aave, Constants.Coins.Bitcoin },
+                new[] { Constants.Currencies.Usd, Constants.Currencies.Eth },
+                includeMarketCap: true,
+                include24HrVol: true);
+
+            result.Should().Contain(p => p.CoinGeckoId == Constants.Coins.Aave && p.Currency == Constants.Currencies.Usd);
+            result.Should().Contain(p => p.CoinGeckoId == Constants.Coins.Bitcoin && p.Currency == Constants.Currencies.Usd);
+            result.Should().Contain(p => p.CoinGeckoId == Constants.Coins.Aave && p.Currency == Constants.Currencies.Eth);
+            result.Should().Contain(p => p.CoinGeckoId == Constants.Coins.Bitcoin && p.Currency == Constants.Currencies.Eth);
+            result.Should().OnlyContain(p => p.MarketCap > 0 && p.DailyVolume > 0);
+            result.Should().HaveCount(4);
+        }
     }
 }
