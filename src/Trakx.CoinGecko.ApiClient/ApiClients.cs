@@ -5534,35 +5534,35 @@ namespace Trakx.CoinGecko.ApiClient
         [Newtonsoft.Json.JsonProperty("fully_diluted_valuation", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public System.Collections.Generic.IDictionary<string, decimal?> Fully_diluted_valuation { get; set; }
     
-        [Newtonsoft.Json.JsonProperty("price_change_24h", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public decimal Price_change_24h { get; init; }
+        [Newtonsoft.Json.JsonProperty("price_change_24h", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public decimal? Price_change_24h { get; init; }
     
-        [Newtonsoft.Json.JsonProperty("price_change_percentage_24h", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public decimal Price_change_percentage_24h { get; init; }
+        [Newtonsoft.Json.JsonProperty("price_change_percentage_24h", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public decimal? Price_change_percentage_24h { get; init; }
     
-        [Newtonsoft.Json.JsonProperty("price_change_percentage_7d", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public decimal Price_change_percentage_7d { get; init; }
+        [Newtonsoft.Json.JsonProperty("price_change_percentage_7d", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public decimal? Price_change_percentage_7d { get; init; }
     
-        [Newtonsoft.Json.JsonProperty("price_change_percentage_14d", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public decimal Price_change_percentage_14d { get; init; }
+        [Newtonsoft.Json.JsonProperty("price_change_percentage_14d", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public decimal? Price_change_percentage_14d { get; init; }
     
-        [Newtonsoft.Json.JsonProperty("price_change_percentage_30d", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public decimal Price_change_percentage_30d { get; init; }
+        [Newtonsoft.Json.JsonProperty("price_change_percentage_30d", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public decimal? Price_change_percentage_30d { get; init; }
     
-        [Newtonsoft.Json.JsonProperty("price_change_percentage_60d", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public decimal Price_change_percentage_60d { get; init; }
+        [Newtonsoft.Json.JsonProperty("price_change_percentage_60d", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public decimal? Price_change_percentage_60d { get; init; }
     
-        [Newtonsoft.Json.JsonProperty("price_change_percentage_200d", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public decimal Price_change_percentage_200d { get; init; }
+        [Newtonsoft.Json.JsonProperty("price_change_percentage_200d", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public decimal? Price_change_percentage_200d { get; init; }
     
-        [Newtonsoft.Json.JsonProperty("price_change_percentage_1y", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public decimal Price_change_percentage_1y { get; init; }
+        [Newtonsoft.Json.JsonProperty("price_change_percentage_1y", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public decimal? Price_change_percentage_1y { get; init; }
     
-        [Newtonsoft.Json.JsonProperty("market_cap_change_24h", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public decimal Market_cap_change_24h { get; init; }
+        [Newtonsoft.Json.JsonProperty("market_cap_change_24h", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public decimal? Market_cap_change_24h { get; init; }
     
-        [Newtonsoft.Json.JsonProperty("market_cap_change_percentage_24h", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public decimal Market_cap_change_percentage_24h { get; init; }
+        [Newtonsoft.Json.JsonProperty("market_cap_change_percentage_24h", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public decimal? Market_cap_change_percentage_24h { get; init; }
     
         [Newtonsoft.Json.JsonProperty("roi", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public Roi Roi { get; init; }

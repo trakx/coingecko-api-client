@@ -398,7 +398,10 @@ paths:
         200:
           description: Get historical market data include price, market cap, and 24h
             volume
-          content: {}
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Range'
   /coins/{id}/market_chart/range:
     get:
       tags:
@@ -1380,33 +1383,43 @@ components:
             price_change_24h:
               type: number
               format: decimal
+              nullable: true
             price_change_percentage_24h:
               type: number
               format: decimal
+              nullable: true
             price_change_percentage_7d:
               type: number
               format: decimal
+              nullable: true
             price_change_percentage_14d:
               type: number
               format: decimal
+              nullable: true
             price_change_percentage_30d:
               type: number
               format: decimal
+              nullable: true
             price_change_percentage_60d:
               type: number
               format: decimal
+              nullable: true
             price_change_percentage_200d:
               type: number
               format: decimal
+              nullable: true
             price_change_percentage_1y:
               type: number
               format: decimal
+              nullable: true
             market_cap_change_24h:
               type: number
               format: decimal
+              nullable: true
             market_cap_change_percentage_24h:
               type: number
               format: decimal
+              nullable: true
             roi:
               type: object
               properties:
