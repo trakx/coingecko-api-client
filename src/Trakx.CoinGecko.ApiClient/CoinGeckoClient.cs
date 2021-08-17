@@ -108,12 +108,14 @@ namespace Trakx.CoinGecko.ApiClient
         }
 
         /// <inheritdoc />
-        public async Task<MarketData> GetMarketDataAsOfFromId(string id, DateTime asOf, string quoteCurrencyId = "usd-coin")
+        public async Task<MarketData?> GetMarketDataAsOfFromId(string id, DateTime asOf, string quoteCurrencyId = "usd-coin")
         {
             var date = asOf.ToString("dd-MM-yyyy");
             var fullData = await _coinsClient.HistoryAsync(id, date, false.ToString())
                 .ConfigureAwait(false);
             var fxRate = await GetUsdFxRate(quoteCurrencyId, date);
+            if (fullData.Result.Market_data == null)
+                return null;
             var marketData = new MarketData
             {
                 AsOf = asOf,
@@ -184,9 +186,47 @@ namespace Trakx.CoinGecko.ApiClient
 
         public async Task<IDictionary<string, IDictionary<string, decimal?>>> GetAllPrices(string[] ids, string[]? vsCurrencies = null)
         {
-            var coinsPrice = await _simpleClient.PriceAsync(ids.ToCsvList(true, true, quoted:false),
-                (vsCurrencies ?? new[] { Constants.Usd }).ToCsvList(true, true, quoted:false)).ConfigureAwait(false);
+            var coinsPrice = await _simpleClient.PriceAsync(ids.ToCsvList(true, true, quoted: false),
+                (vsCurrencies ?? new[] { Constants.Usd }).ToCsvList(true, true, quoted: false)).ConfigureAwait(false);
             return coinsPrice.Result;
+        }
+
+        public async Task<IList<ExtendedPrice>> GetAllPricesExtended(
+            string[] ids,
+            string[]? vsCurrencies = null,
+            bool includeMarketCap = false,
+            bool include24HrVol = false)
+        {
+            var currencies = vsCurrencies ?? new[] { Constants.Usd };
+            var coinPrices = await _simpleClient.PriceAsync(
+                ids.ToCsvList(true, true, quoted: false),
+                currencies.ToCsvList(true, true, quoted: false),
+                include_market_cap: includeMarketCap.ToString().ToLower(),
+                include_24hr_vol: include24HrVol.ToString().ToLower())
+                .ConfigureAwait(false);
+
+            var result = new List<ExtendedPrice>();
+            foreach (var coinInfo in coinPrices.Result)
+            {
+                foreach (string currency in currencies)
+                {
+                    coinInfo.Value.TryGetValue(currency, out var price);
+                    if (price.HasValue)
+                    {
+                        coinInfo.Value.TryGetValue($"{currency}_market_cap", out var marketCap);
+                        coinInfo.Value.TryGetValue($"{currency}_24h_vol", out var dailyVolume);
+                        result.Add(new ExtendedPrice
+                        {
+                            CoinGeckoId = coinInfo.Key,
+                            Currency = currency,
+                            DailyVolume = dailyVolume,
+                            MarketCap = marketCap,
+                            Price = price.Value,
+                        });
+                    }
+                }
+            }
+            return result;
         }
 
         public async Task<IDictionary<DateTimeOffset, MarketData>> GetMarketDataForDateRange(string id, string vsCurrency, DateTimeOffset start, DateTimeOffset end,

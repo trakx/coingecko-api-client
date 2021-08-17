@@ -37,7 +37,7 @@ namespace Trakx.CoinGecko.ApiClient.Tests.Integration
         [Fact]
         public async Task CoinsAsync_should_return_a_valid_coindata_when_passing_a_valid_id()
         {
-            var result = await _coinsClient.CoinsAsync(Constants.BitConnect, "false");
+            var result = await _coinsClient.CoinsAsync(Constants.Coins.BitConnect, "false");
             var list = result.Result;
             EnsureAllJsonElementsWereMapped(list);
         }
@@ -45,9 +45,9 @@ namespace Trakx.CoinGecko.ApiClient.Tests.Integration
         [Fact]
         public async Task HistoryAsync_should_historical_data_when_passing_valid_id()
         {
-            var history = await _coinsClient.HistoryAsync(Constants.BitConnect, "30-01-2021", "true");
+            var history = await _coinsClient.HistoryAsync(Constants.Coins.BitConnect, "30-01-2021", "true");
             history.StatusCode.Should().Be((int)HttpStatusCode.OK);
-            history.Result.Id.Should().Be(Constants.BitConnect);
+            history.Result.Id.Should().Be(Constants.Coins.BitConnect);
             history.Result.Symbol.Should().Be(Constants.Bcc);
             history.Result.Name.Should().Be("Bitconnect");
             history.Result.Image.Thumb.Should().NotBeEmpty();

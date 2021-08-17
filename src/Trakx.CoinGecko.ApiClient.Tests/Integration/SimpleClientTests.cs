@@ -24,9 +24,9 @@ namespace Trakx.CoinGecko.ApiClient.Tests.Integration
         {
             var price = await _simpleClient.PriceAsync("bitcoin", "usd");
             price.StatusCode.Should().Be((int)HttpStatusCode.OK);
-            price.Result.Keys.Should().Contain(Constants.Bitcoin);
-            price.Result[Constants.Bitcoin].Keys.Should().Contain(Constants.Usd);
-            price.Result[Constants.Bitcoin][Constants.Usd].Should().BeGreaterThan(0);
+            price.Result.Keys.Should().Contain(Constants.Coins.Bitcoin);
+            price.Result[Constants.Coins.Bitcoin].Keys.Should().Contain(Constants.Currencies.Usd);
+            price.Result[Constants.Coins.Bitcoin][Constants.Currencies.Usd].Should().BeGreaterThan(0);
             Thread.Sleep(TimeSpan.FromSeconds(5));
         }
 
