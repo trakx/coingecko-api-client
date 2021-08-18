@@ -28,7 +28,7 @@ namespace Trakx.CoinGecko.ApiClient.Tests.Integration
         [ClassData(typeof(CoinGeckoIdsTestData))]
         public async Task GetLatestPrice_should_return_valid_price_when_passing_valid_id(string id)
         {
-            var result = await _coinsClient.GetLatestPrice(id, _quoteCurrencyId);
+            var result = await _coinsClient.GetLatestPrice(id, Constants.Usd);
             result.Should().NotBeNull();
         }
 
@@ -45,7 +45,7 @@ namespace Trakx.CoinGecko.ApiClient.Tests.Integration
         public async Task GetMarketDataAsOfFromId_should_return_valid_data_when_passing_valid_id(string id)
         {
             var result = await _coinsClient.GetMarketDataAsOfFromId(id, _asOf, _quoteCurrencyId);
-            result.AsOf.Should().NotBeNull();
+            result!.AsOf.Should().NotBeNull();
             result.CoinId.Should().Be(id);
             result.CoinSymbol.Should().NotBeEmpty();
             result.MarketCap.Should().NotBeNull();
@@ -71,10 +71,7 @@ namespace Trakx.CoinGecko.ApiClient.Tests.Integration
         [Fact]
         public async Task GetAllPrices_should_return_a_valid_list_of_prices_when_passing_valid_ids_and_currencies()
         {
-            var ids = new CoinGeckoIdsTestData()
-                .SelectMany(s => s!)
-                .Select(s => s.ToString()!)
-                .ToArray();
+            var ids = GetCoinIds();
 
             var result = await _coinsClient.GetAllPrices(
                 ids,
@@ -87,5 +84,34 @@ namespace Trakx.CoinGecko.ApiClient.Tests.Integration
             }
         }
 
+        private static string[] GetCoinIds()
+        {
+            var ids = new CoinGeckoIdsTestData()
+                .SelectMany(s => s!)
+                .Select(s => s.ToString()!)
+                .ToArray();
+            return ids;
+        }
+
+        [Fact]
+        public async Task GetAllPricesExtended_should_return_marketCap_and_dailyVolume()
+        {
+            var coinIds = GetCoinIds();
+            var quoteCurrencies = new[] { Constants.Usd, "eth"};
+            var result = await _coinsClient.GetAllPricesExtended(
+                coinIds,
+                quoteCurrencies,
+                includeMarketCap: true,
+                include24HrVol: true);
+
+            foreach (var coinId in coinIds)
+            foreach (var quoteCurrency in quoteCurrencies)
+            {
+                result.Should().Contain(p => p.CoinGeckoId == coinId && p.Currency == quoteCurrency);
+                result.Should().OnlyContain(p => p.MarketCap > 0 && p.DailyVolume > 0);
+            }
+
+            result.Should().HaveCount(coinIds.Length * quoteCurrencies.Length);
+        }
     }
 }
