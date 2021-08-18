@@ -100,17 +100,17 @@ namespace Trakx.CoinGecko.ApiClient.Tests.Integration
             var configuration = new CoinGeckoApiConfiguration
             {
                 BaseUrl = "https://api.coingecko.com/api/v3",
-                MaxRetryCount = 2,
-                ThrottleDelayPerSecond = 100,
-                CacheDurationInSeconds = 10,
+                MaxRetryCount = 5,
+                ThrottleDelayPerSecond = 500,
+                CacheDurationInSeconds = 20,
                 InitialRetryDelayInMilliseconds = 100
             };
 
             var serviceCollection = new ServiceCollection();
-            
+
             serviceCollection.AddSingleton(configuration);
             serviceCollection.AddCoinGeckoClient(configuration);
-            
+
             ServiceProvider = serviceCollection.BuildServiceProvider();
         }
 
