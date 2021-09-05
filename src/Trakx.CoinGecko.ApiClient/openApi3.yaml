@@ -68,7 +68,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Price'
-      security: 
+      security:
       - ApiKeyAuth: []
   /simple/token_price/{id}:
     get:
@@ -154,7 +154,7 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/CoinList'
-      security: 
+      security:
       - ApiKeyAuth: []
   /coins/markets:
     get:
@@ -1358,8 +1358,7 @@ components:
             last_updated:
               type: datetime
             total_value_locked:
-              type: number
-              format: decimal
+              type: object
               nullable: true
             mcap_to_tvl_ratio:
               type: number
@@ -1421,6 +1420,7 @@ components:
               format: decimal
               nullable: true
             roi:
+              nullable: true
               type: object
               properties:
                 times:
@@ -1536,6 +1536,7 @@ components:
                 type: number
             hashing_algorithm:
                 type: string
+                nullable: true
             categories:
                 type: array
                 nullable: true
@@ -1604,6 +1605,7 @@ components:
                         bid_ask_spread_percentage:
                             type: number
                             format: decimal
+                            nullable: true
                         timestamp:
                             type: datetime
                         last_traded_at:
@@ -1615,6 +1617,7 @@ components:
                         is_stale:
                             type: boolean
                         trade_url:
+                            nullable: true
                             type: string
                         token_info_url:
                             type: string
@@ -1638,40 +1641,45 @@ components:
                     type: string
             links:
                 type: object
+                nullable: true
                 properties:
                     homepage:
                         type: array
-                        nullable: null
+                        nullable: true
                         items:
                             type: string
                     blockchain_site:
                         type: array
-                        nullable: null
+                        nullable: true
                         items:
                             type: string
                     official_forum_url:
                         type: array
-                        nullable: null
+                        nullable: true
                         items:
                             type: string
                     chat_url:
                         type: array
-                        nullable: null
+                        nullable: true
                         items:
                             type: string
                     announcement_url:
                         type: array
-                        nullable: null
+                        nullable: true
                         items:
                             type: string
                     twitter_screen_name:
                         type: string
+                        nullable: true
                     facebook_username:
                         type: string
+                        nullable: true
                     bitcointalk_thread_identifier:
-                        type: number
+                        type: string
+                        nullable: true
                     telegram_channel_identifier:
                         type: string
+                        nullable: true
                     subreddit_url:
                         type: string
                         nullable: true
@@ -1689,8 +1697,12 @@ components:
                                     type: string
             country_origin:
                 type: string
+            contract_address:
+              type: string
+              nullable: true
             genesis_date:
                 type: string
+                nullable: true
             sentiment_votes_up_percentage:
                 type: number
                 format: decimal

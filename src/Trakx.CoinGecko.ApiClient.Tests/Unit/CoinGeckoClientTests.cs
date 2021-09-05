@@ -73,7 +73,7 @@ namespace Trakx.CoinGecko.ApiClient.Tests.Unit
             ConfigureHistoryAsync(currency, asOf, currencyPrice, currencyVolume);
 
             var result = await _coinGeckoClient.GetMarketDataAsOfFromId(coin, asOf, currency);
-            result.AsOf.Should().Be(asOf);
+            result!.AsOf.Should().Be(asOf);
             result.CoinId.Should().Be(coin);
             result.CoinSymbol.Should().Be(coin);
             result.MarketCap.Should().NotBeNull();
@@ -154,7 +154,7 @@ namespace Trakx.CoinGecko.ApiClient.Tests.Unit
             var vsCurrency = _mockCreator.GetRandomString(3);
             var start = _mockCreator.GetRandomUtcDateTimeOffset();
             var end = _mockCreator.GetRandomUtcDateTimeOffset();
-            
+
             _coinsClient.RangeAsync(id, vsCurrency, start.ToUnixTimeSeconds(), end.ToUnixTimeSeconds(), CancellationToken.None)
                 .Returns(new Response<Range>(200, null, range));
 
@@ -166,7 +166,7 @@ namespace Trakx.CoinGecko.ApiClient.Tests.Unit
                 .ConfigureAwait(false);
 
             result.Keys.Should().BeEquivalentTo(dates.Select(d => DateTimeOffset.FromUnixTimeMilliseconds((long)d)));
-            
+
             var firstDate = DateTimeOffset.FromUnixTimeMilliseconds((long)dates[0]);
             var firstResult = result[firstDate];
             firstResult.Price.Should().Be((decimal)2756.166102270321);
@@ -186,11 +186,11 @@ namespace Trakx.CoinGecko.ApiClient.Tests.Unit
             IDictionary<string, IDictionary<string, decimal?>> obj = new Dictionary<string, IDictionary<string, decimal?>>();
             obj[id] = new Dictionary<string, decimal?>
             {
-                [Constants.Currencies.Usd] = coinPrice
+                [Constants.Usd] = coinPrice
             };
             obj[currency] = new Dictionary<string, decimal?>
             {
-                [Constants.Currencies.Usd] = currencyPrice
+                [Constants.Usd] = currencyPrice
             };
             _simpleClient.PriceAsync(Arg.Any<string>(), Arg.Any<string>())
                 .Returns(new Response<IDictionary<string, IDictionary<string, decimal?>>>(200, null, obj));
@@ -206,15 +206,15 @@ namespace Trakx.CoinGecko.ApiClient.Tests.Unit
                 {
                     Current_price = new Dictionary<string, decimal?>
                     {
-                        {Constants.Currencies.Usd, price}
+                        {Constants.Usd, price}
                     },
                     Market_cap = new Dictionary<string, decimal?>
                     {
-                        {Constants.Currencies.Usd, 0}
+                        {Constants.Usd, 0}
                     },
                     Total_volume = new Dictionary<string, decimal?>
                     {
-                        {Constants.Currencies.Usd, volume}
+                        {Constants.Usd, volume}
                     },
                 }
             };

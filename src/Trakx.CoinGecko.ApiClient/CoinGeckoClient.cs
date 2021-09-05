@@ -71,6 +71,7 @@ namespace Trakx.CoinGecko.ApiClient
         }
 
         /// <inheritdoc />
+        [Obsolete("Use GetMarketDataAsOfFromId instead")]
         public async Task<decimal?> GetPriceAsOfFromId(string id, DateTime asOf, string quoteCurrencyId = Constants.UsdCoin)
         {
             try

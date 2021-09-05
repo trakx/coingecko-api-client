@@ -15,7 +15,7 @@ namespace Trakx.CoinGecko.ApiClient.Tests.Integration
 
         private readonly ICoinsClient _coinsClient;
 
-        public CoinsClientTests(CoinGeckoApiFixture apiFixture, ITestOutputHelper output) 
+        public CoinsClientTests(CoinGeckoApiFixture apiFixture, ITestOutputHelper output)
             : base(apiFixture, output)
         {
             _coinsClient = ServiceProvider.GetRequiredService<ICoinsClient>();
@@ -31,25 +31,26 @@ namespace Trakx.CoinGecko.ApiClient.Tests.Integration
                 list.Should().NotBeEmpty();
                 EnsureAllJsonElementsWereMapped(list);
             }
-            
+
         }
 
-        [Fact]
-        public async Task CoinsAsync_should_return_a_valid_coindata_when_passing_a_valid_id()
+        [Theory]
+        [ClassData(typeof(CoinGeckoIdsTestData))]
+        public async Task CoinsAsync_should_return_a_valid_coindata_when_passing_a_valid_id(string id)
         {
-            var result = await _coinsClient.CoinsAsync(Constants.Coins.BitConnect, "false");
+            var result = await _coinsClient.CoinsAsync(id, "false");
             var list = result.Result;
             EnsureAllJsonElementsWereMapped(list);
         }
 
-        [Fact]
-        public async Task HistoryAsync_should_historical_data_when_passing_valid_id()
+        [Theory]
+        [ClassData(typeof(CoinGeckoIdsTestData))]
+        public async Task HistoryAsync_should_historical_data_when_passing_valid_id(string id)
         {
-            var history = await _coinsClient.HistoryAsync(Constants.Coins.BitConnect, "30-01-2021", "true");
+            var history = await _coinsClient.HistoryAsync(id, "30-01-2021", "true");
             history.StatusCode.Should().Be((int)HttpStatusCode.OK);
-            history.Result.Id.Should().Be(Constants.Coins.BitConnect);
-            history.Result.Symbol.Should().Be(Constants.Bcc);
-            history.Result.Name.Should().Be("Bitconnect");
+            history.Result.Id.Should().Be(id);
+            history.Result.Symbol.Should().NotBeNullOrWhiteSpace();
             history.Result.Image.Thumb.Should().NotBeEmpty();
             history.Result.Image.Small.Should().NotBeEmpty();
             history.Result.Market_data.Current_price.Should().NotBeEmpty();
@@ -64,7 +65,7 @@ namespace Trakx.CoinGecko.ApiClient.Tests.Integration
             var end = DateTimeOffset.Parse("2020-12-31");var range = await _coinsClient
                 .RangeAsync("ethereum", "usd", start.ToUnixTimeSeconds(), end.ToUnixTimeSeconds(), CancellationToken.None)
                 .ConfigureAwait(false);
-            
+
             range.StatusCode.Should().Be((int)HttpStatusCode.OK);
             range.Result.Prices.Count.Should().BeGreaterThan(30);
             range.Result.Market_caps.Count.Should().Be(range.Result.Prices.Count);
