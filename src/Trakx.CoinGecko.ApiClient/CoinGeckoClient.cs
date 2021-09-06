@@ -234,10 +234,25 @@ namespace Trakx.CoinGecko.ApiClient
             CancellationToken cancellationToken)
         {
             var range = await _coinsClient
-                .RangeAsync(id, vsCurrency, start.ToUnixTimeSeconds(), end.ToUnixTimeSeconds(), CancellationToken.None)
+                .RangeAsync(id, vsCurrency, start.ToUnixTimeSeconds(), end.ToUnixTimeSeconds(), cancellationToken)
                 .ConfigureAwait(false);
-            
-            var result = Enumerable.Range(0, range.Result.Prices.Count).Select(i =>
+
+            return BuildMarketData(id, vsCurrency, range);
+        }
+
+        public async Task<IDictionary<DateTimeOffset, MarketData>> GetMarketData(string id, string vsCurrency, int days,
+            CancellationToken cancellationToken)
+        {
+            var range = await _coinsClient
+                .Market_chartAsync(id, vsCurrency, days.ToString(), "daily", cancellationToken: cancellationToken)
+                .ConfigureAwait(false);
+
+            return BuildMarketData(id, vsCurrency, range);
+        }
+
+        private Dictionary<DateTimeOffset, MarketData> BuildMarketData(string id, string vsCurrency, Response<Range> range)
+        {
+            return Enumerable.Range(0, range.Result.Prices.Count).Select(i =>
                 new { Index = i, Date = DateTimeOffset.FromUnixTimeMilliseconds((long)range.Result.Prices[i][0]) })
                 .ToDictionary(d => d.Date,
                     d => new MarketData
@@ -250,7 +265,6 @@ namespace Trakx.CoinGecko.ApiClient
                         Volume = (decimal)range.Result.Total_volumes[d.Index][1],
                         QuoteCurrency = vsCurrency
                     });
-            return result;
         }
     }
 }

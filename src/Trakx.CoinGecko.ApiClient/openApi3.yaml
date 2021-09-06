@@ -398,7 +398,10 @@ paths:
         200:
           description: Get historical market data include price, market cap, and 24h
             volume
-          content: {}
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Range'
   /coins/{id}/market_chart/range:
     get:
       tags:

@@ -724,7 +724,7 @@ namespace Trakx.CoinGecko.ApiClient
         /// <param name="interval">Data interval. Possible value: daily</param>
         /// <returns>Get historical market data include price, market cap, and 24h volume</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<Response> Market_chartAsync(string id, string vs_currency, string days, string interval = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
+        System.Threading.Tasks.Task<Response<Range>> Market_chartAsync(string id, string vs_currency, string days, string interval = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
     
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <summary>Get historical market data include price, market cap, and 24h volume within a range of timestamp (granularity auto)</summary>
@@ -1261,7 +1261,7 @@ namespace Trakx.CoinGecko.ApiClient
         /// <param name="interval">Data interval. Possible value: daily</param>
         /// <returns>Get historical market data include price, market cap, and 24h volume</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public async System.Threading.Tasks.Task<Response> Market_chartAsync(string id, string vs_currency, string days, string interval = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
+        public async System.Threading.Tasks.Task<Response<Range>> Market_chartAsync(string id, string vs_currency, string days, string interval = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
         {
             if (id == null)
                 throw new System.ArgumentNullException("id");
@@ -1290,6 +1290,7 @@ namespace Trakx.CoinGecko.ApiClient
                 using (var request_ = new System.Net.Http.HttpRequestMessage())
                 {
                     request_.Method = new System.Net.Http.HttpMethod("GET");
+                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
     
                     PrepareRequest(client_, request_, urlBuilder_);
     
@@ -1314,7 +1315,8 @@ namespace Trakx.CoinGecko.ApiClient
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
-                            return new Response(status_, headers_);
+                            var objectResponse_ = await ReadObjectResponseAsync<Range>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            return new Response<Range>(status_, headers_, objectResponse_.Object);
                         }
                         else
                         {

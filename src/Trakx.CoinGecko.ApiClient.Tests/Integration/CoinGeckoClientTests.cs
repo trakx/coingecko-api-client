@@ -1,4 +1,5 @@
 using System;
+using System.Threading;
 using System.Linq;
 using System.Threading.Tasks;
 using FluentAssertions;
@@ -108,10 +109,29 @@ namespace Trakx.CoinGecko.ApiClient.Tests.Integration
             foreach (var quoteCurrency in quoteCurrencies)
             {
                 result.Should().Contain(p => p.CoinGeckoId == coinId && p.Currency == quoteCurrency);
-                result.Should().OnlyContain(p => p.MarketCap > 0 && p.DailyVolume > 0);
-            }
+            result.Should().OnlyContain(p => p.MarketCap > 0 && p.DailyVolume > 0);
+        }
 
             result.Should().HaveCount(coinIds.Length * quoteCurrencies.Length);
+        }
+
+        [Fact]
+        public async Task GetMarketData_should_return_valid_data_when_passing_valid_id()
+        {
+            var coinGeckoId = "bitcoin";
+            var currencyId = Constants.Usd;
+            int daysCount = 2;
+            var result = await _coinsClient.GetMarketData(coinGeckoId, currencyId, daysCount, CancellationToken.None);
+            result.Should().HaveCount(daysCount + 1);
+            foreach (var item in result)
+            {
+                item.Value.AsOf.Should().NotBeNull();
+                item.Value.CoinId.Should().Be(coinGeckoId);
+                item.Value.MarketCap.Should().NotBeNull();
+                item.Value.Price.Should().BeGreaterThan(0);
+                item.Value.Volume.Should().BeGreaterThan(0);
+                item.Value.QuoteCurrency.Should().Be(currencyId);
+            }
         }
     }
 }

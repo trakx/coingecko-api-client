@@ -16,5 +16,6 @@ namespace Trakx.CoinGecko.ApiClient
         Task<IList<ExtendedPrice>> GetAllPricesExtended(string[] ids, string[]? vsCurrencies = null, bool includeMarketCap = false, bool include24HrVol = false);
         Task<IDictionary<DateTimeOffset, MarketData>> GetMarketDataForDateRange(string id, string vsCurrency,
             DateTimeOffset start, DateTimeOffset end, CancellationToken cancellationToken);
+        Task<IDictionary<DateTimeOffset, MarketData>> GetMarketData(string id, string vsCurrency, int days, CancellationToken cancellationToken);
     }
 }
