@@ -20,7 +20,7 @@ namespace Trakx.CoinGecko.ApiClient.Tests.Integration
             _throttleDelay = 100;
             var config = new CoinGeckoApiConfiguration
             {
-                BaseUrl = "https://api.coingecko.com/api/v3",
+                BaseUrl = CoinGeckoApiFixture.CoinGeckoBaseUrl,
                 ThrottleDelayPerSecond = _throttleDelay
             };
             serviceCollection.AddCoinGeckoClient(config);

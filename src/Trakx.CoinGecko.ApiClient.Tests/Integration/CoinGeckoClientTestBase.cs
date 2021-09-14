@@ -93,13 +93,16 @@ namespace Trakx.CoinGecko.ApiClient.Tests.Integration
 
     public class CoinGeckoApiFixture : IDisposable
     {
+        public const string CoinGeckoBaseUrl = "https://api.coingecko.com/api/v3";
+        public const string CoinGeckoProBaseUrl = "https://pro-api.coingecko.com/api/v3";
+        
         public ServiceProvider ServiceProvider { get; }
 
         public CoinGeckoApiFixture( )
         {
             var configuration = new CoinGeckoApiConfiguration
             {
-                BaseUrl = "https://api.coingecko.com/api/v3",
+                BaseUrl = CoinGeckoBaseUrl,
                 MaxRetryCount = 5,
                 ThrottleDelayPerSecond = 500,
                 CacheDurationInSeconds = 20,
