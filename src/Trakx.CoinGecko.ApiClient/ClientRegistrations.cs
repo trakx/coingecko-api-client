@@ -11,7 +11,7 @@ namespace Trakx.CoinGecko.ApiClient
 {
     public static partial class AddCoinGeckoClientExtension
     {
-	    private const string proKey = "X-Cg-Pro-Api-Key";
+	    private const string proHeader = "X-Cg-Pro-Api-Key";
 	    
         private static void AddClients(this IServiceCollection services, CoinGeckoApiConfiguration configuration)
         {
@@ -20,7 +20,7 @@ namespace Trakx.CoinGecko.ApiClient
                 medianFirstRetryDelay: TimeSpan.FromMilliseconds(configuration.InitialRetryDelayInMilliseconds ?? 100), 
                 retryCount: maxRetryCount, fastFirst: false).ToList();
 
-            services.AddHttpClient<IPingClient, PingClient>("Trakx.CoinGecko.ApiClient.PingClient", ConfigureClient)
+            services.AddHttpClient<IPingClient, PingClient>("Trakx.CoinGecko.ApiClient.PingClient", x => ConfigureClient(x, configuration))
                 .AddPolicyHandler((s, request) => 
                     Policy<HttpResponseMessage>
                     .Handle<ApiException>()
@@ -36,7 +36,7 @@ namespace Trakx.CoinGecko.ApiClient
                 .AddHttpMessageHandler<CachedHttpClientHandler>();
 
                                 
-            services.AddHttpClient<ISimpleClient, SimpleClient>("Trakx.CoinGecko.ApiClient.SimpleClient", ConfigureClient)
+            services.AddHttpClient<ISimpleClient, SimpleClient>("Trakx.CoinGecko.ApiClient.SimpleClient", client => ConfigureClient(client, configuration))
                 .AddPolicyHandler((s, request) => 
                     Policy<HttpResponseMessage>
                     .Handle<ApiException>()
@@ -52,7 +52,7 @@ namespace Trakx.CoinGecko.ApiClient
                 .AddHttpMessageHandler<CachedHttpClientHandler>();
 
                                 
-            services.AddHttpClient<ICoinsClient, CoinsClient>("Trakx.CoinGecko.ApiClient.CoinsClient", ConfigureClient)
+            services.AddHttpClient<ICoinsClient, CoinsClient>("Trakx.CoinGecko.ApiClient.CoinsClient", client => ConfigureClient(client, configuration))
                 .AddPolicyHandler((s, request) => 
                     Policy<HttpResponseMessage>
                     .Handle<ApiException>()
@@ -68,7 +68,7 @@ namespace Trakx.CoinGecko.ApiClient
                 .AddHttpMessageHandler<CachedHttpClientHandler>();
 
                                 
-            services.AddHttpClient<IContractClient, ContractClient>("Trakx.CoinGecko.ApiClient.ContractClient", ConfigureClient)
+            services.AddHttpClient<IContractClient, ContractClient>("Trakx.CoinGecko.ApiClient.ContractClient", client => ConfigureClient(client, configuration))
                 .AddPolicyHandler((s, request) => 
                     Policy<HttpResponseMessage>
                     .Handle<ApiException>()
@@ -84,7 +84,7 @@ namespace Trakx.CoinGecko.ApiClient
                 .AddHttpMessageHandler<CachedHttpClientHandler>();
 
                                 
-            services.AddHttpClient<IExchangesClient, ExchangesClient>("Trakx.CoinGecko.ApiClient.ExchangesClient", ConfigureClient)
+            services.AddHttpClient<IExchangesClient, ExchangesClient>("Trakx.CoinGecko.ApiClient.ExchangesClient", client => ConfigureClient(client, configuration))
                 .AddPolicyHandler((s, request) => 
                     Policy<HttpResponseMessage>
                     .Handle<ApiException>()
@@ -100,7 +100,7 @@ namespace Trakx.CoinGecko.ApiClient
                 .AddHttpMessageHandler<CachedHttpClientHandler>();
 
                                 
-            services.AddHttpClient<IFinanceClient, FinanceClient>("Trakx.CoinGecko.ApiClient.FinanceClient", ConfigureClient)
+            services.AddHttpClient<IFinanceClient, FinanceClient>("Trakx.CoinGecko.ApiClient.FinanceClient", client => ConfigureClient(client, configuration))
                 .AddPolicyHandler((s, request) => 
                     Policy<HttpResponseMessage>
                     .Handle<ApiException>()
@@ -116,7 +116,7 @@ namespace Trakx.CoinGecko.ApiClient
                 .AddHttpMessageHandler<CachedHttpClientHandler>();
 
                                 
-            services.AddHttpClient<IIndexesClient, IndexesClient>("Trakx.CoinGecko.ApiClient.IndexesClient", ConfigureClient)
+            services.AddHttpClient<IIndexesClient, IndexesClient>("Trakx.CoinGecko.ApiClient.IndexesClient", client => ConfigureClient(client, configuration))
                 .AddPolicyHandler((s, request) => 
                     Policy<HttpResponseMessage>
                     .Handle<ApiException>()
@@ -132,7 +132,7 @@ namespace Trakx.CoinGecko.ApiClient
                 .AddHttpMessageHandler<CachedHttpClientHandler>();
 
                                 
-            services.AddHttpClient<IDerivativesClient, DerivativesClient>("Trakx.CoinGecko.ApiClient.DerivativesClient", ConfigureClient)
+            services.AddHttpClient<IDerivativesClient, DerivativesClient>("Trakx.CoinGecko.ApiClient.DerivativesClient", client => ConfigureClient(client, configuration))
                 .AddPolicyHandler((s, request) => 
                     Policy<HttpResponseMessage>
                     .Handle<ApiException>()
@@ -148,7 +148,7 @@ namespace Trakx.CoinGecko.ApiClient
                 .AddHttpMessageHandler<CachedHttpClientHandler>();
 
                                 
-            services.AddHttpClient<IStatus_updatesClient, Status_updatesClient>("Trakx.CoinGecko.ApiClient.Status_updatesClient", ConfigureClient)
+            services.AddHttpClient<IStatus_updatesClient, Status_updatesClient>("Trakx.CoinGecko.ApiClient.Status_updatesClient", client => ConfigureClient(client, configuration))
                 .AddPolicyHandler((s, request) => 
                     Policy<HttpResponseMessage>
                     .Handle<ApiException>()
@@ -164,7 +164,7 @@ namespace Trakx.CoinGecko.ApiClient
                 .AddHttpMessageHandler<CachedHttpClientHandler>();
 
                                 
-            services.AddHttpClient<IEventsClient, EventsClient>("Trakx.CoinGecko.ApiClient.EventsClient", ConfigureClient)
+            services.AddHttpClient<IEventsClient, EventsClient>("Trakx.CoinGecko.ApiClient.EventsClient", client => ConfigureClient(client, configuration))
                 .AddPolicyHandler((s, request) => 
                     Policy<HttpResponseMessage>
                     .Handle<ApiException>()
@@ -180,7 +180,7 @@ namespace Trakx.CoinGecko.ApiClient
                 .AddHttpMessageHandler<CachedHttpClientHandler>();
 
                                 
-            services.AddHttpClient<IExchange_ratesClient, Exchange_ratesClient>("Trakx.CoinGecko.ApiClient.Exchange_ratesClient", ConfigureClient)
+            services.AddHttpClient<IExchange_ratesClient, Exchange_ratesClient>("Trakx.CoinGecko.ApiClient.Exchange_ratesClient", client => ConfigureClient(client, configuration))
                 .AddPolicyHandler((s, request) => 
                     Policy<HttpResponseMessage>
                     .Handle<ApiException>()
@@ -196,7 +196,7 @@ namespace Trakx.CoinGecko.ApiClient
                 .AddHttpMessageHandler<CachedHttpClientHandler>();
 
                                 
-            services.AddHttpClient<ITrendingClient, TrendingClient>("Trakx.CoinGecko.ApiClient.TrendingClient", ConfigureClient)
+            services.AddHttpClient<ITrendingClient, TrendingClient>("Trakx.CoinGecko.ApiClient.TrendingClient", client => ConfigureClient(client, configuration))
                 .AddPolicyHandler((s, request) => 
                     Policy<HttpResponseMessage>
                     .Handle<ApiException>()
@@ -212,7 +212,7 @@ namespace Trakx.CoinGecko.ApiClient
                 .AddHttpMessageHandler<CachedHttpClientHandler>();
 
                                 
-            services.AddHttpClient<IGlobalClient, GlobalClient>("Trakx.CoinGecko.ApiClient.GlobalClient", ConfigureClient)
+            services.AddHttpClient<IGlobalClient, GlobalClient>("Trakx.CoinGecko.ApiClient.GlobalClient", client => ConfigureClient(client, configuration))
                 .AddPolicyHandler((s, request) => 
                     Policy<HttpResponseMessage>
                     .Handle<ApiException>()
@@ -229,9 +229,10 @@ namespace Trakx.CoinGecko.ApiClient
 
         }
 
-        private static void ConfigureClient(HttpClient client)
+        private static void ConfigureClient(HttpClient client, CoinGeckoApiConfiguration configuration)
         {
-	        client.DefaultRequestHeaders.Add(proKey, Environment.GetEnvironmentVariable("COINGECKO_API_KEY"));
+	        if (configuration.IsPro)
+				client.DefaultRequestHeaders.Add(proHeader, configuration.ApiKey);
         }
     }
 }

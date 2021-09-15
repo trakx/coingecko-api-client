@@ -1,4 +1,6 @@
-﻿namespace Trakx.CoinGecko.ApiClient
+﻿using System;
+
+namespace Trakx.CoinGecko.ApiClient
 {
     public record CoinGeckoApiConfiguration
     {
@@ -14,5 +16,8 @@
 
         public int? CacheDurationInSeconds { get; init; }
 
+        public bool IsPro => BaseUrl.Contains("pro-api", StringComparison.InvariantCultureIgnoreCase);
+        
+        public string ApiKey { get; init; }
     }
 }

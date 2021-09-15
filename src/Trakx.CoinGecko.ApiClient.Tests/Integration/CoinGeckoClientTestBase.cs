@@ -6,8 +6,6 @@ using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using Serilog;
-using Serilog.Core;
-using Serilog.Sinks.XUnit;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -102,11 +100,12 @@ namespace Trakx.CoinGecko.ApiClient.Tests.Integration
         {
             var configuration = new CoinGeckoApiConfiguration
             {
-                BaseUrl = CoinGeckoBaseUrl,
+                BaseUrl = CoinGeckoProBaseUrl,
                 MaxRetryCount = 5,
                 ThrottleDelayPerSecond = 500,
                 CacheDurationInSeconds = 20,
-                InitialRetryDelayInMilliseconds = 100
+                InitialRetryDelayInMilliseconds = 100,
+                ApiKey = CoinGeckoApiKey
             };
 
             var serviceCollection = new ServiceCollection();
@@ -116,6 +115,8 @@ namespace Trakx.CoinGecko.ApiClient.Tests.Integration
 
             ServiceProvider = serviceCollection.BuildServiceProvider();
         }
+
+        public static string CoinGeckoApiKey => Environment.GetEnvironmentVariable("CoinGeckoApiConfiguration__ApiKey");
 
         protected virtual void Dispose(bool disposing)
         {

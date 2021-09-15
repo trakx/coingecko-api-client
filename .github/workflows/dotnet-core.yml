@@ -35,6 +35,8 @@ jobs:
         dotnet build ${{env.SOLUTION_PATH}} --configuration Debug --no-restore
 
     - name: Test & Coverage
+      env:
+        COINGECKO_API_KEY: ${{ secrets.COINGECKO_API_KEY }}
       run: |
         for f in ./src/*.Tests/*.Tests.csproj; do echo "testing project $f" && \
         dotnet test $f --configuration Debug --no-restore --logger GitHubActions --verbosity normal\
