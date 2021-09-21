@@ -1,4 +1,5 @@
 ﻿using System;
+using Trakx.Utils.Attributes;
 
 namespace Trakx.CoinGecko.ApiClient
 {
@@ -12,12 +13,13 @@ namespace Trakx.CoinGecko.ApiClient
 
         public int? InitialRetryDelayInMilliseconds { get; init; }
 
-        public  int? ThrottleDelayPerSecond { get; init; }
+        public int? ThrottleDelayPerSecond { get; init; }
 
         public int? CacheDurationInSeconds { get; init; }
 
         public bool IsPro => BaseUrl.Contains("pro-api", StringComparison.InvariantCultureIgnoreCase);
-        
+
+        [SecretEnvironmentVariable(nameof(CoinGeckoApiConfiguration), nameof(ApiKey))]
         public string ApiKey { get; init; }
     }
 }

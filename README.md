@@ -11,3 +11,9 @@ C# implementation of a CoinGecko API client
 * Do right click on the project and select Edit Project File. In the file change value of `GenerateApiClient` property to true.
 * Rebuild the project. `NSwag` target will be executed as post action.
 * The last thing to be done is to run integration test `OpenApiGeneratedCodeModifier` that will rewrite auto generated C# classes to use C# 9 features like records and init keyword.
+
+## Creating your local .env file
+In order to be able to run some integration tests, you should create a `.env` file in the `src` folder with the following variables:
+```secretsEnvVariables
+CoinGeckoApiConfiguration__ApiKey=********
+```
