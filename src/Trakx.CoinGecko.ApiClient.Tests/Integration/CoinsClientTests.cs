@@ -72,7 +72,7 @@ namespace Trakx.CoinGecko.ApiClient.Tests.Integration
             range.Result.Total_volumes.Count.Should().Be(range.Result.Prices.Count);
 
             DateTimeOffset.FromUnixTimeMilliseconds((long) range.Result.Prices.First()[0]).Should().BeCloseTo(start, TimeSpan.FromDays(1));
-            range.Result.Prices.First()[1].Should().BeApproximately(613d, 10d);
+            range.Result.Prices.First()[1].Should().BeApproximately(613d, 15d);
             DateTimeOffset.FromUnixTimeMilliseconds((long) range.Result.Prices.Last()[0]).Should().BeCloseTo(end, TimeSpan.FromDays(1));
             range.Result.Prices.Last()[1].Should().BeApproximately(746d, 10d);
             EnsureAllJsonElementsWereMapped(range);
