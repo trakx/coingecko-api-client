@@ -9,7 +9,9 @@
   <Import Project="../Common.Projects.props" />
 
   <ItemGroup>
-    <None Include="..\..\LICENSE" Link="LICENSE" />
+    <None Include="..\..\LICENSE">
+      <Link>LICENSE</Link>
+    </None>
   </ItemGroup>
 
   <ItemGroup>

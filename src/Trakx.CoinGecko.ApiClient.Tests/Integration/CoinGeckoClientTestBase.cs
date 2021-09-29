@@ -6,6 +6,8 @@ using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using Serilog;
+using Trakx.Utils.Attributes;
+using Trakx.Utils.Testing;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -93,19 +95,20 @@ namespace Trakx.CoinGecko.ApiClient.Tests.Integration
     {
         public const string CoinGeckoBaseUrl = "https://api.coingecko.com/api/v3";
         public const string CoinGeckoProBaseUrl = "https://pro-api.coingecko.com/api/v3";
-        
+
         public ServiceProvider ServiceProvider { get; }
 
         public CoinGeckoApiFixture( )
         {
+            var secrets = new Secrets();
             var configuration = new CoinGeckoApiConfiguration
             {
                 BaseUrl = CoinGeckoProBaseUrl,
                 MaxRetryCount = 5,
-                ThrottleDelayPerSecond = 500,
+                ThrottleDelayPerSecond = 120,
                 CacheDurationInSeconds = 20,
                 InitialRetryDelayInMilliseconds = 100,
-                ApiKey = CoinGeckoApiKey
+                ApiKey = secrets.ApiKey
             };
 
             var serviceCollection = new ServiceCollection();
@@ -115,8 +118,6 @@ namespace Trakx.CoinGecko.ApiClient.Tests.Integration
 
             ServiceProvider = serviceCollection.BuildServiceProvider();
         }
-
-        public static string CoinGeckoApiKey => Environment.GetEnvironmentVariable("CoinGeckoApiConfiguration__ApiKey");
 
         protected virtual void Dispose(bool disposing)
         {
@@ -129,5 +130,13 @@ namespace Trakx.CoinGecko.ApiClient.Tests.Integration
             Dispose(true);
             GC.SuppressFinalize(this);
         }
+    }
+
+    public record Secrets : SecretsBase
+    {
+#nullable disable
+        [SecretEnvironmentVariable(nameof(CoinGeckoApiConfiguration), nameof(CoinGeckoApiConfiguration.ApiKey))]
+        public string ApiKey { get; init; }
+#nullable restore
     }
 }
