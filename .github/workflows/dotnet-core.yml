@@ -8,6 +8,7 @@ on:
     
 env:
   SOLUTION_PATH: "src/Trakx.CoinGecko.ApiClient.sln"
+  CoinGeckoApiConfiguration__ApiKey: ${{secrets.COINGECKO_API_KEY}}
   
 jobs:
   build:

@@ -6,8 +6,8 @@ using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using Serilog;
-using Serilog.Core;
-using Serilog.Sinks.XUnit;
+using Trakx.Utils.Attributes;
+using Trakx.Utils.Testing;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -93,24 +93,29 @@ namespace Trakx.CoinGecko.ApiClient.Tests.Integration
 
     public class CoinGeckoApiFixture : IDisposable
     {
+        public const string CoinGeckoBaseUrl = "https://api.coingecko.com/api/v3";
+        public const string CoinGeckoProBaseUrl = "https://pro-api.coingecko.com/api/v3";
+
         public ServiceProvider ServiceProvider { get; }
 
         public CoinGeckoApiFixture( )
         {
+            var secrets = new Secrets();
             var configuration = new CoinGeckoApiConfiguration
             {
-                BaseUrl = "https://api.coingecko.com/api/v3",
-                MaxRetryCount = 2,
-                ThrottleDelayPerSecond = 100,
-                CacheDurationInSeconds = 10,
-                InitialRetryDelayInMilliseconds = 100
+                BaseUrl = CoinGeckoProBaseUrl,
+                MaxRetryCount = 5,
+                ThrottleDelayPerSecond = 120,
+                CacheDurationInSeconds = 20,
+                InitialRetryDelayInMilliseconds = 100,
+                ApiKey = secrets.ApiKey
             };
 
             var serviceCollection = new ServiceCollection();
-            
+
             serviceCollection.AddSingleton(configuration);
             serviceCollection.AddCoinGeckoClient(configuration);
-            
+
             ServiceProvider = serviceCollection.BuildServiceProvider();
         }
 
@@ -125,5 +130,13 @@ namespace Trakx.CoinGecko.ApiClient.Tests.Integration
             Dispose(true);
             GC.SuppressFinalize(this);
         }
+    }
+
+    public record Secrets : SecretsBase
+    {
+#nullable disable
+        [SecretEnvironmentVariable(nameof(CoinGeckoApiConfiguration), nameof(CoinGeckoApiConfiguration.ApiKey))]
+        public string ApiKey { get; init; }
+#nullable restore
     }
 }

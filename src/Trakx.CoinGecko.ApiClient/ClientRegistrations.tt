@@ -22,6 +22,7 @@ namespace <#= nameSpace #>
     {
         private static void AddClients(this IServiceCollection services, CoinGeckoApiConfiguration configuration)
         {
+            var configurator = new ClientConfigurator(configuration);
             var maxRetryCount = configuration.MaxRetryCount ?? 10;
             var delays = Backoff.DecorrelatedJitterBackoffV2(
                 medianFirstRetryDelay: TimeSpan.FromMilliseconds(configuration.InitialRetryDelayInMilliseconds ?? 100), 
@@ -37,7 +38,7 @@ namespace <#= nameSpace #>
             {
             #>
                         
-            services.AddHttpClient<I<#= name #>, <#= name #>>("<#= nameSpace #>.<#= name #>")
+            services.AddHttpClient<I<#= name #>, <#= name #>>("<#= nameSpace #>.<#= name #>", x => configurator.AddHeaders(x))
                 .AddPolicyHandler((s, request) => 
                     Policy<HttpResponseMessage>
                     .Handle<ApiException>()
@@ -52,9 +53,9 @@ namespace <#= nameSpace #>
                     
                 .AddHttpMessageHandler<CachedHttpClientHandler>();
 
-        <#
-        }
-        #>
+            <#
+            }
+            #>
 }
     }
 }

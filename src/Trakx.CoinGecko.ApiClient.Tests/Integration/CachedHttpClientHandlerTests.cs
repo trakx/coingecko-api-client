@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
-using Xunit.Abstractions;
 
 namespace Trakx.CoinGecko.ApiClient.Tests.Integration
 {
@@ -14,13 +13,13 @@ namespace Trakx.CoinGecko.ApiClient.Tests.Integration
         private readonly ICoinGeckoClient _client;
         private readonly int _throttleDelay;
 
-        public CachedHttpClientHandlerTests(ITestOutputHelper output)
+        public CachedHttpClientHandlerTests()
         {
             var serviceCollection = new ServiceCollection();
             _throttleDelay = 100;
             var config = new CoinGeckoApiConfiguration
             {
-                BaseUrl = "https://api.coingecko.com/api/v3",
+                BaseUrl = CoinGeckoApiFixture.CoinGeckoBaseUrl,
                 ThrottleDelayPerSecond = _throttleDelay
             };
             serviceCollection.AddCoinGeckoClient(config);

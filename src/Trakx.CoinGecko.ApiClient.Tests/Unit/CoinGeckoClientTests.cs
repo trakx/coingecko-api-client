@@ -73,7 +73,7 @@ namespace Trakx.CoinGecko.ApiClient.Tests.Unit
             ConfigureHistoryAsync(currency, asOf, currencyPrice, currencyVolume);
 
             var result = await _coinGeckoClient.GetMarketDataAsOfFromId(coin, asOf, currency);
-            result.AsOf.Should().Be(asOf);
+            result!.AsOf.Should().Be(asOf);
             result.CoinId.Should().Be(coin);
             result.CoinSymbol.Should().Be(coin);
             result.MarketCap.Should().NotBeNull();
@@ -154,7 +154,7 @@ namespace Trakx.CoinGecko.ApiClient.Tests.Unit
             var vsCurrency = _mockCreator.GetRandomString(3);
             var start = _mockCreator.GetRandomUtcDateTimeOffset();
             var end = _mockCreator.GetRandomUtcDateTimeOffset();
-            
+
             _coinsClient.RangeAsync(id, vsCurrency, start.ToUnixTimeSeconds(), end.ToUnixTimeSeconds(), CancellationToken.None)
                 .Returns(new Response<Range>(200, null, range));
 
@@ -166,7 +166,7 @@ namespace Trakx.CoinGecko.ApiClient.Tests.Unit
                 .ConfigureAwait(false);
 
             result.Keys.Should().BeEquivalentTo(dates.Select(d => DateTimeOffset.FromUnixTimeMilliseconds((long)d)));
-            
+
             var firstDate = DateTimeOffset.FromUnixTimeMilliseconds((long)dates[0]);
             var firstResult = result[firstDate];
             firstResult.Price.Should().Be((decimal)2756.166102270321);
