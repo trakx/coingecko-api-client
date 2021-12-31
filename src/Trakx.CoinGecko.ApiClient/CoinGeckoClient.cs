@@ -98,10 +98,11 @@ namespace Trakx.CoinGecko.ApiClient
             var quoteResponse = await _coinsClient.HistoryAsync(quoteCurrencyId, date, false.ToString())
                 .ConfigureAwait(false);
 
-            var fxRate = quoteResponse.Result.Market_data.Current_price.ContainsKey(Constants.Usd) ?
+            var fxRate = quoteResponse.Result.Market_data is not null &&
+                quoteResponse.Result.Market_data.Current_price.ContainsKey(Constants.Usd) ?
                 quoteResponse.Result.Market_data.Current_price[Constants.Usd] : default;
 
-            if (fxRate != null) return (decimal) fxRate;
+            if (fxRate != null) return (decimal)fxRate;
 
             Logger.Debug($"Current price for '{Constants.Usd}' in coin id '{quoteCurrencyId} for date '{date:dd-MM-yyyy}' is missing.");
             throw new FailedToRetrievePriceException($"Failed to retrieve price of {quoteCurrencyId} as of {date}");
