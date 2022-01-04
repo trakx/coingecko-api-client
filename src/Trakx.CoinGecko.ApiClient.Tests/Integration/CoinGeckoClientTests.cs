@@ -98,7 +98,7 @@ namespace Trakx.CoinGecko.ApiClient.Tests.Integration
         public async Task GetAllPricesExtended_should_return_marketCap_and_dailyVolume()
         {
             var coinIds = GetCoinIds();
-            var quoteCurrencies = new[] { Constants.Usd, "eth"};
+            var quoteCurrencies = new[] { Constants.Usd, "eth" };
             var result = await _coinsClient.GetAllPricesExtended(
                 coinIds,
                 quoteCurrencies,
@@ -106,11 +106,11 @@ namespace Trakx.CoinGecko.ApiClient.Tests.Integration
                 include24HrVol: true);
 
             foreach (var coinId in coinIds)
-            foreach (var quoteCurrency in quoteCurrencies)
-            {
-                result.Should().Contain(p => p.CoinGeckoId == coinId && p.Currency == quoteCurrency);
-            result.Should().OnlyContain(p => p.MarketCap > 0 && p.DailyVolume > 0);
-        }
+                foreach (var quoteCurrency in quoteCurrencies)
+                {
+                    result.Should().Contain(p => p.CoinGeckoId == coinId && p.Currency == quoteCurrency);
+                    result.Should().OnlyContain(p => p.MarketCap > 0 && p.DailyVolume > 0);
+                }
 
             result.Should().HaveCount(coinIds.Length * quoteCurrencies.Length);
         }
@@ -121,8 +121,9 @@ namespace Trakx.CoinGecko.ApiClient.Tests.Integration
             var coinGeckoId = "bitcoin";
             var currencyId = Constants.Usd;
             int daysCount = 2;
-            var result = await _coinsClient.GetMarketData(coinGeckoId, currencyId, daysCount, CancellationToken.None);
-            result.Should().HaveCount(daysCount + 1);
+            var result = await _coinsClient.GetMarketData(coinGeckoId,
+                currencyId, daysCount, CancellationToken.None);
+            result.Should().HaveCountGreaterOrEqualTo(daysCount);
             foreach (var item in result)
             {
                 item.Value.AsOf.Should().NotBeNull();
