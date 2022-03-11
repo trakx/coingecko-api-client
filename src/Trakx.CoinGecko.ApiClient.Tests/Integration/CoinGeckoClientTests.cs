@@ -35,14 +35,6 @@ namespace Trakx.CoinGecko.ApiClient.Tests.Integration
 
         [Theory]
         [ClassData(typeof(CoinGeckoIdsTestData))]
-        public async Task GetPriceAsOfFromId_should_return_valid_price_when_passing_valid_id(string id)
-        {
-            var result = await _coinsClient.GetPriceAsOfFromId(id, _asOf, _quoteCurrencyId);
-            result.Should().NotBeNull();
-        }
-
-        [Theory]
-        [ClassData(typeof(CoinGeckoIdsTestData))]
         public async Task GetMarketDataAsOfFromId_should_return_valid_data_when_passing_valid_id(string id)
         {
             var result = await _coinsClient.GetMarketDataAsOfFromId(id, _asOf, _quoteCurrencyId);

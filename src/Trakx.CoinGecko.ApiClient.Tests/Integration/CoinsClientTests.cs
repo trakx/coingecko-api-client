@@ -1,10 +1,12 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.VisualStudio.TestPlatform.Utilities;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -12,13 +14,16 @@ namespace Trakx.CoinGecko.ApiClient.Tests.Integration
 {
     public class CoinsClientTests : CoinGeckoClientTestBase
     {
-
+        private readonly ISimpleClient _simpleClient;
         private readonly ICoinsClient _coinsClient;
+        private readonly ITestOutputHelper _output;
 
         public CoinsClientTests(CoinGeckoApiFixture apiFixture, ITestOutputHelper output)
             : base(apiFixture, output)
         {
             _coinsClient = ServiceProvider.GetRequiredService<ICoinsClient>();
+            _simpleClient = ServiceProvider.GetRequiredService<ISimpleClient>();
+            _output = output;
         }
 
         [Fact]
@@ -76,6 +81,30 @@ namespace Trakx.CoinGecko.ApiClient.Tests.Integration
             DateTimeOffset.FromUnixTimeMilliseconds((long) range.Result.Prices.Last()[0]).Should().BeCloseTo(end, TimeSpan.FromDays(1));
             range.Result.Prices.Last()[1].Should().BeApproximately(746d, 10d);
             EnsureAllJsonElementsWereMapped(range);
+        }
+
+        [Fact]
+        public async Task Export_recent_prices()
+        {
+            var coins = new List<string>()
+            {
+                "bitcoin", "pax-gold", "usd-coin", "ethereum", "binancecoin", "crypto-com-chain", "ftx-token",
+                "huobi-token", "kucoin-shares", "okb", "woo-network", "1inch", "pancakeswap-token", "curve-dao-token",
+                "dydx", "loopring", "thorchain", "havven", "sushi", "uniswap", "0x", "api3", "perpetual-protocol",
+                "yearn-finance", "cosmos", "polkadot", "zelcash", "icon", "chainlink", "quant-network", "zencash",
+                "aave", "anchor-protocol", "compound-governance-token", "kava", "maker", "cardano", "avalanche-2",
+                "dogecoin", "terra-luna", "solana", "ripple", "amp-token", "the-graph", "axie-infinity", "chiliz",
+                "enjincoin", "flow", "gala", "decentraland", "the-sandbox", "smooth-love-potion", "theta-token", "wax",
+                "matic-network", "tron"
+            };
+
+            var data = await _simpleClient.PriceAsync(string.Join(",", coins), "usd");
+            _output.WriteLine("\"coin\",\"price\"");
+            foreach (var coin in coins)
+            {
+                var price = data.Result[coin]["usd"]!.Value;
+                _output.WriteLine($"\"{coin}\",\"{price}\"");
+            }
         }
     }
 }

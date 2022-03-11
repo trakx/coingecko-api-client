@@ -1,9 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
+using Microsoft.Extensions.Caching.Memory;
 using NSubstitute;
 using Trakx.Utils.Testing;
 using Xunit;
@@ -18,14 +20,16 @@ namespace Trakx.CoinGecko.ApiClient.Tests.Unit
         private readonly ISimpleClient _simpleClient;
         private readonly ICoinsClient _coinsClient;
         private readonly MockCreator _mockCreator;
+        private readonly IMemoryCache _memoryCache;
 
         public CoinGeckoClientTests(ITestOutputHelper output)
         {
             _simpleClient = Substitute.For<ISimpleClient>();
             _coinsClient = Substitute.For<ICoinsClient>();
+            _memoryCache = Substitute.For<IMemoryCache>();
             _mockCreator = new MockCreator(output);
 
-            _coinGeckoClient = new CoinGeckoClient(_coinsClient, _simpleClient);
+            _coinGeckoClient = new CoinGeckoClient(_memoryCache, _coinsClient, _simpleClient);
         }
 
         [Fact]
@@ -41,26 +45,10 @@ namespace Trakx.CoinGecko.ApiClient.Tests.Unit
         }
 
         [Fact]
-        public async Task GetPriceAsOfFromId_should_return_valid_price_when_passing_valid_id()
-        {
-            var asOf = _mockCreator.GetRandomUtcDateTime();
-
-            var coin = _mockCreator.GetRandomString(10);
-            var coinPrice = _mockCreator.GetRandomPrice();
-            ConfigureHistoryAsync(coin, asOf, coinPrice, 1m);
-
-            var currency = _mockCreator.GetRandomString(10);
-            var currencyPrice = _mockCreator.GetRandomPrice();
-            ConfigureHistoryAsync(currency, asOf, currencyPrice, 1m);
-
-            var result = await _coinGeckoClient.GetPriceAsOfFromId(coin, asOf, currency);
-            result.Should().Be(coinPrice / currencyPrice);
-        }
-
-        [Fact]
         public async Task GetMarketDataAsOfFromId_should_return_valid_data_when_passing_valid_id()
         {
             var asOf = _mockCreator.GetRandomUtcDateTime();
+            var asOfString = asOf.ToString("dd-MM-yyyy");
 
             var coin = _mockCreator.GetRandomString(10);
             var coinPrice = _mockCreator.GetRandomPrice();
@@ -80,6 +68,16 @@ namespace Trakx.CoinGecko.ApiClient.Tests.Unit
             result.Price.Should().Be(coinPrice / currencyPrice);
             result.Volume.Should().Be(coinVolume / currencyPrice);
             result.QuoteCurrency.Should().Be(coin);
+
+            Expression<Predicate<object>> fxRatePredicate =
+                o =>  o.ToString()!.Contains(asOfString) && o.ToString()!.Contains("fx-rate") && o.ToString()!.Contains(currency);
+            Expression<Predicate<object>> marketDataPredicate =
+                o =>  o.ToString()!.Contains(asOfString) && o.ToString()!.Contains("market-data") && o.ToString()!.Contains(currency) && o.ToString()!.Contains(coin);
+
+            _memoryCache.Received(1).TryGetValue(Arg.Is(fxRatePredicate), out _);
+            _memoryCache.Received(1).CreateEntry(Arg.Is(fxRatePredicate));
+            _memoryCache.Received(1).TryGetValue(Arg.Is(marketDataPredicate), out _);
+            _memoryCache.Received(1).CreateEntry(Arg.Is(marketDataPredicate));
         }
 
         [Fact]
@@ -108,6 +106,7 @@ namespace Trakx.CoinGecko.ApiClient.Tests.Unit
             ConfigureListAllAsync(count: 5);
             var result = await _coinGeckoClient.GetCoinList();
             result.Count.Should().Be(5);
+            _memoryCache.Received(1).CreateEntry(Arg.Is<object>(o => o.ToString()!.Contains("coin-list")));
         }
 
         [Fact]

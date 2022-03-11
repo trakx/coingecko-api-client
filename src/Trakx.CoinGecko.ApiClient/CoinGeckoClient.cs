@@ -1,12 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reflection;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using Ardalis.GuardClauses;
+using Microsoft.Extensions.Caching.Memory;
 using Serilog;
+using Serilog.Events;
 using Trakx.Utils.Extensions;
 
 namespace Trakx.CoinGecko.ApiClient
@@ -16,10 +19,11 @@ namespace Trakx.CoinGecko.ApiClient
         private static readonly ILogger Logger =
             Log.Logger.ForContext(MethodBase.GetCurrentMethod()!.DeclaringType);
 
+        private readonly IMemoryCache _cache;
         private readonly ICoinsClient _coinsClient;
         private readonly ISimpleClient _simpleClient;
-        private Dictionary<string, string>? _symbolsByNames;
         private Dictionary<string, string>? _idsBySymbolName;
+        private readonly string? _typeName;
 
         public Dictionary<string, string> IdsBySymbolName
         {
@@ -33,12 +37,17 @@ namespace Trakx.CoinGecko.ApiClient
 
         public Dictionary<string, CoinFullData> CoinFullDataByIds { get; }
 
-        public CoinGeckoClient(ICoinsClient coinsClient, ISimpleClient simpleClient)
+        public CoinGeckoClient(
+            IMemoryCache cache,
+            ICoinsClient coinsClient,
+            ISimpleClient simpleClient)
         {
+            _cache = cache;
             _coinsClient = coinsClient;
             _simpleClient = simpleClient;
 
             CoinFullDataByIds = new Dictionary<string, CoinFullData>();
+            _typeName = GetType().FullName;
         }
 
         /// <inheritdoc />
@@ -50,7 +59,7 @@ namespace Trakx.CoinGecko.ApiClient
                 .PriceAsync($"{coinGeckoId},{quoteCurrencyId}", "usd")
                 .ConfigureAwait(false);
 
-            Logger.Debug(JsonSerializer.Serialize(tickerDetails));
+            Logger.Debug("Received latest price {tickerDetails}", JsonSerializer.Serialize(tickerDetails));
 
             var price = tickerDetails.Result[coinGeckoId]["usd"];
             var conversionToQuoteCurrency = quoteCurrencyId == "usd"
@@ -70,30 +79,12 @@ namespace Trakx.CoinGecko.ApiClient
             return ids.Count == 1 ? ids[0].Id : null;
         }
 
-        /// <inheritdoc />
-        [Obsolete("Use GetMarketDataAsOfFromId instead")]
-        public async Task<decimal?> GetPriceAsOfFromId(string id, DateTime asOf, string quoteCurrencyId = Constants.UsdCoin)
-        {
-            try
-            {
-                var date = asOf.ToString("dd-MM-yyyy");
-
-                var fxRate = await GetUsdFxRate(quoteCurrencyId, date);
-
-                var historicalPrice = await _coinsClient.HistoryAsync(id, date, false.ToString()).ConfigureAwait(false);
-
-                return historicalPrice.Result.Market_data.Current_price[Constants.Usd] / fxRate;
-            }
-            catch (Exception e)
-            {
-                Logger.Debug(e, "Failed to retrieve price for {0} as of {1:yyyyMMdd}", id, asOf);
-                return null;
-            }
-        }
-
         private async Task<decimal> GetUsdFxRate(string quoteCurrencyId, string date)
         {
             Guard.Against.NullOrWhiteSpace(quoteCurrencyId, nameof(quoteCurrencyId));
+
+            var cacheKey = $"{_typeName}|usd-fx-rate|{quoteCurrencyId}|{date}";
+            if (_cache.TryGetValue(cacheKey, out decimal cached)) return cached;
 
             var quoteResponse = await _coinsClient.HistoryAsync(quoteCurrencyId, date, false.ToString())
                 .ConfigureAwait(false);
@@ -102,22 +93,34 @@ namespace Trakx.CoinGecko.ApiClient
                 quoteResponse.Result.Market_data.Current_price.ContainsKey(Constants.Usd) ?
                 quoteResponse.Result.Market_data.Current_price[Constants.Usd] : default;
 
-            if (fxRate != null) return (decimal)fxRate;
+            if (fxRate == null)
+            {
+                Logger.Debug($"Current price for '{Constants.Usd}' in coin id '{quoteCurrencyId} for date '{date:dd-MM-yyyy}' is missing.");
+                throw new FailedToRetrievePriceException($"Failed to retrieve price of {quoteCurrencyId} as of {date}");
+            }
 
-            Logger.Debug($"Current price for '{Constants.Usd}' in coin id '{quoteCurrencyId} for date '{date:dd-MM-yyyy}' is missing.");
-            throw new FailedToRetrievePriceException($"Failed to retrieve price of {quoteCurrencyId} as of {date}");
-
+            var entry =_cache.CreateEntry(cacheKey);
+            entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromDays(1);
+            entry.Value = fxRate.Value;
+            return fxRate.Value;
         }
 
         /// <inheritdoc />
         public async Task<MarketData?> GetMarketDataAsOfFromId(string id, DateTime asOf, string quoteCurrencyId = "usd-coin")
         {
             var date = asOf.ToString("dd-MM-yyyy");
-            var fullData = await _coinsClient.HistoryAsync(id, date, false.ToString())
+            var cacheKey = $"{_typeName}|market-data|{id}|{quoteCurrencyId}|{date}";
+            if (_cache.TryGetValue(cacheKey, out MarketData cached)) return cached;
+
+            var fullData = await _coinsClient
+                .HistoryAsync(id, date, false.ToString())
                 .ConfigureAwait(false);
+
             var fxRate = await GetUsdFxRate(quoteCurrencyId, date);
+
             if (fullData.Result.Market_data == null)
                 return null;
+
             var marketData = new MarketData
             {
                 AsOf = asOf,
@@ -129,16 +132,11 @@ namespace Trakx.CoinGecko.ApiClient
                 QuoteCurrency = fullData.Result.Symbol
             };
 
+            var entry = _cache.CreateEntry(cacheKey);
+            entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromDays(1);
+            entry.Value = marketData;
+
             return marketData;
-        }
-
-        public bool TryRetrieveSymbol(string coinName, out string? symbol)
-        {
-            _symbolsByNames ??= GetCoinList().GetAwaiter().GetResult().ToDictionary(c => c.Name, c => c.Symbol);
-            var bestMatch = coinName.FindBestLevenshteinMatch(_symbolsByNames.Keys);
-            symbol = bestMatch != null ? _symbolsByNames[bestMatch] : null;
-
-            return bestMatch != null;
         }
 
         private string GetSymbolNameKey(string symbol, string name)
@@ -146,47 +144,20 @@ namespace Trakx.CoinGecko.ApiClient
             return $"{symbol.ToLower()}|{name.ToLower()}";
         }
 
-        public string RetrieveCoinGeckoId(string symbol, string name)
-        {
-            var symbolNameKey = GetSymbolNameKey(symbol, name);
-            if (IdsBySymbolName.TryGetValue(symbolNameKey, out var coinGeckoId))
-                return coinGeckoId;
-
-            var bestMatch = symbolNameKey.FindBestLevenshteinMatch(IdsBySymbolName.Keys);
-            if (bestMatch == null) throw new FailedToRetrieveCoinGeckoIdException($"Unable to find the best coin gecko id match for symbol '{symbol}'.");
-
-            coinGeckoId = IdsBySymbolName[bestMatch];
-            IdsBySymbolName.Add(symbolNameKey, coinGeckoId);
-            return coinGeckoId;
-
-        }
-        public CoinFullData? RetrieveCoinFullData(string coinId)
-        {
-            if (CoinFullDataByIds.TryGetValue(coinId, out var data)) return data;
-
-            try
-            {
-                data = _coinsClient.CoinsAsync(coinId, "false",
-                        false, false, false, false, false)
-                    .GetAwaiter().GetResult().Result;
-
-                CoinFullDataByIds[coinId] = data;
-                return data;
-            }
-            catch (Exception exception)
-            {
-                Logger.Warning(exception, "Failed to retrieve coin data for {0}", coinId);
-                return default;
-            }
-        }
-
         public async Task<IReadOnlyList<CoinList>> GetCoinList()
         {
-            var coinList = await _coinsClient.ListAllAsync().ConfigureAwait(false);
-            return coinList.Result;
+            var cacheKey = $"{_typeName}|coin-list";
+            var result = await _cache.GetOrCreateAsync<ReadOnlyCollection<CoinList>>(cacheKey,
+                async e =>
+                {
+                    var coinList = await _coinsClient.ListAllAsync().ConfigureAwait(false);
+                    e.AbsoluteExpirationRelativeToNow = TimeSpan.FromDays(1);
+                    return coinList.Result!.AsReadOnly();
+                });
+            return result;
         }
 
-        public async Task<IDictionary<string, IDictionary<string, decimal?>>> GetAllPrices(string[] ids, string[]? vsCurrencies = null)
+        public async Task<IDictionary<string, IDictionary<string, decimal?>>> GetAllPrices(IEnumerable<string> ids, string[]? vsCurrencies = null)
         {
             var coinsPrice = await _simpleClient.PriceAsync(ids.ToCsvList(true, true, quoted: false),
                 (vsCurrencies ?? new[] { Constants.Usd }).ToCsvList(true, true, quoted: false)).ConfigureAwait(false);
@@ -194,7 +165,7 @@ namespace Trakx.CoinGecko.ApiClient
         }
 
         public async Task<IList<ExtendedPrice>> GetAllPricesExtended(
-            string[] ids,
+            IEnumerable<string> ids,
             string[]? vsCurrencies = null,
             bool includeMarketCap = false,
             bool include24HrVol = false)
