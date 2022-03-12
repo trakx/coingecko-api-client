@@ -1,13 +1,12 @@
-﻿namespace Trakx.CoinGecko.ApiClient
-{
-    internal abstract class AuthorisedClient
-    {
-        public readonly CoinGeckoApiConfiguration Configuration;
-        protected string BaseUrl => Configuration!.BaseUrl;
+﻿namespace Trakx.CoinGecko.ApiClient;
 
-        protected AuthorisedClient(ClientConfigurator clientConfigurator)
-        {
-            Configuration = clientConfigurator.ApiConfiguration;
-        }
+internal abstract class AuthorisedClient
+{
+    public readonly CoinGeckoApiConfiguration Configuration;
+    protected string BaseUrl => Configuration!.BaseUrl;
+
+    protected AuthorisedClient(ClientConfigurator clientConfigurator)
+    {
+        Configuration = clientConfigurator.ApiConfiguration;
     }
 }
