@@ -7,225 +7,226 @@ using Polly.Contrib.WaitAndRetry;
 using Polly.Extensions.Http;
 using Serilog;
 
-namespace Trakx.CoinGecko.ApiClient;
-
-public static partial class AddCoinGeckoClientExtension
+namespace Trakx.CoinGecko.ApiClient
 {
-	private static void AddClients(this IServiceCollection services, CoinGeckoApiConfiguration configuration)
-	{
-		var configurator = new ClientConfigurator(configuration);
-		var maxRetryCount = configuration.MaxRetryCount ?? 10;
-		var delays = Backoff.DecorrelatedJitterBackoffV2(
-			medianFirstRetryDelay: TimeSpan.FromMilliseconds(configuration.InitialRetryDelayInMilliseconds ?? 100), 
-			retryCount: maxRetryCount, fastFirst: false).ToList();
+    public static partial class AddCoinGeckoClientExtension
+    {
+        private static void AddClients(this IServiceCollection services, CoinGeckoApiConfiguration configuration)
+        {
+            var configurator = new ClientConfigurator(configuration);
+            var maxRetryCount = configuration.MaxRetryCount ?? 10;
+            var delays = Backoff.DecorrelatedJitterBackoffV2(
+                medianFirstRetryDelay: TimeSpan.FromMilliseconds(configuration.InitialRetryDelayInMilliseconds ?? 100), 
+                retryCount: maxRetryCount, fastFirst: false).ToList();
 
                                     
-		services.AddHttpClient<IPingClient, PingClient>("Trakx.CoinGecko.ApiClient.PingClient", x => configurator.AddHeaders(x))
-			.AddPolicyHandler((s, request) => 
-				Policy<HttpResponseMessage>
-					.Handle<ApiException>()
-					.OrTransientHttpStatusCode()
-					.WaitAndRetryAsync(
-						retryCount: maxRetryCount,
-						sleepDurationProvider: (retryCount, response, context) => 
-							GetServerWaitDuration(response, delays[retryCount - 1]),
-						onRetryAsync: (result, timeSpan, retryCount, context) =>
+            services.AddHttpClient<IPingClient, PingClient>("Trakx.CoinGecko.ApiClient.PingClient", x => configurator.AddHeaders(x))
+                .AddPolicyHandler((s, request) => 
+                    Policy<HttpResponseMessage>
+                    .Handle<ApiException>()
+                    .OrTransientHttpStatusCode()
+                    .WaitAndRetryAsync(
+		                retryCount: maxRetryCount,
+		                sleepDurationProvider: (retryCount, response, context) => 
+			                GetServerWaitDuration(response, delays[retryCount - 1]),
+		                onRetryAsync: (result, timeSpan, retryCount, context) =>
 							LogFailure(Log.Logger.ForContext<PingClient>(), result, timeSpan, retryCount, context))
-					.WithPolicyKey("Trakx.CoinGecko.ApiClient.PingClient"))
+                    .WithPolicyKey("Trakx.CoinGecko.ApiClient.PingClient"))
                     
-			.AddHttpMessageHandler<CachedHttpClientHandler>();
+                .AddHttpMessageHandler<CachedHttpClientHandler>();
 
                                     
-		services.AddHttpClient<ISimpleClient, SimpleClient>("Trakx.CoinGecko.ApiClient.SimpleClient", x => configurator.AddHeaders(x))
-			.AddPolicyHandler((s, request) => 
-				Policy<HttpResponseMessage>
-					.Handle<ApiException>()
-					.OrTransientHttpStatusCode()
-					.WaitAndRetryAsync(
-						retryCount: maxRetryCount,
-						sleepDurationProvider: (retryCount, response, context) => 
-							GetServerWaitDuration(response, delays[retryCount - 1]),
-						onRetryAsync: (result, timeSpan, retryCount, context) =>
+            services.AddHttpClient<ISimpleClient, SimpleClient>("Trakx.CoinGecko.ApiClient.SimpleClient", x => configurator.AddHeaders(x))
+                .AddPolicyHandler((s, request) => 
+                    Policy<HttpResponseMessage>
+                    .Handle<ApiException>()
+                    .OrTransientHttpStatusCode()
+                    .WaitAndRetryAsync(
+		                retryCount: maxRetryCount,
+		                sleepDurationProvider: (retryCount, response, context) => 
+			                GetServerWaitDuration(response, delays[retryCount - 1]),
+		                onRetryAsync: (result, timeSpan, retryCount, context) =>
 							LogFailure(Log.Logger.ForContext<SimpleClient>(), result, timeSpan, retryCount, context))
-					.WithPolicyKey("Trakx.CoinGecko.ApiClient.SimpleClient"))
+                    .WithPolicyKey("Trakx.CoinGecko.ApiClient.SimpleClient"))
                     
-			.AddHttpMessageHandler<CachedHttpClientHandler>();
+                .AddHttpMessageHandler<CachedHttpClientHandler>();
 
                                     
-		services.AddHttpClient<ICoinsClient, CoinsClient>("Trakx.CoinGecko.ApiClient.CoinsClient", x => configurator.AddHeaders(x))
-			.AddPolicyHandler((s, request) => 
-				Policy<HttpResponseMessage>
-					.Handle<ApiException>()
-					.OrTransientHttpStatusCode()
-					.WaitAndRetryAsync(
-						retryCount: maxRetryCount,
-						sleepDurationProvider: (retryCount, response, context) => 
-							GetServerWaitDuration(response, delays[retryCount - 1]),
-						onRetryAsync: (result, timeSpan, retryCount, context) =>
+            services.AddHttpClient<ICoinsClient, CoinsClient>("Trakx.CoinGecko.ApiClient.CoinsClient", x => configurator.AddHeaders(x))
+                .AddPolicyHandler((s, request) => 
+                    Policy<HttpResponseMessage>
+                    .Handle<ApiException>()
+                    .OrTransientHttpStatusCode()
+                    .WaitAndRetryAsync(
+		                retryCount: maxRetryCount,
+		                sleepDurationProvider: (retryCount, response, context) => 
+			                GetServerWaitDuration(response, delays[retryCount - 1]),
+		                onRetryAsync: (result, timeSpan, retryCount, context) =>
 							LogFailure(Log.Logger.ForContext<CoinsClient>(), result, timeSpan, retryCount, context))
-					.WithPolicyKey("Trakx.CoinGecko.ApiClient.CoinsClient"))
+                    .WithPolicyKey("Trakx.CoinGecko.ApiClient.CoinsClient"))
                     
-			.AddHttpMessageHandler<CachedHttpClientHandler>();
+                .AddHttpMessageHandler<CachedHttpClientHandler>();
 
                                     
-		services.AddHttpClient<IContractClient, ContractClient>("Trakx.CoinGecko.ApiClient.ContractClient", x => configurator.AddHeaders(x))
-			.AddPolicyHandler((s, request) => 
-				Policy<HttpResponseMessage>
-					.Handle<ApiException>()
-					.OrTransientHttpStatusCode()
-					.WaitAndRetryAsync(
-						retryCount: maxRetryCount,
-						sleepDurationProvider: (retryCount, response, context) => 
-							GetServerWaitDuration(response, delays[retryCount - 1]),
-						onRetryAsync: (result, timeSpan, retryCount, context) =>
+            services.AddHttpClient<IContractClient, ContractClient>("Trakx.CoinGecko.ApiClient.ContractClient", x => configurator.AddHeaders(x))
+                .AddPolicyHandler((s, request) => 
+                    Policy<HttpResponseMessage>
+                    .Handle<ApiException>()
+                    .OrTransientHttpStatusCode()
+                    .WaitAndRetryAsync(
+		                retryCount: maxRetryCount,
+		                sleepDurationProvider: (retryCount, response, context) => 
+			                GetServerWaitDuration(response, delays[retryCount - 1]),
+		                onRetryAsync: (result, timeSpan, retryCount, context) =>
 							LogFailure(Log.Logger.ForContext<ContractClient>(), result, timeSpan, retryCount, context))
-					.WithPolicyKey("Trakx.CoinGecko.ApiClient.ContractClient"))
+                    .WithPolicyKey("Trakx.CoinGecko.ApiClient.ContractClient"))
                     
-			.AddHttpMessageHandler<CachedHttpClientHandler>();
+                .AddHttpMessageHandler<CachedHttpClientHandler>();
 
                                     
-		services.AddHttpClient<IExchangesClient, ExchangesClient>("Trakx.CoinGecko.ApiClient.ExchangesClient", x => configurator.AddHeaders(x))
-			.AddPolicyHandler((s, request) => 
-				Policy<HttpResponseMessage>
-					.Handle<ApiException>()
-					.OrTransientHttpStatusCode()
-					.WaitAndRetryAsync(
-						retryCount: maxRetryCount,
-						sleepDurationProvider: (retryCount, response, context) => 
-							GetServerWaitDuration(response, delays[retryCount - 1]),
-						onRetryAsync: (result, timeSpan, retryCount, context) =>
+            services.AddHttpClient<IExchangesClient, ExchangesClient>("Trakx.CoinGecko.ApiClient.ExchangesClient", x => configurator.AddHeaders(x))
+                .AddPolicyHandler((s, request) => 
+                    Policy<HttpResponseMessage>
+                    .Handle<ApiException>()
+                    .OrTransientHttpStatusCode()
+                    .WaitAndRetryAsync(
+		                retryCount: maxRetryCount,
+		                sleepDurationProvider: (retryCount, response, context) => 
+			                GetServerWaitDuration(response, delays[retryCount - 1]),
+		                onRetryAsync: (result, timeSpan, retryCount, context) =>
 							LogFailure(Log.Logger.ForContext<ExchangesClient>(), result, timeSpan, retryCount, context))
-					.WithPolicyKey("Trakx.CoinGecko.ApiClient.ExchangesClient"))
+                    .WithPolicyKey("Trakx.CoinGecko.ApiClient.ExchangesClient"))
                     
-			.AddHttpMessageHandler<CachedHttpClientHandler>();
+                .AddHttpMessageHandler<CachedHttpClientHandler>();
 
                                     
-		services.AddHttpClient<IFinanceClient, FinanceClient>("Trakx.CoinGecko.ApiClient.FinanceClient", x => configurator.AddHeaders(x))
-			.AddPolicyHandler((s, request) => 
-				Policy<HttpResponseMessage>
-					.Handle<ApiException>()
-					.OrTransientHttpStatusCode()
-					.WaitAndRetryAsync(
-						retryCount: maxRetryCount,
-						sleepDurationProvider: (retryCount, response, context) => 
-							GetServerWaitDuration(response, delays[retryCount - 1]),
-						onRetryAsync: (result, timeSpan, retryCount, context) =>
+            services.AddHttpClient<IFinanceClient, FinanceClient>("Trakx.CoinGecko.ApiClient.FinanceClient", x => configurator.AddHeaders(x))
+                .AddPolicyHandler((s, request) => 
+                    Policy<HttpResponseMessage>
+                    .Handle<ApiException>()
+                    .OrTransientHttpStatusCode()
+                    .WaitAndRetryAsync(
+		                retryCount: maxRetryCount,
+		                sleepDurationProvider: (retryCount, response, context) => 
+			                GetServerWaitDuration(response, delays[retryCount - 1]),
+		                onRetryAsync: (result, timeSpan, retryCount, context) =>
 							LogFailure(Log.Logger.ForContext<FinanceClient>(), result, timeSpan, retryCount, context))
-					.WithPolicyKey("Trakx.CoinGecko.ApiClient.FinanceClient"))
+                    .WithPolicyKey("Trakx.CoinGecko.ApiClient.FinanceClient"))
                     
-			.AddHttpMessageHandler<CachedHttpClientHandler>();
+                .AddHttpMessageHandler<CachedHttpClientHandler>();
 
                                     
-		services.AddHttpClient<IIndexesClient, IndexesClient>("Trakx.CoinGecko.ApiClient.IndexesClient", x => configurator.AddHeaders(x))
-			.AddPolicyHandler((s, request) => 
-				Policy<HttpResponseMessage>
-					.Handle<ApiException>()
-					.OrTransientHttpStatusCode()
-					.WaitAndRetryAsync(
-						retryCount: maxRetryCount,
-						sleepDurationProvider: (retryCount, response, context) => 
-							GetServerWaitDuration(response, delays[retryCount - 1]),
-						onRetryAsync: (result, timeSpan, retryCount, context) =>
+            services.AddHttpClient<IIndexesClient, IndexesClient>("Trakx.CoinGecko.ApiClient.IndexesClient", x => configurator.AddHeaders(x))
+                .AddPolicyHandler((s, request) => 
+                    Policy<HttpResponseMessage>
+                    .Handle<ApiException>()
+                    .OrTransientHttpStatusCode()
+                    .WaitAndRetryAsync(
+		                retryCount: maxRetryCount,
+		                sleepDurationProvider: (retryCount, response, context) => 
+			                GetServerWaitDuration(response, delays[retryCount - 1]),
+		                onRetryAsync: (result, timeSpan, retryCount, context) =>
 							LogFailure(Log.Logger.ForContext<IndexesClient>(), result, timeSpan, retryCount, context))
-					.WithPolicyKey("Trakx.CoinGecko.ApiClient.IndexesClient"))
+                    .WithPolicyKey("Trakx.CoinGecko.ApiClient.IndexesClient"))
                     
-			.AddHttpMessageHandler<CachedHttpClientHandler>();
+                .AddHttpMessageHandler<CachedHttpClientHandler>();
 
                                     
-		services.AddHttpClient<IDerivativesClient, DerivativesClient>("Trakx.CoinGecko.ApiClient.DerivativesClient", x => configurator.AddHeaders(x))
-			.AddPolicyHandler((s, request) => 
-				Policy<HttpResponseMessage>
-					.Handle<ApiException>()
-					.OrTransientHttpStatusCode()
-					.WaitAndRetryAsync(
-						retryCount: maxRetryCount,
-						sleepDurationProvider: (retryCount, response, context) => 
-							GetServerWaitDuration(response, delays[retryCount - 1]),
-						onRetryAsync: (result, timeSpan, retryCount, context) =>
+            services.AddHttpClient<IDerivativesClient, DerivativesClient>("Trakx.CoinGecko.ApiClient.DerivativesClient", x => configurator.AddHeaders(x))
+                .AddPolicyHandler((s, request) => 
+                    Policy<HttpResponseMessage>
+                    .Handle<ApiException>()
+                    .OrTransientHttpStatusCode()
+                    .WaitAndRetryAsync(
+		                retryCount: maxRetryCount,
+		                sleepDurationProvider: (retryCount, response, context) => 
+			                GetServerWaitDuration(response, delays[retryCount - 1]),
+		                onRetryAsync: (result, timeSpan, retryCount, context) =>
 							LogFailure(Log.Logger.ForContext<DerivativesClient>(), result, timeSpan, retryCount, context))
-					.WithPolicyKey("Trakx.CoinGecko.ApiClient.DerivativesClient"))
+                    .WithPolicyKey("Trakx.CoinGecko.ApiClient.DerivativesClient"))
                     
-			.AddHttpMessageHandler<CachedHttpClientHandler>();
+                .AddHttpMessageHandler<CachedHttpClientHandler>();
 
                                     
-		services.AddHttpClient<IStatus_updatesClient, Status_updatesClient>("Trakx.CoinGecko.ApiClient.Status_updatesClient", x => configurator.AddHeaders(x))
-			.AddPolicyHandler((s, request) => 
-				Policy<HttpResponseMessage>
-					.Handle<ApiException>()
-					.OrTransientHttpStatusCode()
-					.WaitAndRetryAsync(
-						retryCount: maxRetryCount,
-						sleepDurationProvider: (retryCount, response, context) => 
-							GetServerWaitDuration(response, delays[retryCount - 1]),
-						onRetryAsync: (result, timeSpan, retryCount, context) =>
+            services.AddHttpClient<IStatus_updatesClient, Status_updatesClient>("Trakx.CoinGecko.ApiClient.Status_updatesClient", x => configurator.AddHeaders(x))
+                .AddPolicyHandler((s, request) => 
+                    Policy<HttpResponseMessage>
+                    .Handle<ApiException>()
+                    .OrTransientHttpStatusCode()
+                    .WaitAndRetryAsync(
+		                retryCount: maxRetryCount,
+		                sleepDurationProvider: (retryCount, response, context) => 
+			                GetServerWaitDuration(response, delays[retryCount - 1]),
+		                onRetryAsync: (result, timeSpan, retryCount, context) =>
 							LogFailure(Log.Logger.ForContext<Status_updatesClient>(), result, timeSpan, retryCount, context))
-					.WithPolicyKey("Trakx.CoinGecko.ApiClient.Status_updatesClient"))
+                    .WithPolicyKey("Trakx.CoinGecko.ApiClient.Status_updatesClient"))
                     
-			.AddHttpMessageHandler<CachedHttpClientHandler>();
+                .AddHttpMessageHandler<CachedHttpClientHandler>();
 
                                     
-		services.AddHttpClient<IEventsClient, EventsClient>("Trakx.CoinGecko.ApiClient.EventsClient", x => configurator.AddHeaders(x))
-			.AddPolicyHandler((s, request) => 
-				Policy<HttpResponseMessage>
-					.Handle<ApiException>()
-					.OrTransientHttpStatusCode()
-					.WaitAndRetryAsync(
-						retryCount: maxRetryCount,
-						sleepDurationProvider: (retryCount, response, context) => 
-							GetServerWaitDuration(response, delays[retryCount - 1]),
-						onRetryAsync: (result, timeSpan, retryCount, context) =>
+            services.AddHttpClient<IEventsClient, EventsClient>("Trakx.CoinGecko.ApiClient.EventsClient", x => configurator.AddHeaders(x))
+                .AddPolicyHandler((s, request) => 
+                    Policy<HttpResponseMessage>
+                    .Handle<ApiException>()
+                    .OrTransientHttpStatusCode()
+                    .WaitAndRetryAsync(
+		                retryCount: maxRetryCount,
+		                sleepDurationProvider: (retryCount, response, context) => 
+			                GetServerWaitDuration(response, delays[retryCount - 1]),
+		                onRetryAsync: (result, timeSpan, retryCount, context) =>
 							LogFailure(Log.Logger.ForContext<EventsClient>(), result, timeSpan, retryCount, context))
-					.WithPolicyKey("Trakx.CoinGecko.ApiClient.EventsClient"))
+                    .WithPolicyKey("Trakx.CoinGecko.ApiClient.EventsClient"))
                     
-			.AddHttpMessageHandler<CachedHttpClientHandler>();
+                .AddHttpMessageHandler<CachedHttpClientHandler>();
 
                                     
-		services.AddHttpClient<IExchange_ratesClient, Exchange_ratesClient>("Trakx.CoinGecko.ApiClient.Exchange_ratesClient", x => configurator.AddHeaders(x))
-			.AddPolicyHandler((s, request) => 
-				Policy<HttpResponseMessage>
-					.Handle<ApiException>()
-					.OrTransientHttpStatusCode()
-					.WaitAndRetryAsync(
-						retryCount: maxRetryCount,
-						sleepDurationProvider: (retryCount, response, context) => 
-							GetServerWaitDuration(response, delays[retryCount - 1]),
-						onRetryAsync: (result, timeSpan, retryCount, context) =>
+            services.AddHttpClient<IExchange_ratesClient, Exchange_ratesClient>("Trakx.CoinGecko.ApiClient.Exchange_ratesClient", x => configurator.AddHeaders(x))
+                .AddPolicyHandler((s, request) => 
+                    Policy<HttpResponseMessage>
+                    .Handle<ApiException>()
+                    .OrTransientHttpStatusCode()
+                    .WaitAndRetryAsync(
+		                retryCount: maxRetryCount,
+		                sleepDurationProvider: (retryCount, response, context) => 
+			                GetServerWaitDuration(response, delays[retryCount - 1]),
+		                onRetryAsync: (result, timeSpan, retryCount, context) =>
 							LogFailure(Log.Logger.ForContext<Exchange_ratesClient>(), result, timeSpan, retryCount, context))
-					.WithPolicyKey("Trakx.CoinGecko.ApiClient.Exchange_ratesClient"))
+                    .WithPolicyKey("Trakx.CoinGecko.ApiClient.Exchange_ratesClient"))
                     
-			.AddHttpMessageHandler<CachedHttpClientHandler>();
+                .AddHttpMessageHandler<CachedHttpClientHandler>();
 
                                     
-		services.AddHttpClient<ITrendingClient, TrendingClient>("Trakx.CoinGecko.ApiClient.TrendingClient", x => configurator.AddHeaders(x))
-			.AddPolicyHandler((s, request) => 
-				Policy<HttpResponseMessage>
-					.Handle<ApiException>()
-					.OrTransientHttpStatusCode()
-					.WaitAndRetryAsync(
-						retryCount: maxRetryCount,
-						sleepDurationProvider: (retryCount, response, context) => 
-							GetServerWaitDuration(response, delays[retryCount - 1]),
-						onRetryAsync: (result, timeSpan, retryCount, context) =>
+            services.AddHttpClient<ITrendingClient, TrendingClient>("Trakx.CoinGecko.ApiClient.TrendingClient", x => configurator.AddHeaders(x))
+                .AddPolicyHandler((s, request) => 
+                    Policy<HttpResponseMessage>
+                    .Handle<ApiException>()
+                    .OrTransientHttpStatusCode()
+                    .WaitAndRetryAsync(
+		                retryCount: maxRetryCount,
+		                sleepDurationProvider: (retryCount, response, context) => 
+			                GetServerWaitDuration(response, delays[retryCount - 1]),
+		                onRetryAsync: (result, timeSpan, retryCount, context) =>
 							LogFailure(Log.Logger.ForContext<TrendingClient>(), result, timeSpan, retryCount, context))
-					.WithPolicyKey("Trakx.CoinGecko.ApiClient.TrendingClient"))
+                    .WithPolicyKey("Trakx.CoinGecko.ApiClient.TrendingClient"))
                     
-			.AddHttpMessageHandler<CachedHttpClientHandler>();
+                .AddHttpMessageHandler<CachedHttpClientHandler>();
 
                                     
-		services.AddHttpClient<IGlobalClient, GlobalClient>("Trakx.CoinGecko.ApiClient.GlobalClient", x => configurator.AddHeaders(x))
-			.AddPolicyHandler((s, request) => 
-				Policy<HttpResponseMessage>
-					.Handle<ApiException>()
-					.OrTransientHttpStatusCode()
-					.WaitAndRetryAsync(
-						retryCount: maxRetryCount,
-						sleepDurationProvider: (retryCount, response, context) => 
-							GetServerWaitDuration(response, delays[retryCount - 1]),
-						onRetryAsync: (result, timeSpan, retryCount, context) =>
+            services.AddHttpClient<IGlobalClient, GlobalClient>("Trakx.CoinGecko.ApiClient.GlobalClient", x => configurator.AddHeaders(x))
+                .AddPolicyHandler((s, request) => 
+                    Policy<HttpResponseMessage>
+                    .Handle<ApiException>()
+                    .OrTransientHttpStatusCode()
+                    .WaitAndRetryAsync(
+		                retryCount: maxRetryCount,
+		                sleepDurationProvider: (retryCount, response, context) => 
+			                GetServerWaitDuration(response, delays[retryCount - 1]),
+		                onRetryAsync: (result, timeSpan, retryCount, context) =>
 							LogFailure(Log.Logger.ForContext<GlobalClient>(), result, timeSpan, retryCount, context))
-					.WithPolicyKey("Trakx.CoinGecko.ApiClient.GlobalClient"))
+                    .WithPolicyKey("Trakx.CoinGecko.ApiClient.GlobalClient"))
                     
-			.AddHttpMessageHandler<CachedHttpClientHandler>();
+                .AddHttpMessageHandler<CachedHttpClientHandler>();
 
-	}
+            }
+    }
 }
