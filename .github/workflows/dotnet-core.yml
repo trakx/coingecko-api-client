@@ -5,11 +5,11 @@ on:
     branches: [ dev, master ]
   pull_request:
     branches: [ dev, master ]
-    
+
 env:
   SOLUTION_PATH: "src/Trakx.CoinGecko.ApiClient.sln"
   CoinGeckoApiConfiguration__ApiKey: ${{secrets.COINGECKO_API_KEY}}
-  
+
 jobs:
   build:
 
@@ -20,15 +20,15 @@ jobs:
     - name: Setup .NET Core
       uses: actions/setup-dotnet@v1
       with:
-        dotnet-version: 5.0.x
-    
+        dotnet-version: 6.0.x
+
     - name: Add github nuget source
       run: dotnet nuget add source "https://nuget.pkg.github.com/trakx/index.json" --name "github" --username "trakx-bot" --password ${{secrets.TRAKX_BOT_READONLY_PAT}} --store-password-in-clear-text
-    
+
     - name: Install dependencies
       run: dotnet restore ${{env.SOLUTION_PATH}}
-    
-    - name: Remove github source    
+
+    - name: Remove github source
       run: dotnet nuget remove source "github"
 
     - name: Build
@@ -46,7 +46,7 @@ jobs:
             /p:Include=\"[Trakx.*]*\"; \
         done
     - name: Publish Coverage
-      env: 
+      env:
         CODACY_PROJECT_TOKEN: ${{secrets.CODACY_TOKEN}}
       run: |
         for f in ./src/*.Tests/coverage.opencover.xml; do echo "sending coverage report $f" && \
