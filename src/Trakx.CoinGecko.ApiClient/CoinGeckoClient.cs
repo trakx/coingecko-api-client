@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using Ardalis.GuardClauses;
 using Microsoft.Extensions.Caching.Memory;
 using Serilog;
+using Trakx.Utils.Apis;
 using Trakx.Utils.Extensions;
 
 namespace Trakx.CoinGecko.ApiClient;
