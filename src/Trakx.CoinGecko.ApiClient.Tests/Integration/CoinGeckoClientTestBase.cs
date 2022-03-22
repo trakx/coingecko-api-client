@@ -6,7 +6,6 @@ using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using Serilog;
-using Trakx.Utils.Attributes;
 using Trakx.Utils.Testing;
 using Xunit;
 using Xunit.Abstractions;
@@ -100,15 +99,14 @@ public class CoinGeckoApiFixture : IDisposable
 
     public CoinGeckoApiFixture( )
     {
-        var secrets = new Secrets();
-        var configuration = new CoinGeckoApiConfiguration
-        {
+
+        var configuration = ConfigurationHelper.GetConfigurationFromEnv<CoinGeckoApiConfiguration>()
+            with {
             BaseUrl = CoinGeckoProBaseUrl,
             MaxRetryCount = 5,
             ThrottleDelayPerSecond = 120,
             CacheDurationInSeconds = 20,
-            InitialRetryDelayInMilliseconds = 100,
-            ApiKey = secrets.ApiKey
+            InitialRetryDelayInMilliseconds = 100
         };
 
         var serviceCollection = new ServiceCollection();
@@ -130,12 +128,4 @@ public class CoinGeckoApiFixture : IDisposable
         Dispose(true);
         GC.SuppressFinalize(this);
     }
-}
-
-public record Secrets : SecretsBase
-{
-#nullable disable
-    [SecretEnvironmentVariable(nameof(CoinGeckoApiConfiguration), nameof(CoinGeckoApiConfiguration.ApiKey))]
-    public string ApiKey { get; init; }
-#nullable restore
 }

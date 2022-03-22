@@ -41,7 +41,8 @@
       "operationGenerationMode": "MultipleClientsFromFirstTagAndOperationId",
       "additionalNamespaceUsages": [
         "Microsoft.AspNetCore.Mvc",
-        "System.Threading"
+        "System.Threading",
+        "Trakx.Utils.Apis"
       ],
       "additionalContractNamespaceUsages": [],
       "generateOptionalParameters": true,
@@ -53,7 +54,7 @@
       "responseDictionaryType": "System.Collections.Generic.IDictionary",
       "wrapResponses": true,
       "wrapResponseMethods": [],
-      "generateResponseClasses": true,
+      "generateResponseClasses": false,
       "responseClass": "Response",
       "namespace": "Trakx.CoinGecko.ApiClient",
       "requiredPropertiesMustBeDefined": true,

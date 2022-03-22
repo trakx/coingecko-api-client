@@ -17,8 +17,9 @@ public record CoinGeckoApiConfiguration
 
     public int? CacheDurationInSeconds { get; init; }
 
-    public bool IsPro => BaseUrl.Contains("pro-api", StringComparison.InvariantCultureIgnoreCase);
+    public bool IsPro => (BaseUrl ?? "").Contains("pro-api", StringComparison.InvariantCultureIgnoreCase);
 
-    [SecretEnvironmentVariable(nameof(CoinGeckoApiConfiguration), nameof(ApiKey))]
+    [AwsParameter]
+    [SecretEnvironmentVariable]
     public string ApiKey { get; init; }
 }

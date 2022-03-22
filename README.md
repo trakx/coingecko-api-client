@@ -17,3 +17,9 @@ In order to be able to run some integration tests, you should create a `.env` fi
 ```secretsEnvVariables
 CoinGeckoApiConfiguration__ApiKey=********
 ```
+
+## AWS Parameters
+In order to be able to run some integration tests you should ensure that you have access to the following AWS parameters :
+```awsParams
+/Trakx/CoinGecko/ApiClient/CoinGeckoApiConfiguration/ApiKey
+```

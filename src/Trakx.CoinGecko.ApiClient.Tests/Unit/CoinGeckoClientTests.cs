@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.Extensions.Caching.Memory;
 using NSubstitute;
+using Trakx.Utils.Apis;
 using Trakx.Utils.Testing;
 using Xunit;
 using Xunit.Abstractions;
