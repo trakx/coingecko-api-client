@@ -35,7 +35,7 @@
     </PackageReference>
     <PackageReference Include="Polly.Extensions.Http" Version="3.0.0" />
     <PackageReference Include="Serilog" Version="2.10.0" />
-    <PackageReference Include="Trakx.Utils" Version="0.3.1" />
+    <PackageReference Include="Trakx.Utils" Version="0.3.11" />
   </ItemGroup>
 
   <ItemGroup>
