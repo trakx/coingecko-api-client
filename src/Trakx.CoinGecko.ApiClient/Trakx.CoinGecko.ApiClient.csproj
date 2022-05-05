@@ -34,8 +34,8 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Polly.Extensions.Http" Version="3.0.0" />
-    <PackageReference Include="Serilog" Version="2.10.0" />
-    <PackageReference Include="Trakx.Utils" Version="0.3.12" />
+    <PackageReference Include="Serilog" Version="2.11.0" />
+    <PackageReference Include="Trakx.Utils" Version="0.3.14" />
   </ItemGroup>
 
   <ItemGroup>
