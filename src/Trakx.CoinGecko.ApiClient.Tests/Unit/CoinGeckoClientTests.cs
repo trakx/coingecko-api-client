@@ -9,6 +9,7 @@ using Microsoft.Extensions.Caching.Memory;
 using NSubstitute;
 using Trakx.Utils.Apis;
 using Trakx.Utils.Testing;
+using Trakx.Utils.Testing.Apis;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -36,10 +37,10 @@ public class CoinGeckoClientTests
     [Fact]
     public async Task GetLatestPrice_should_return_valid_price_when_passing_valid_id()
     {
-        var id = _mockCreator.GetRandomString(10);
-        var currency = _mockCreator.GetRandomString(5);
-        var coinPrice = _mockCreator.GetRandomPrice();
-        var currencyPrice = _mockCreator.GetRandomPrice();
+        var id = _mockCreator.GetString(10);
+        var currency = _mockCreator.GetString(5);
+        var coinPrice = _mockCreator.GetPrice();
+        var currencyPrice = _mockCreator.GetPrice();
         ConfigurePriceAsync(id, currency, coinPrice, currencyPrice);
         var result = await _coinGeckoClient.GetLatestPrice(id, currency);
         result.Should().Be(coinPrice / currencyPrice);
@@ -48,17 +49,17 @@ public class CoinGeckoClientTests
     [Fact]
     public async Task GetMarketDataAsOfFromId_should_return_valid_data_when_passing_valid_id()
     {
-        var asOf = _mockCreator.GetRandomUtcDateTime();
+        var asOf = _mockCreator.GetUtcDateTime();
         var asOfString = asOf.ToString("dd-MM-yyyy");
 
-        var coin = _mockCreator.GetRandomString(10);
-        var coinPrice = _mockCreator.GetRandomPrice();
-        var coinVolume = _mockCreator.GetRandomValue();
+        var coin = _mockCreator.GetString(10);
+        var coinPrice = _mockCreator.GetPrice();
+        var coinVolume = _mockCreator.GetValue();
         ConfigureHistoryAsync(coin, asOf, coinPrice, coinVolume);
 
-        var currency = _mockCreator.GetRandomString(10);
-        var currencyPrice = _mockCreator.GetRandomPrice();
-        var currencyVolume = _mockCreator.GetRandomValue();
+        var currency = _mockCreator.GetString(10);
+        var currencyPrice = _mockCreator.GetPrice();
+        var currencyVolume = _mockCreator.GetValue();
         ConfigureHistoryAsync(currency, asOf, currencyPrice, currencyVolume);
 
         var result = await _coinGeckoClient.GetMarketDataAsOfFromId(coin, asOf, currency);
@@ -84,8 +85,8 @@ public class CoinGeckoClientTests
     [Fact]
     public async Task GetCoinGeckoIdFromSymbol_should_return_valid_data_when_passing_valid_id()
     {
-        var id = _mockCreator.GetRandomString(10);
-        var symbol = _mockCreator.GetRandomString(30);
+        var id = _mockCreator.GetString(10);
+        var symbol = _mockCreator.GetString(30);
         ConfigureListAllAsync(id, symbol);
         var result = await _coinGeckoClient.GetCoinGeckoIdFromSymbol(symbol);
         result.Should().Be(id);
@@ -94,8 +95,8 @@ public class CoinGeckoClientTests
     [Fact]
     public async Task GetCoinGeckoIdFromSymbol_should_return_null_if_there_are_2_coins_with_the_same_symbol()
     {
-        var id = _mockCreator.GetRandomString(10);
-        var symbol = _mockCreator.GetRandomString(30);
+        var id = _mockCreator.GetString(10);
+        var symbol = _mockCreator.GetString(30);
         ConfigureListAllAsync(id, symbol, 2);
         var result = await _coinGeckoClient.GetCoinGeckoIdFromSymbol(symbol);
         result.Should().BeNullOrEmpty();
@@ -113,10 +114,10 @@ public class CoinGeckoClientTests
     [Fact]
     public async Task GetAllPrices_should_return_a_valid_list_of_prices_when_passing_valid_ids_and_currencies()
     {
-        var id = _mockCreator.GetRandomString(10);
-        var currency = _mockCreator.GetRandomString(10);
-        var coinPrice = _mockCreator.GetRandomPrice();
-        var currentPrice = _mockCreator.GetRandomPrice();
+        var id = _mockCreator.GetString(10);
+        var currency = _mockCreator.GetString(10);
+        var coinPrice = _mockCreator.GetPrice();
+        var currentPrice = _mockCreator.GetPrice();
         ConfigurePriceAsync(id, currency, coinPrice, currentPrice);
         var result = await _coinGeckoClient.GetAllPrices(new[] { id }, new[] { currency });
         result.Keys.Should().Contain(id);
@@ -150,13 +151,13 @@ public class CoinGeckoClientTests
                 new() { dates[1], 2761.460672838776 },
             }
         };
-        var id = _mockCreator.GetRandomString(5);
-        var vsCurrency = _mockCreator.GetRandomString(3);
-        var start = _mockCreator.GetRandomUtcDateTimeOffset();
-        var end = _mockCreator.GetRandomUtcDateTimeOffset();
+        var id = _mockCreator.GetString(5);
+        var vsCurrency = _mockCreator.GetString(3);
+        var start = _mockCreator.GetUtcDateTimeOffset();
+        var end = _mockCreator.GetUtcDateTimeOffset();
 
         _coinsClient.RangeAsync(id, vsCurrency, start.ToUnixTimeSeconds(), end.ToUnixTimeSeconds(), CancellationToken.None)
-            .Returns(new Response<Range>(200, null, range));
+            .Returns(range.AsResponse());
 
         var result = await _coinGeckoClient.GetMarketDataForDateRange(id, vsCurrency, start, end, CancellationToken.None)
             .ConfigureAwait(false);
@@ -183,17 +184,17 @@ public class CoinGeckoClientTests
     private void ConfigurePriceAsync(string id, string currency, decimal? coinPrice,
         decimal? currencyPrice)
     {
-        IDictionary<string, IDictionary<string, decimal?>> obj = new Dictionary<string, IDictionary<string, decimal?>>();
-        obj[id] = new Dictionary<string, decimal?>
+        IDictionary<string, IDictionary<string, decimal?>> response = new Dictionary<string, IDictionary<string, decimal?>>();
+        response[id] = new Dictionary<string, decimal?>
         {
             [Constants.Usd] = coinPrice
         };
-        obj[currency] = new Dictionary<string, decimal?>
+        response[currency] = new Dictionary<string, decimal?>
         {
             [Constants.Usd] = currencyPrice
         };
         _simpleClient.PriceAsync(Arg.Any<string>(), Arg.Any<string>())
-            .Returns(new Response<IDictionary<string, IDictionary<string, decimal?>>>(200, null, obj));
+            .Returns(response.AsResponse());
     }
 
     private void ConfigureHistoryAsync(string id, DateTime date, decimal price, decimal volume)
@@ -219,7 +220,7 @@ public class CoinGeckoClientTests
             }
         };
         _coinsClient.HistoryAsync(id, date.ToString("dd-MM-yyyy"), "False")
-            .Returns(new Response<CoinData>(200, null, result));
+            .Returns(((CoinData)result).AsResponse());
     }
 
     private void ConfigureListAllAsync(string? id = default, string? symbol = default, int count = 1)
@@ -227,12 +228,12 @@ public class CoinGeckoClientTests
         var list = Enumerable.Range(0, count)
             .Select(_ => new CoinList
             {
-                Id = id ?? _mockCreator.GetRandomString(10),
-                Symbol = symbol ?? _mockCreator.GetRandomString(30)
+                Id = id ?? _mockCreator.GetString(10),
+                Symbol = symbol ?? _mockCreator.GetString(30)
             }).ToList();
 
         _coinsClient.ListAllAsync()
-            .Returns(new Response<List<CoinList>>(200, null, list));
+            .Returns(list.AsResponse());
     }
 
     #endregion
