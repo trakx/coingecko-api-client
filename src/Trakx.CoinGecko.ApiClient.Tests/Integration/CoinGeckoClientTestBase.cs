@@ -21,7 +21,7 @@ public class CoinGeckoClientTestBase
     protected CoinGeckoClientTestBase(CoinGeckoApiFixture apiFixture, ITestOutputHelper output)
     {
         Logger = new LoggerConfiguration().WriteTo.TestOutput(output).CreateLogger()
-            .ForContext(MethodBase.GetCurrentMethod()!.DeclaringType);
+            .ForContext(MethodBase.GetCurrentMethod()!.DeclaringType!);
         ServiceProvider = apiFixture.ServiceProvider;
     }
 
