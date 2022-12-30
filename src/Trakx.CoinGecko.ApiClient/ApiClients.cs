@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.Threading;
 using Trakx.Utils.Apis;
 
+#pragma warning disable CS0618
 #pragma warning disable 108 // Disable "CS0108 '{derivedDto}.ToJson()' hides inherited member '{dtoBase}.ToJson()'. Use the new keyword if hiding was intended."
 #pragma warning disable 114 // Disable "CS0114 '{derivedDto}.RaisePropertyChanged(String)' hides inherited member 'dtoBase.RaisePropertyChanged(String)'. To make the current member override that implementation, add the override keyword. Otherwise add the new keyword."
 #pragma warning disable 472 // Disable "CS0472 The result of the expression is always 'false' since a value of type 'Int32' is never equal to 'null' of type 'Int32?'
@@ -88,7 +89,7 @@ namespace Trakx.CoinGecko.ApiClient
 
                     PrepareRequest(client_, request_, url_);
 
-                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+                    var response_ = client_.Send(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken);
                     var disposeResponse_ = true;
                     try
                     {
@@ -362,7 +363,7 @@ namespace Trakx.CoinGecko.ApiClient
 
                     PrepareRequest(client_, request_, url_);
 
-                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+                    var response_ = client_.Send(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken);
                     var disposeResponse_ = true;
                     try
                     {
@@ -468,7 +469,7 @@ namespace Trakx.CoinGecko.ApiClient
 
                     PrepareRequest(client_, request_, url_);
 
-                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+                    var response_ = client_.Send(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken);
                     var disposeResponse_ = true;
                     try
                     {
@@ -532,7 +533,7 @@ namespace Trakx.CoinGecko.ApiClient
 
                     PrepareRequest(client_, request_, url_);
 
-                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+                    var response_ = client_.Send(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken);
                     var disposeResponse_ = true;
                     try
                     {
@@ -863,7 +864,7 @@ namespace Trakx.CoinGecko.ApiClient
 
                     PrepareRequest(client_, request_, url_);
 
-                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+                    var response_ = client_.Send(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken);
                     var disposeResponse_ = true;
                     try
                     {
@@ -977,7 +978,7 @@ namespace Trakx.CoinGecko.ApiClient
 
                     PrepareRequest(client_, request_, url_);
 
-                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+                    var response_ = client_.Send(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken);
                     var disposeResponse_ = true;
                     try
                     {
@@ -1083,7 +1084,7 @@ namespace Trakx.CoinGecko.ApiClient
 
                     PrepareRequest(client_, request_, url_);
 
-                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+                    var response_ = client_.Send(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken);
                     var disposeResponse_ = true;
                     try
                     {
@@ -1183,7 +1184,7 @@ namespace Trakx.CoinGecko.ApiClient
 
                     PrepareRequest(client_, request_, url_);
 
-                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+                    var response_ = client_.Send(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken);
                     var disposeResponse_ = true;
                     try
                     {
@@ -1264,7 +1265,7 @@ namespace Trakx.CoinGecko.ApiClient
 
                     PrepareRequest(client_, request_, url_);
 
-                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+                    var response_ = client_.Send(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken);
                     var disposeResponse_ = true;
                     try
                     {
@@ -1355,7 +1356,7 @@ namespace Trakx.CoinGecko.ApiClient
 
                     PrepareRequest(client_, request_, url_);
 
-                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+                    var response_ = client_.Send(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken);
                     var disposeResponse_ = true;
                     try
                     {
@@ -1442,7 +1443,7 @@ namespace Trakx.CoinGecko.ApiClient
 
                     PrepareRequest(client_, request_, url_);
 
-                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+                    var response_ = client_.Send(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken);
                     var disposeResponse_ = true;
                     try
                     {
@@ -1523,7 +1524,7 @@ namespace Trakx.CoinGecko.ApiClient
 
                     PrepareRequest(client_, request_, url_);
 
-                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+                    var response_ = client_.Send(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken);
                     var disposeResponse_ = true;
                     try
                     {
@@ -1612,7 +1613,7 @@ namespace Trakx.CoinGecko.ApiClient
 
                     PrepareRequest(client_, request_, url_);
 
-                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+                    var response_ = client_.Send(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken);
                     var disposeResponse_ = true;
                     try
                     {
@@ -1862,7 +1863,7 @@ namespace Trakx.CoinGecko.ApiClient
 
                     PrepareRequest(client_, request_, url_);
 
-                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+                    var response_ = client_.Send(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken);
                     var disposeResponse_ = true;
                     try
                     {
@@ -1947,7 +1948,7 @@ namespace Trakx.CoinGecko.ApiClient
 
                     PrepareRequest(client_, request_, url_);
 
-                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+                    var response_ = client_.Send(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken);
                     var disposeResponse_ = true;
                     try
                     {
@@ -2037,7 +2038,7 @@ namespace Trakx.CoinGecko.ApiClient
 
                     PrepareRequest(client_, request_, url_);
 
-                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+                    var response_ = client_.Send(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken);
                     var disposeResponse_ = true;
                     try
                     {
@@ -2314,7 +2315,7 @@ namespace Trakx.CoinGecko.ApiClient
 
                     PrepareRequest(client_, request_, url_);
 
-                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+                    var response_ = client_.Send(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken);
                     var disposeResponse_ = true;
                     try
                     {
@@ -2378,7 +2379,7 @@ namespace Trakx.CoinGecko.ApiClient
 
                     PrepareRequest(client_, request_, url_);
 
-                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+                    var response_ = client_.Send(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken);
                     var disposeResponse_ = true;
                     try
                     {
@@ -2447,7 +2448,7 @@ namespace Trakx.CoinGecko.ApiClient
 
                     PrepareRequest(client_, request_, url_);
 
-                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+                    var response_ = client_.Send(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken);
                     var disposeResponse_ = true;
                     try
                     {
@@ -2542,7 +2543,7 @@ namespace Trakx.CoinGecko.ApiClient
 
                     PrepareRequest(client_, request_, url_);
 
-                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+                    var response_ = client_.Send(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken);
                     var disposeResponse_ = true;
                     try
                     {
@@ -2622,7 +2623,7 @@ namespace Trakx.CoinGecko.ApiClient
 
                     PrepareRequest(client_, request_, url_);
 
-                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+                    var response_ = client_.Send(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken);
                     var disposeResponse_ = true;
                     try
                     {
@@ -2697,7 +2698,7 @@ namespace Trakx.CoinGecko.ApiClient
 
                     PrepareRequest(client_, request_, url_);
 
-                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+                    var response_ = client_.Send(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken);
                     var disposeResponse_ = true;
                     try
                     {
@@ -2930,7 +2931,7 @@ namespace Trakx.CoinGecko.ApiClient
 
                     PrepareRequest(client_, request_, url_);
 
-                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+                    var response_ = client_.Send(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken);
                     var disposeResponse_ = true;
                     try
                     {
@@ -3015,7 +3016,7 @@ namespace Trakx.CoinGecko.ApiClient
 
                     PrepareRequest(client_, request_, url_);
 
-                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+                    var response_ = client_.Send(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken);
                     var disposeResponse_ = true;
                     try
                     {
@@ -3265,7 +3266,7 @@ namespace Trakx.CoinGecko.ApiClient
 
                     PrepareRequest(client_, request_, url_);
 
-                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+                    var response_ = client_.Send(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken);
                     var disposeResponse_ = true;
                     try
                     {
@@ -3345,7 +3346,7 @@ namespace Trakx.CoinGecko.ApiClient
 
                     PrepareRequest(client_, request_, url_);
 
-                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+                    var response_ = client_.Send(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken);
                     var disposeResponse_ = true;
                     try
                     {
@@ -3409,7 +3410,7 @@ namespace Trakx.CoinGecko.ApiClient
 
                     PrepareRequest(client_, request_, url_);
 
-                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+                    var response_ = client_.Send(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken);
                     var disposeResponse_ = true;
                     try
                     {
@@ -3484,7 +3485,7 @@ namespace Trakx.CoinGecko.ApiClient
 
                     PrepareRequest(client_, request_, url_);
 
-                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+                    var response_ = client_.Send(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken);
                     var disposeResponse_ = true;
                     try
                     {
@@ -3728,7 +3729,7 @@ namespace Trakx.CoinGecko.ApiClient
 
                     PrepareRequest(client_, request_, url_);
 
-                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+                    var response_ = client_.Send(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken);
                     var disposeResponse_ = true;
                     try
                     {
@@ -3808,7 +3809,7 @@ namespace Trakx.CoinGecko.ApiClient
 
                     PrepareRequest(client_, request_, url_);
 
-                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+                    var response_ = client_.Send(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken);
                     var disposeResponse_ = true;
                     try
                     {
@@ -3883,7 +3884,7 @@ namespace Trakx.CoinGecko.ApiClient
 
                     PrepareRequest(client_, request_, url_);
 
-                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+                    var response_ = client_.Send(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken);
                     var disposeResponse_ = true;
                     try
                     {
@@ -3947,7 +3948,7 @@ namespace Trakx.CoinGecko.ApiClient
 
                     PrepareRequest(client_, request_, url_);
 
-                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+                    var response_ = client_.Send(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken);
                     var disposeResponse_ = true;
                     try
                     {
@@ -4180,7 +4181,7 @@ namespace Trakx.CoinGecko.ApiClient
 
                     PrepareRequest(client_, request_, url_);
 
-                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+                    var response_ = client_.Send(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken);
                     var disposeResponse_ = true;
                     try
                     {
@@ -4441,7 +4442,7 @@ namespace Trakx.CoinGecko.ApiClient
 
                     PrepareRequest(client_, request_, url_);
 
-                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+                    var response_ = client_.Send(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken);
                     var disposeResponse_ = true;
                     try
                     {
@@ -4505,7 +4506,7 @@ namespace Trakx.CoinGecko.ApiClient
 
                     PrepareRequest(client_, request_, url_);
 
-                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+                    var response_ = client_.Send(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken);
                     var disposeResponse_ = true;
                     try
                     {
@@ -4569,7 +4570,7 @@ namespace Trakx.CoinGecko.ApiClient
 
                     PrepareRequest(client_, request_, url_);
 
-                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+                    var response_ = client_.Send(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken);
                     var disposeResponse_ = true;
                     try
                     {
@@ -4777,7 +4778,7 @@ namespace Trakx.CoinGecko.ApiClient
 
                     PrepareRequest(client_, request_, url_);
 
-                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+                    var response_ = client_.Send(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken);
                     var disposeResponse_ = true;
                     try
                     {
@@ -4985,7 +4986,7 @@ namespace Trakx.CoinGecko.ApiClient
 
                     PrepareRequest(client_, request_, url_);
 
-                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+                    var response_ = client_.Send(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken);
                     var disposeResponse_ = true;
                     try
                     {
@@ -5201,7 +5202,7 @@ namespace Trakx.CoinGecko.ApiClient
 
                     PrepareRequest(client_, request_, url_);
 
-                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+                    var response_ = client_.Send(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken);
                     var disposeResponse_ = true;
                     try
                     {
@@ -5265,7 +5266,7 @@ namespace Trakx.CoinGecko.ApiClient
 
                     PrepareRequest(client_, request_, url_);
 
-                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+                    var response_ = client_.Send(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken);
                     var disposeResponse_ = true;
                     try
                     {
@@ -5413,16 +5414,16 @@ namespace Trakx.CoinGecko.ApiClient
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "13.15.10.0 (NJsonSchema v10.6.10.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class CoinList
+    public partial record CoinList
     {
         [Newtonsoft.Json.JsonProperty("id", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string Id { get; set; }
+        public string Id { get; init; }
 
         [Newtonsoft.Json.JsonProperty("symbol", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string Symbol { get; set; }
+        public string Symbol { get; init; }
 
         [Newtonsoft.Json.JsonProperty("name", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string Name { get; set; }
+        public string Name { get; init; }
 
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties = new System.Collections.Generic.Dictionary<string, object>();
 
@@ -5436,34 +5437,34 @@ namespace Trakx.CoinGecko.ApiClient
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "13.15.10.0 (NJsonSchema v10.6.10.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class CoinData
+    public partial record CoinData
     {
         [Newtonsoft.Json.JsonProperty("id", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string Id { get; set; }
+        public string Id { get; init; }
 
         [Newtonsoft.Json.JsonProperty("symbol", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string Symbol { get; set; }
+        public string Symbol { get; init; }
 
         [Newtonsoft.Json.JsonProperty("name", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string Name { get; set; }
+        public string Name { get; init; }
 
         [Newtonsoft.Json.JsonProperty("localization", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public System.Collections.Generic.IDictionary<string, string> Localization { get; set; }
 
         [Newtonsoft.Json.JsonProperty("image", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public Image Image { get; set; }
+        public Image Image { get; init; }
 
         [Newtonsoft.Json.JsonProperty("market_data", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public Market_data Market_data { get; set; }
+        public Market_data Market_data { get; init; }
 
         [Newtonsoft.Json.JsonProperty("community_data", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public object Community_data { get; set; }
+        public object Community_data { get; init; }
 
         [Newtonsoft.Json.JsonProperty("developer_data", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public object Developer_data { get; set; }
+        public object Developer_data { get; init; }
 
         [Newtonsoft.Json.JsonProperty("public_interest_stats", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public object Public_interest_stats { get; set; }
+        public object Public_interest_stats { get; init; }
 
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties = new System.Collections.Generic.Dictionary<string, object>();
 
@@ -5477,96 +5478,96 @@ namespace Trakx.CoinGecko.ApiClient
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "13.15.10.0 (NJsonSchema v10.6.10.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class CoinFullData : CoinData
+    public partial record CoinFullData : CoinData
     {
         [Newtonsoft.Json.JsonProperty("asset_platform_id", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string Asset_platform_id { get; set; }
+        public string Asset_platform_id { get; init; }
 
         [Newtonsoft.Json.JsonProperty("platforms", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public System.Collections.Generic.IDictionary<string, string> Platforms { get; set; }
 
         [Newtonsoft.Json.JsonProperty("block_time_in_minutes", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public double Block_time_in_minutes { get; set; }
+        public double Block_time_in_minutes { get; init; }
 
         [Newtonsoft.Json.JsonProperty("hashing_algorithm", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string Hashing_algorithm { get; set; }
+        public string Hashing_algorithm { get; init; }
 
         [Newtonsoft.Json.JsonProperty("categories", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public System.Collections.Generic.List<string> Categories { get; set; }
+        public System.Collections.Generic.List<string> Categories { get; init; }
 
         [Newtonsoft.Json.JsonProperty("public_notice", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string Public_notice { get; set; }
+        public string Public_notice { get; init; }
 
         [Newtonsoft.Json.JsonProperty("status_updates", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public System.Collections.Generic.List<object> Status_updates { get; set; }
+        public System.Collections.Generic.List<object> Status_updates { get; init; }
 
         [Newtonsoft.Json.JsonProperty("tickers", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public System.Collections.Generic.List<Tickers> Tickers { get; set; }
+        public System.Collections.Generic.List<Tickers> Tickers { get; init; }
 
         [Newtonsoft.Json.JsonProperty("last_updated", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public object Last_updated { get; set; }
+        public object Last_updated { get; init; }
 
         [Newtonsoft.Json.JsonProperty("additional_notices", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public System.Collections.Generic.List<string> Additional_notices { get; set; }
+        public System.Collections.Generic.List<string> Additional_notices { get; init; }
 
         [Newtonsoft.Json.JsonProperty("description", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public System.Collections.Generic.IDictionary<string, string> Description { get; set; }
 
         [Newtonsoft.Json.JsonProperty("links", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public Links Links { get; set; }
+        public Links Links { get; init; }
 
         [Newtonsoft.Json.JsonProperty("country_origin", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string Country_origin { get; set; }
+        public string Country_origin { get; init; }
 
         [Newtonsoft.Json.JsonProperty("contract_address", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string Contract_address { get; set; }
+        public string Contract_address { get; init; }
 
         [Newtonsoft.Json.JsonProperty("genesis_date", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string Genesis_date { get; set; }
+        public string Genesis_date { get; init; }
 
         [Newtonsoft.Json.JsonProperty("sentiment_votes_up_percentage", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public decimal? Sentiment_votes_up_percentage { get; set; }
+        public decimal? Sentiment_votes_up_percentage { get; init; }
 
         [Newtonsoft.Json.JsonProperty("sentiment_votes_down_percentage", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public decimal? Sentiment_votes_down_percentage { get; set; }
+        public decimal? Sentiment_votes_down_percentage { get; init; }
 
         [Newtonsoft.Json.JsonProperty("ico_data", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public Ico_data Ico_data { get; set; }
+        public Ico_data Ico_data { get; init; }
 
         [Newtonsoft.Json.JsonProperty("market_cap_rank", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public decimal? Market_cap_rank { get; set; }
+        public decimal? Market_cap_rank { get; init; }
 
         [Newtonsoft.Json.JsonProperty("coingecko_rank", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public decimal? Coingecko_rank { get; set; }
+        public decimal? Coingecko_rank { get; init; }
 
         [Newtonsoft.Json.JsonProperty("coingecko_score", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public decimal Coingecko_score { get; set; }
+        public decimal Coingecko_score { get; init; }
 
         [Newtonsoft.Json.JsonProperty("developer_score", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public decimal Developer_score { get; set; }
+        public decimal Developer_score { get; init; }
 
         [Newtonsoft.Json.JsonProperty("community_score", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public decimal Community_score { get; set; }
+        public decimal Community_score { get; init; }
 
         [Newtonsoft.Json.JsonProperty("liquidity_score", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public decimal Liquidity_score { get; set; }
+        public decimal Liquidity_score { get; init; }
 
         [Newtonsoft.Json.JsonProperty("public_interest_score", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public decimal Public_interest_score { get; set; }
+        public decimal Public_interest_score { get; init; }
 
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "13.15.10.0 (NJsonSchema v10.6.10.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class Range
+    public partial record Range
     {
         [Newtonsoft.Json.JsonProperty("prices", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public System.Collections.Generic.List<TimestampedValue> Prices { get; set; }
+        public System.Collections.Generic.List<TimestampedValue> Prices { get; init; }
 
         [Newtonsoft.Json.JsonProperty("market_caps", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public System.Collections.Generic.List<TimestampedValue> Market_caps { get; set; }
+        public System.Collections.Generic.List<TimestampedValue> Market_caps { get; init; }
 
         [Newtonsoft.Json.JsonProperty("total_volumes", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public System.Collections.Generic.List<TimestampedValue> Total_volumes { get; set; }
+        public System.Collections.Generic.List<TimestampedValue> Total_volumes { get; init; }
 
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties = new System.Collections.Generic.Dictionary<string, object>();
 
@@ -5592,34 +5593,34 @@ namespace Trakx.CoinGecko.ApiClient
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "13.15.10.0 (NJsonSchema v10.6.10.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class SearchCoinData
+    public partial record SearchCoinData
     {
         [Newtonsoft.Json.JsonProperty("id", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string Id { get; set; }
+        public string Id { get; init; }
 
         [Newtonsoft.Json.JsonProperty("symbol", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string Symbol { get; set; }
+        public string Symbol { get; init; }
 
         [Newtonsoft.Json.JsonProperty("name", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string Name { get; set; }
+        public string Name { get; init; }
 
         [Newtonsoft.Json.JsonProperty("current_price", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public decimal? Current_price { get; set; }
+        public decimal? Current_price { get; init; }
 
         [Newtonsoft.Json.JsonProperty("market_cap", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public decimal? Market_cap { get; set; }
+        public decimal? Market_cap { get; init; }
 
         [Newtonsoft.Json.JsonProperty("total_volume", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public decimal? Total_volume { get; set; }
+        public decimal? Total_volume { get; init; }
 
         [Newtonsoft.Json.JsonProperty("circulating_supply", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public decimal? Circulating_supply { get; set; }
+        public decimal? Circulating_supply { get; init; }
 
         [Newtonsoft.Json.JsonProperty("total_supply", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public decimal? Total_supply { get; set; }
+        public decimal? Total_supply { get; init; }
 
         [Newtonsoft.Json.JsonProperty("max_supply", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public decimal? Max_supply { get; set; }
+        public decimal? Max_supply { get; init; }
 
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties = new System.Collections.Generic.Dictionary<string, object>();
 
@@ -5633,16 +5634,16 @@ namespace Trakx.CoinGecko.ApiClient
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "13.15.10.0 (NJsonSchema v10.6.10.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class Image
+    public partial record Image
     {
         [Newtonsoft.Json.JsonProperty("thumb", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string Thumb { get; set; }
+        public string Thumb { get; init; }
 
         [Newtonsoft.Json.JsonProperty("small", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string Small { get; set; }
+        public string Small { get; init; }
 
         [Newtonsoft.Json.JsonProperty("large", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string Large { get; set; }
+        public string Large { get; init; }
 
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties = new System.Collections.Generic.Dictionary<string, object>();
 
@@ -5656,7 +5657,7 @@ namespace Trakx.CoinGecko.ApiClient
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "13.15.10.0 (NJsonSchema v10.6.10.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class Market_data
+    public partial record Market_data
     {
         [Newtonsoft.Json.JsonProperty("current_price", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public System.Collections.Generic.IDictionary<string, decimal?> Current_price { get; set; }
@@ -5668,7 +5669,7 @@ namespace Trakx.CoinGecko.ApiClient
         public System.Collections.Generic.IDictionary<string, decimal?> Ath_change_percentage { get; set; }
 
         [Newtonsoft.Json.JsonProperty("ath_date", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public object Ath_date { get; set; }
+        public object Ath_date { get; init; }
 
         [Newtonsoft.Json.JsonProperty("atl", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public System.Collections.Generic.IDictionary<string, decimal?> Atl { get; set; }
@@ -5677,7 +5678,7 @@ namespace Trakx.CoinGecko.ApiClient
         public System.Collections.Generic.IDictionary<string, decimal?> Atl_change_percentage { get; set; }
 
         [Newtonsoft.Json.JsonProperty("atl_date", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public object Atl_date { get; set; }
+        public object Atl_date { get; init; }
 
         [Newtonsoft.Json.JsonProperty("market_cap", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public System.Collections.Generic.IDictionary<string, decimal?> Market_cap { get; set; }
@@ -5725,64 +5726,64 @@ namespace Trakx.CoinGecko.ApiClient
         public System.Collections.Generic.IDictionary<string, decimal?> Market_cap_change_percentage_24h_in_currency { get; set; }
 
         [Newtonsoft.Json.JsonProperty("total_supply", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public decimal? Total_supply { get; set; }
+        public decimal? Total_supply { get; init; }
 
         [Newtonsoft.Json.JsonProperty("max_supply", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public decimal? Max_supply { get; set; }
+        public decimal? Max_supply { get; init; }
 
         [Newtonsoft.Json.JsonProperty("circulating_supply", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public decimal? Circulating_supply { get; set; }
+        public decimal? Circulating_supply { get; init; }
 
         [Newtonsoft.Json.JsonProperty("last_updated", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public object Last_updated { get; set; }
+        public object Last_updated { get; init; }
 
         [Newtonsoft.Json.JsonProperty("total_value_locked", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public object Total_value_locked { get; set; }
+        public object Total_value_locked { get; init; }
 
         [Newtonsoft.Json.JsonProperty("mcap_to_tvl_ratio", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public decimal? Mcap_to_tvl_ratio { get; set; }
+        public decimal? Mcap_to_tvl_ratio { get; init; }
 
         [Newtonsoft.Json.JsonProperty("fdv_to_tvl_ratio", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public decimal? Fdv_to_tvl_ratio { get; set; }
+        public decimal? Fdv_to_tvl_ratio { get; init; }
 
         [Newtonsoft.Json.JsonProperty("market_cap_rank", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public decimal? Market_cap_rank { get; set; }
+        public decimal? Market_cap_rank { get; init; }
 
         [Newtonsoft.Json.JsonProperty("fully_diluted_valuation", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public System.Collections.Generic.IDictionary<string, decimal?> Fully_diluted_valuation { get; set; }
 
         [Newtonsoft.Json.JsonProperty("price_change_24h", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public decimal? Price_change_24h { get; set; }
+        public decimal? Price_change_24h { get; init; }
 
         [Newtonsoft.Json.JsonProperty("price_change_percentage_24h", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public decimal? Price_change_percentage_24h { get; set; }
+        public decimal? Price_change_percentage_24h { get; init; }
 
         [Newtonsoft.Json.JsonProperty("price_change_percentage_7d", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public decimal? Price_change_percentage_7d { get; set; }
+        public decimal? Price_change_percentage_7d { get; init; }
 
         [Newtonsoft.Json.JsonProperty("price_change_percentage_14d", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public decimal? Price_change_percentage_14d { get; set; }
+        public decimal? Price_change_percentage_14d { get; init; }
 
         [Newtonsoft.Json.JsonProperty("price_change_percentage_30d", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public decimal? Price_change_percentage_30d { get; set; }
+        public decimal? Price_change_percentage_30d { get; init; }
 
         [Newtonsoft.Json.JsonProperty("price_change_percentage_60d", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public decimal? Price_change_percentage_60d { get; set; }
+        public decimal? Price_change_percentage_60d { get; init; }
 
         [Newtonsoft.Json.JsonProperty("price_change_percentage_200d", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public decimal? Price_change_percentage_200d { get; set; }
+        public decimal? Price_change_percentage_200d { get; init; }
 
         [Newtonsoft.Json.JsonProperty("price_change_percentage_1y", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public decimal? Price_change_percentage_1y { get; set; }
+        public decimal? Price_change_percentage_1y { get; init; }
 
         [Newtonsoft.Json.JsonProperty("market_cap_change_24h", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public decimal? Market_cap_change_24h { get; set; }
+        public decimal? Market_cap_change_24h { get; init; }
 
         [Newtonsoft.Json.JsonProperty("market_cap_change_percentage_24h", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public decimal? Market_cap_change_percentage_24h { get; set; }
+        public decimal? Market_cap_change_percentage_24h { get; init; }
 
         [Newtonsoft.Json.JsonProperty("roi", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public Roi Roi { get; set; }
+        public Roi Roi { get; init; }
 
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties = new System.Collections.Generic.Dictionary<string, object>();
 
@@ -5796,61 +5797,61 @@ namespace Trakx.CoinGecko.ApiClient
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "13.15.10.0 (NJsonSchema v10.6.10.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class Tickers
+    public partial record Tickers
     {
         [Newtonsoft.Json.JsonProperty("base", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string Base { get; set; }
+        public string Base { get; init; }
 
         [Newtonsoft.Json.JsonProperty("target", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string Target { get; set; }
+        public string Target { get; init; }
 
         [Newtonsoft.Json.JsonProperty("market", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public Market Market { get; set; }
+        public Market Market { get; init; }
 
         [Newtonsoft.Json.JsonProperty("last", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public double Last { get; set; }
+        public double Last { get; init; }
 
         [Newtonsoft.Json.JsonProperty("volume", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public decimal Volume { get; set; }
+        public decimal Volume { get; init; }
 
         [Newtonsoft.Json.JsonProperty("converted_last", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public Converted_last Converted_last { get; set; }
+        public Converted_last Converted_last { get; init; }
 
         [Newtonsoft.Json.JsonProperty("converted_volume", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public Converted_volume Converted_volume { get; set; }
+        public Converted_volume Converted_volume { get; init; }
 
         [Newtonsoft.Json.JsonProperty("trust_score", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string Trust_score { get; set; }
+        public string Trust_score { get; init; }
 
         [Newtonsoft.Json.JsonProperty("bid_ask_spread_percentage", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public decimal? Bid_ask_spread_percentage { get; set; }
+        public decimal? Bid_ask_spread_percentage { get; init; }
 
         [Newtonsoft.Json.JsonProperty("timestamp", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public object Timestamp { get; set; }
+        public object Timestamp { get; init; }
 
         [Newtonsoft.Json.JsonProperty("last_traded_at", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public object Last_traded_at { get; set; }
+        public object Last_traded_at { get; init; }
 
         [Newtonsoft.Json.JsonProperty("last_fetch_at", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public object Last_fetch_at { get; set; }
+        public object Last_fetch_at { get; init; }
 
         [Newtonsoft.Json.JsonProperty("is_anomaly", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public bool Is_anomaly { get; set; }
+        public bool Is_anomaly { get; init; }
 
         [Newtonsoft.Json.JsonProperty("is_stale", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public bool Is_stale { get; set; }
+        public bool Is_stale { get; init; }
 
         [Newtonsoft.Json.JsonProperty("trade_url", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string Trade_url { get; set; }
+        public string Trade_url { get; init; }
 
         [Newtonsoft.Json.JsonProperty("token_info_url", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string Token_info_url { get; set; }
+        public string Token_info_url { get; init; }
 
         [Newtonsoft.Json.JsonProperty("coin_id", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string Coin_id { get; set; }
+        public string Coin_id { get; init; }
 
         [Newtonsoft.Json.JsonProperty("target_coin_id", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string Target_coin_id { get; set; }
+        public string Target_coin_id { get; init; }
 
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties = new System.Collections.Generic.Dictionary<string, object>();
 
@@ -5864,40 +5865,40 @@ namespace Trakx.CoinGecko.ApiClient
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "13.15.10.0 (NJsonSchema v10.6.10.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class Links
+    public partial record Links
     {
         [Newtonsoft.Json.JsonProperty("homepage", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public System.Collections.Generic.List<string> Homepage { get; set; }
+        public System.Collections.Generic.List<string> Homepage { get; init; }
 
         [Newtonsoft.Json.JsonProperty("blockchain_site", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public System.Collections.Generic.List<string> Blockchain_site { get; set; }
+        public System.Collections.Generic.List<string> Blockchain_site { get; init; }
 
         [Newtonsoft.Json.JsonProperty("official_forum_url", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public System.Collections.Generic.List<string> Official_forum_url { get; set; }
+        public System.Collections.Generic.List<string> Official_forum_url { get; init; }
 
         [Newtonsoft.Json.JsonProperty("chat_url", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public System.Collections.Generic.List<string> Chat_url { get; set; }
+        public System.Collections.Generic.List<string> Chat_url { get; init; }
 
         [Newtonsoft.Json.JsonProperty("announcement_url", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public System.Collections.Generic.List<string> Announcement_url { get; set; }
+        public System.Collections.Generic.List<string> Announcement_url { get; init; }
 
         [Newtonsoft.Json.JsonProperty("twitter_screen_name", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string Twitter_screen_name { get; set; }
+        public string Twitter_screen_name { get; init; }
 
         [Newtonsoft.Json.JsonProperty("facebook_username", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string Facebook_username { get; set; }
+        public string Facebook_username { get; init; }
 
         [Newtonsoft.Json.JsonProperty("bitcointalk_thread_identifier", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string Bitcointalk_thread_identifier { get; set; }
+        public string Bitcointalk_thread_identifier { get; init; }
 
         [Newtonsoft.Json.JsonProperty("telegram_channel_identifier", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string Telegram_channel_identifier { get; set; }
+        public string Telegram_channel_identifier { get; init; }
 
         [Newtonsoft.Json.JsonProperty("subreddit_url", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string Subreddit_url { get; set; }
+        public string Subreddit_url { get; init; }
 
         [Newtonsoft.Json.JsonProperty("repos_url", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public Repos_url Repos_url { get; set; }
+        public Repos_url Repos_url { get; init; }
 
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties = new System.Collections.Generic.Dictionary<string, object>();
 
@@ -5911,97 +5912,97 @@ namespace Trakx.CoinGecko.ApiClient
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "13.15.10.0 (NJsonSchema v10.6.10.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class Ico_data
+    public partial record Ico_data
     {
         [Newtonsoft.Json.JsonProperty("ico_start_date", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public object Ico_start_date { get; set; }
+        public object Ico_start_date { get; init; }
 
         [Newtonsoft.Json.JsonProperty("ico_end_date", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public object Ico_end_date { get; set; }
+        public object Ico_end_date { get; init; }
 
         [Newtonsoft.Json.JsonProperty("short_desc", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string Short_desc { get; set; }
+        public string Short_desc { get; init; }
 
         [Newtonsoft.Json.JsonProperty("description", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string Description { get; set; }
+        public string Description { get; init; }
 
         [Newtonsoft.Json.JsonProperty("links", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public object Links { get; set; }
+        public object Links { get; init; }
 
         [Newtonsoft.Json.JsonProperty("softcap_currency", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string Softcap_currency { get; set; }
+        public string Softcap_currency { get; init; }
 
         [Newtonsoft.Json.JsonProperty("hardcap_currency", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string Hardcap_currency { get; set; }
+        public string Hardcap_currency { get; init; }
 
         [Newtonsoft.Json.JsonProperty("total_raised_currency", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string Total_raised_currency { get; set; }
+        public string Total_raised_currency { get; init; }
 
         [Newtonsoft.Json.JsonProperty("softcap_amount", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public object Softcap_amount { get; set; }
+        public object Softcap_amount { get; init; }
 
         [Newtonsoft.Json.JsonProperty("hardcap_amount", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public object Hardcap_amount { get; set; }
+        public object Hardcap_amount { get; init; }
 
         [Newtonsoft.Json.JsonProperty("total_raised", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public object Total_raised { get; set; }
+        public object Total_raised { get; init; }
 
         [Newtonsoft.Json.JsonProperty("quote_pre_sale_currency", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string Quote_pre_sale_currency { get; set; }
+        public string Quote_pre_sale_currency { get; init; }
 
         [Newtonsoft.Json.JsonProperty("base_pre_sale_amount", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public object Base_pre_sale_amount { get; set; }
+        public object Base_pre_sale_amount { get; init; }
 
         [Newtonsoft.Json.JsonProperty("quote_pre_sale_amount", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public object Quote_pre_sale_amount { get; set; }
+        public object Quote_pre_sale_amount { get; init; }
 
         [Newtonsoft.Json.JsonProperty("quote_public_sale_currency", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string Quote_public_sale_currency { get; set; }
+        public string Quote_public_sale_currency { get; init; }
 
         [Newtonsoft.Json.JsonProperty("base_public_sale_amount", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public object Base_public_sale_amount { get; set; }
+        public object Base_public_sale_amount { get; init; }
 
         [Newtonsoft.Json.JsonProperty("quote_public_sale_amount", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public object Quote_public_sale_amount { get; set; }
+        public object Quote_public_sale_amount { get; init; }
 
         [Newtonsoft.Json.JsonProperty("accepting_currencies", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string Accepting_currencies { get; set; }
+        public string Accepting_currencies { get; init; }
 
         [Newtonsoft.Json.JsonProperty("country_origin", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string Country_origin { get; set; }
+        public string Country_origin { get; init; }
 
         [Newtonsoft.Json.JsonProperty("pre_sale_start_date", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public object Pre_sale_start_date { get; set; }
+        public object Pre_sale_start_date { get; init; }
 
         [Newtonsoft.Json.JsonProperty("pre_sale_end_date", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public object Pre_sale_end_date { get; set; }
+        public object Pre_sale_end_date { get; init; }
 
         [Newtonsoft.Json.JsonProperty("whitelist_url", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string Whitelist_url { get; set; }
+        public string Whitelist_url { get; init; }
 
         [Newtonsoft.Json.JsonProperty("whitelist_start_date", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public object Whitelist_start_date { get; set; }
+        public object Whitelist_start_date { get; init; }
 
         [Newtonsoft.Json.JsonProperty("whitelist_end_date", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public object Whitelist_end_date { get; set; }
+        public object Whitelist_end_date { get; init; }
 
         [Newtonsoft.Json.JsonProperty("whitelist_available", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string Whitelist_available { get; set; }
+        public string Whitelist_available { get; init; }
 
         [Newtonsoft.Json.JsonProperty("bounty_detail_url", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string Bounty_detail_url { get; set; }
+        public string Bounty_detail_url { get; init; }
 
         [Newtonsoft.Json.JsonProperty("amount_for_sale", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public decimal? Amount_for_sale { get; set; }
+        public decimal? Amount_for_sale { get; init; }
 
         [Newtonsoft.Json.JsonProperty("kyc_required", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public bool Kyc_required { get; set; }
+        public bool Kyc_required { get; init; }
 
         [Newtonsoft.Json.JsonProperty("pre_sale_available", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string Pre_sale_available { get; set; }
+        public string Pre_sale_available { get; init; }
 
         [Newtonsoft.Json.JsonProperty("pre_sale_ended", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public bool Pre_sale_ended { get; set; }
+        public bool Pre_sale_ended { get; init; }
 
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties = new System.Collections.Generic.Dictionary<string, object>();
 
@@ -6015,16 +6016,16 @@ namespace Trakx.CoinGecko.ApiClient
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "13.15.10.0 (NJsonSchema v10.6.10.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class Roi
+    public partial record Roi
     {
         [Newtonsoft.Json.JsonProperty("times", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public decimal? Times { get; set; }
+        public decimal? Times { get; init; }
 
         [Newtonsoft.Json.JsonProperty("currency", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string Currency { get; set; }
+        public string Currency { get; init; }
 
         [Newtonsoft.Json.JsonProperty("percentage", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public decimal? Percentage { get; set; }
+        public decimal? Percentage { get; init; }
 
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties = new System.Collections.Generic.Dictionary<string, object>();
 
@@ -6038,16 +6039,16 @@ namespace Trakx.CoinGecko.ApiClient
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "13.15.10.0 (NJsonSchema v10.6.10.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class Market
+    public partial record Market
     {
         [Newtonsoft.Json.JsonProperty("name", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string Name { get; set; }
+        public string Name { get; init; }
 
         [Newtonsoft.Json.JsonProperty("identifier", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string Identifier { get; set; }
+        public string Identifier { get; init; }
 
         [Newtonsoft.Json.JsonProperty("has_trading_incentive", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public bool Has_trading_incentive { get; set; }
+        public bool Has_trading_incentive { get; init; }
 
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties = new System.Collections.Generic.Dictionary<string, object>();
 
@@ -6061,16 +6062,16 @@ namespace Trakx.CoinGecko.ApiClient
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "13.15.10.0 (NJsonSchema v10.6.10.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class Converted_last
+    public partial record Converted_last
     {
         [Newtonsoft.Json.JsonProperty("btc", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public decimal Btc { get; set; }
+        public decimal Btc { get; init; }
 
         [Newtonsoft.Json.JsonProperty("eth", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public decimal Eth { get; set; }
+        public decimal Eth { get; init; }
 
         [Newtonsoft.Json.JsonProperty("usd", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public decimal Usd { get; set; }
+        public decimal Usd { get; init; }
 
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties = new System.Collections.Generic.Dictionary<string, object>();
 
@@ -6084,16 +6085,16 @@ namespace Trakx.CoinGecko.ApiClient
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "13.15.10.0 (NJsonSchema v10.6.10.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class Converted_volume
+    public partial record Converted_volume
     {
         [Newtonsoft.Json.JsonProperty("btc", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public decimal Btc { get; set; }
+        public decimal Btc { get; init; }
 
         [Newtonsoft.Json.JsonProperty("eth", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public decimal Eth { get; set; }
+        public decimal Eth { get; init; }
 
         [Newtonsoft.Json.JsonProperty("usd", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public decimal Usd { get; set; }
+        public decimal Usd { get; init; }
 
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties = new System.Collections.Generic.Dictionary<string, object>();
 
@@ -6107,13 +6108,13 @@ namespace Trakx.CoinGecko.ApiClient
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "13.15.10.0 (NJsonSchema v10.6.10.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class Repos_url
+    public partial record Repos_url
     {
         [Newtonsoft.Json.JsonProperty("github", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public System.Collections.Generic.List<string> Github { get; set; }
+        public System.Collections.Generic.List<string> Github { get; init; }
 
         [Newtonsoft.Json.JsonProperty("bitbucket", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public System.Collections.Generic.List<string> Bitbucket { get; set; }
+        public System.Collections.Generic.List<string> Bitbucket { get; init; }
 
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties = new System.Collections.Generic.Dictionary<string, object>();
 
