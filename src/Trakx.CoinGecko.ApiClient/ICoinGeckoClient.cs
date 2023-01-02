@@ -16,5 +16,4 @@ public interface ICoinGeckoClient
     Task<IDictionary<DateTimeOffset, MarketData>> GetMarketDataForDateRange(string id, string vsCurrency,
         DateTimeOffset start, DateTimeOffset end, CancellationToken cancellationToken);
     Task<IDictionary<DateTimeOffset, MarketData>> GetMarketData(string id, string vsCurrency, int days, CancellationToken cancellationToken);
-    Task<List<MarketData>> Search(string vsCurrency, string? ids = null, string? category = null, string? order = null, int? per_page = null, int? page = null, CancellationToken cancellationToken = default);
 }

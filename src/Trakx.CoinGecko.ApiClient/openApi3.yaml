@@ -222,11 +222,7 @@ paths:
       responses:
         200:
           description: List all coins with market data
-          content: 
-             application/json:
-              schema:
-                $ref: '#/components/schemas/CoinMarketOutput'
-          
+          content: {}
   /coins/{id}:
     get:
       tags:
@@ -1848,44 +1844,3 @@ components:
       type: integer
       format: int64
       minimum: 0
-    CoinMarketOutput:
-      type: array
-      items:
-        $ref: '#/components/schemas/SearchCoinData'
-    SearchCoinData:
-      type: object
-      nullable : true
-      properties:
-        id:
-          type: string
-          nullable: true
-        symbol:
-          type: string
-          nullable: true
-        name: 
-          type: string
-          nullable: true
-        current_price: 
-          type: number
-          format: decimal
-          nullable: true
-        market_cap:
-          type: number
-          format: decimal
-          nullable: true
-        total_volume: 
-          type: number
-          format: decimal
-          nullable: true
-        circulating_supply: 
-          type: number
-          format: decimal
-          nullable: true
-        total_supply: 
-          type: number
-          format: decimal
-          nullable: true
-        max_supply: 
-          type: number
-          format: decimal
-          nullable: true

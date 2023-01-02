@@ -99,7 +99,7 @@ public class CoinGeckoClient : ICoinGeckoClient
             throw new FailedToRetrievePriceException($"Failed to retrieve price of {quoteCurrencyId} as of {date}");
         }
 
-        var entry = _cache.CreateEntry(cacheKey);
+        var entry =_cache.CreateEntry(cacheKey);
         entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromDays(1);
         entry.Value = fxRate.Value;
         return fxRate.Value;
@@ -222,24 +222,6 @@ public class CoinGeckoClient : ICoinGeckoClient
         return BuildMarketData(id, vsCurrency, range);
     }
 
-    public async Task<List<MarketData>> Search(string vsCurrency, string? ids = null, string? category = null, string? order = null, int? per_page = null, int? page = null, CancellationToken cancellationToken = default)
-    {
-        var result = await _coinsClient
-            .MarketsAsync(vsCurrency, ids, category, order, per_page, page, cancellationToken: cancellationToken)
-            .ConfigureAwait(false);
-
-        return result.Result.ConvertAll(x => new MarketData{
-            CoinId = x.Id,
-            Name = x.Name,
-            MarketCap =x.Market_cap,
-            Price = x.Current_price,
-            CoinSymbol = x.Symbol,
-            Volume = x.Total_volume
-        });
-    }
-
-    #region [ Private methods ]
-
     private Dictionary<DateTimeOffset, MarketData> BuildMarketData(string id, string vsCurrency, Response<Range> range)
     {
         return Enumerable.Range(0, range.Result.Prices.Count).Select(i =>
@@ -256,6 +238,4 @@ public class CoinGeckoClient : ICoinGeckoClient
                     QuoteCurrency = vsCurrency
                 });
     }
-
-    #endregion [ Private methods ]
 }

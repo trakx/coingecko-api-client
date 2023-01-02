@@ -44,7 +44,7 @@ public class CoinsClientTests : CoinGeckoClientTestBase
     {
         var result = await _coinsClient.CoinsAsync(id, "false");
         var list = result.Result;
-        Assert.NotNull(list);
+        EnsureAllJsonElementsWereMapped(list);
     }
 
     [Theory]
