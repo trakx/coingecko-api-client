@@ -705,7 +705,7 @@ namespace Trakx.CoinGecko.ApiClient
         /// <param name="price_change_percentage">Include price change percentage in &lt;b&gt;1h, 24h, 7d, 14d, 30d, 200d, 1y&lt;/b&gt; (eg. '`1h,24h,7d`' comma-separated, invalid values will be discarded)</param>
         /// <returns>List all coins with market data</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<Response> MarketsAsync(string vs_currency, string ids = null, string category = null, string order = null, int? per_page = null, int? page = null, bool? sparkline = null, string price_change_percentage = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
+        System.Threading.Tasks.Task<Response<System.Collections.Generic.List<SearchCoinData>>> MarketsAsync(string vs_currency, string ids = null, string category = null, string order = null, int? per_page = null, int? page = null, bool? sparkline = null, string price_change_percentage = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <summary>
@@ -924,7 +924,7 @@ namespace Trakx.CoinGecko.ApiClient
         /// <param name="price_change_percentage">Include price change percentage in &lt;b&gt;1h, 24h, 7d, 14d, 30d, 200d, 1y&lt;/b&gt; (eg. '`1h,24h,7d`' comma-separated, invalid values will be discarded)</param>
         /// <returns>List all coins with market data</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<Response> MarketsAsync(string vs_currency, string ids = null, string category = null, string order = null, int? per_page = null, int? page = null, bool? sparkline = null, string price_change_percentage = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
+        public virtual async System.Threading.Tasks.Task<Response<System.Collections.Generic.List<SearchCoinData>>> MarketsAsync(string vs_currency, string ids = null, string category = null, string order = null, int? per_page = null, int? page = null, bool? sparkline = null, string price_change_percentage = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
         {
             if (vs_currency == null)
                 throw new System.ArgumentNullException("vs_currency");
@@ -969,6 +969,7 @@ namespace Trakx.CoinGecko.ApiClient
                 using (var request_ = new System.Net.Http.HttpRequestMessage())
                 {
                     request_.Method = new System.Net.Http.HttpMethod("GET");
+                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
 
                     PrepareRequest(client_, request_, urlBuilder_);
 
@@ -993,7 +994,12 @@ namespace Trakx.CoinGecko.ApiClient
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
-                            return new Response(status_, headers_);
+                            var objectResponse_ = await ReadObjectResponseAsync<System.Collections.Generic.List<SearchCoinData>>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            if (objectResponse_.Object == null)
+                            {
+                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                            }
+                            return new Response<System.Collections.Generic.List<SearchCoinData>>(status_, headers_, objectResponse_.Object);
                         }
                         else
                         {
@@ -5577,6 +5583,53 @@ namespace Trakx.CoinGecko.ApiClient
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "13.15.10.0 (NJsonSchema v10.6.10.0 (Newtonsoft.Json v13.0.0.0))")]
     public partial class TimestampedValue : System.Collections.Generic.List<double>
     {
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "13.15.10.0 (NJsonSchema v10.6.10.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial class CoinMarketOutput : System.Collections.Generic.List<SearchCoinData>
+    {
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "13.15.10.0 (NJsonSchema v10.6.10.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial record SearchCoinData
+    {
+        [Newtonsoft.Json.JsonProperty("id", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string Id { get; init; }
+
+        [Newtonsoft.Json.JsonProperty("symbol", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string Symbol { get; init; }
+
+        [Newtonsoft.Json.JsonProperty("name", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string Name { get; init; }
+
+        [Newtonsoft.Json.JsonProperty("current_price", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public decimal? Current_price { get; init; }
+
+        [Newtonsoft.Json.JsonProperty("market_cap", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public decimal? Market_cap { get; init; }
+
+        [Newtonsoft.Json.JsonProperty("total_volume", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public decimal? Total_volume { get; init; }
+
+        [Newtonsoft.Json.JsonProperty("circulating_supply", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public decimal? Circulating_supply { get; init; }
+
+        [Newtonsoft.Json.JsonProperty("total_supply", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public decimal? Total_supply { get; init; }
+
+        [Newtonsoft.Json.JsonProperty("max_supply", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public decimal? Max_supply { get; init; }
+
+        private System.Collections.Generic.IDictionary<string, object> _additionalProperties = new System.Collections.Generic.Dictionary<string, object>();
+
+        [Newtonsoft.Json.JsonExtensionData]
+        public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
+        {
+            get { return _additionalProperties; }
+            set { _additionalProperties = value; }
+        }
 
     }
 
