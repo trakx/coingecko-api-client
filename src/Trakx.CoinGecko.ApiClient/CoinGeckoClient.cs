@@ -17,7 +17,7 @@ namespace Trakx.CoinGecko.ApiClient;
 public class CoinGeckoClient : ICoinGeckoClient
 {
     private static readonly ILogger Logger =
-        Log.Logger.ForContext(MethodBase.GetCurrentMethod()!.DeclaringType);
+        Log.Logger.ForContext(MethodBase.GetCurrentMethod()!.DeclaringType!);
 
     private readonly IMemoryCache _cache;
     private readonly ICoinsClient _coinsClient;
@@ -237,6 +237,7 @@ public class CoinGeckoClient : ICoinGeckoClient
             CoinSymbol = x.Symbol,
             Volume = x.Total_volume,
             CirculatingSupply = x.Circulating_supply,
+            MarketCapRank = x.Market_cap_rank,
         });
     }
 

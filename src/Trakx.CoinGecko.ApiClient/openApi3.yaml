@@ -1862,7 +1862,7 @@ components:
         symbol:
           type: string
           nullable: true
-        name: 
+        name:
           type: string
           nullable: true
         current_price: 
@@ -1873,15 +1873,18 @@ components:
           type: number
           format: decimal
           nullable: true
-        total_volume: 
+        market_cap_rank:
+            type: integer
+            nullable: true
+        total_volume:
           type: number
           format: decimal
           nullable: true
-        circulating_supply: 
+        circulating_supply:
           type: number
           format: decimal
           nullable: true
-        total_supply: 
+        total_supply:
           type: number
           format: decimal
           nullable: true
