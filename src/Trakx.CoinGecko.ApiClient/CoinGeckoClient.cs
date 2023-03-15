@@ -228,13 +228,15 @@ public class CoinGeckoClient : ICoinGeckoClient
             .MarketsAsync(vsCurrency, ids, category, order, per_page, page, cancellationToken: cancellationToken)
             .ConfigureAwait(false);
 
-        return result.Result.ConvertAll(x => new MarketData{
+        return result.Result.ConvertAll(x => new MarketData
+        {
             CoinId = x.Id,
             Name = x.Name,
-            MarketCap =x.Market_cap,
+            MarketCap = x.Market_cap,
             Price = x.Current_price,
             CoinSymbol = x.Symbol,
-            Volume = x.Total_volume
+            Volume = x.Total_volume,
+            CirculatingSupply = x.Circulating_supply,
         });
     }
 
