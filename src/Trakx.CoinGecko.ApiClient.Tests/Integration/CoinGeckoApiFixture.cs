@@ -2,6 +2,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Trakx.Utils.Testing;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace Trakx.CoinGecko.ApiClient.Tests.Integration;
 
@@ -18,11 +19,13 @@ public class CoinGeckoApiFixture : IDisposable
     public const string CoinGeckoBaseUrl = "https://api.coingecko.com/api/v3";
     public const string CoinGeckoProBaseUrl = "https://pro-api.coingecko.com/api/v3";
 
+    public ITestOutputHelper Output { get; }
     public ServiceProvider ServiceProvider { get; }
     public CoinGeckoApiConfiguration Configuration { get; }
 
-    public CoinGeckoApiFixture()
+    public CoinGeckoApiFixture(ITestOutputHelper output)
     {
+        Output = output;
         Configuration = BuildConfiguration();
         ServiceProvider = BuildServiceProvider();
     }

@@ -21,9 +21,10 @@ public class CoinGeckoClientTestBase
     protected CoinGeckoClientTestBase(CoinGeckoApiFixture apiFixture, ITestOutputHelper output)
     {
         Logger = new LoggerConfiguration()
-            .WriteTo.TestOutput(output)
+            .WriteTo.TestOutput(Output)
             .CreateLogger()
             .ForContext(MethodBase.GetCurrentMethod()!.DeclaringType!);
+
         ServiceProvider = apiFixture.ServiceProvider;
     }
 
@@ -38,14 +39,10 @@ public class CoinGeckoClientTestBase
                                      from attribute in property.GetCustomAttributes(typeof(JsonExtensionDataAttribute), true)
                                      select property).FirstOrDefault();
 
-        if (extendedDataFieldInfo != null &&
-            extendedDataFieldInfo.PropertyType == typeof(IDictionary<string, object>))
+        if (extendedDataFieldInfo?.GetValue(obj) is IDictionary<string, object> notMappedValues && notMappedValues.Any())
         {
-            if (extendedDataFieldInfo.GetValue(obj) is IDictionary<string, object> notMappedValues && notMappedValues.Any())
-            {
-                throw new Exception($"The following element(s) must be mapped to the object '{obj.GetType().FullName}': " +
-                                    $"{string.Join(",", notMappedValues.Keys)}");
-            }
+            throw new Exception($"The following element(s) must be mapped to the object '{obj.GetType().FullName}': " +
+                                $"{string.Join(",", notMappedValues.Keys)}");
         }
 
         foreach (var property in obj.GetType().GetProperties().Where(f => f != extendedDataFieldInfo))

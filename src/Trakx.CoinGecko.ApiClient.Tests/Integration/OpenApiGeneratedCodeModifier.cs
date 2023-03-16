@@ -9,7 +9,8 @@ public class OpenApiGeneratedCodeModifier : Trakx.Utils.Testing.OpenApiGenerated
     public OpenApiGeneratedCodeModifier(ITestOutputHelper output)
         : base(output)
     {
-        var foundRoot = default(DirectoryInfo).TryWalkBackToRepositoryRoot(out var rootDirectory)!;
+        default(DirectoryInfo).TryWalkBackToRepositoryRoot(out var rootDirectory);
+
         FilePaths.Add(Path.Combine(rootDirectory!.FullName, "src",
             "Trakx.CoinGecko.ApiClient", "ApiClients.cs"));
     }

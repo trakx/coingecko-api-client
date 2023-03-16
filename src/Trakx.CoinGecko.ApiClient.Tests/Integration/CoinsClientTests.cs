@@ -108,6 +108,10 @@ public class CoinsClientTests : CoinGeckoClientTestBase
         };
 
         var data = await _simpleClient.PriceAsync(string.Join(",", coins), "usd");
+
+        data.Should().NotBeNull();
+        data.Result.Should().NotBeNullOrEmpty();
+
         _output.WriteLine("\"coin\",\"price\"");
         foreach (var coin in coins)
         {
