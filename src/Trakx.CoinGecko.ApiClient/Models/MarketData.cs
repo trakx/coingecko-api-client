@@ -12,4 +12,7 @@ public record MarketData
     public decimal? Volume { get; init; }
     public decimal? MarketCap { get; init; }
     public string? CoinSymbol { get; init; }
+    public decimal? CirculatingSupply { get; init; }
+    public int? MarketCapRank { get; init; }
+
 }

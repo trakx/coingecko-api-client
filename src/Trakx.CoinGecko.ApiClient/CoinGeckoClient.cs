@@ -17,7 +17,7 @@ namespace Trakx.CoinGecko.ApiClient;
 public class CoinGeckoClient : ICoinGeckoClient
 {
     private static readonly ILogger Logger =
-        Log.Logger.ForContext(MethodBase.GetCurrentMethod()!.DeclaringType);
+        Log.Logger.ForContext(MethodBase.GetCurrentMethod()!.DeclaringType!);
 
     private readonly IMemoryCache _cache;
     private readonly ICoinsClient _coinsClient;
@@ -34,7 +34,7 @@ public class CoinGeckoClient : ICoinGeckoClient
             return idsBySymbolName;
         }
     }
-
+		
     public Dictionary<string, CoinFullData> CoinFullDataByIds { get; }
 
     public CoinGeckoClient(
@@ -228,13 +228,16 @@ public class CoinGeckoClient : ICoinGeckoClient
             .MarketsAsync(vsCurrency, ids, category, order, per_page, page, cancellationToken: cancellationToken)
             .ConfigureAwait(false);
 
-        return result.Result.ConvertAll(x => new MarketData{
+        return result.Result.ConvertAll(x => new MarketData
+        {
             CoinId = x.Id,
             Name = x.Name,
-            MarketCap =x.Market_cap,
+            MarketCap = x.Market_cap,
             Price = x.Current_price,
             CoinSymbol = x.Symbol,
-            Volume = x.Total_volume
+            Volume = x.Total_volume,
+            CirculatingSupply = x.Circulating_supply,
+            MarketCapRank = x.Market_cap_rank,
         });
     }
 
