@@ -21,5 +21,5 @@ public record CoinGeckoApiConfiguration
 
     [AwsParameter]
     [SecretEnvironmentVariable]
-    public string ApiKey { get; init; }
+    public string ApiKey { get; init; } = null!;
 }

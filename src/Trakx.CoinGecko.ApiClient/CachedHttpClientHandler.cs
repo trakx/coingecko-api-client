@@ -26,11 +26,6 @@ public class Semaphore : ISemaphore
         _semaphoreImplementation = semaphoreImplementation;
     }
 
-    public void Dispose()
-    {
-        _semaphoreImplementation.Dispose();
-    }
-
     public async Task WaitAsync(CancellationToken cancellationToken)
     {
         await _semaphoreImplementation.WaitAsync(cancellationToken);
@@ -40,12 +35,24 @@ public class Semaphore : ISemaphore
     {
         return _semaphoreImplementation.Release(count);
     }
+
+    protected virtual void Dispose(bool disposing)
+    {
+        if (!disposing) return;
+        _semaphoreImplementation.Dispose();
+    }
+
+    public void Dispose()
+    {
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
 }
 
 public class CachedHttpClientHandler : DelegatingHandler
 {
     private static readonly ILogger Logger =
-        Log.Logger.ForContext(MethodBase.GetCurrentMethod()!.DeclaringType);
+        Log.Logger.ForContext(MethodBase.GetCurrentMethod()!.DeclaringType!);
 
     private readonly IMemoryCache _cache;
     private readonly CoinGeckoApiConfiguration _apiConfiguration;
@@ -98,7 +105,7 @@ public class CachedHttpClientHandler : DelegatingHandler
     /// <param name="request">Http request that should be performed</param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    private async Task<HttpResponseMessage> TryGetOrSetRequestFromCache(HttpRequestMessage request, 
+    private async Task<HttpResponseMessage> TryGetOrSetRequestFromCache(HttpRequestMessage request,
         CancellationToken cancellationToken)
     {
         // Data cache is only applicable for GET operations
@@ -128,7 +135,7 @@ public class CachedHttpClientHandler : DelegatingHandler
                     .ConfigureAwait(false);
                 var content = await response.Content.ReadAsStringAsync(cancellationToken);
 
-                e.AbsoluteExpirationRelativeToNow = response.IsSuccessStatusCode 
+                e.AbsoluteExpirationRelativeToNow = response.IsSuccessStatusCode
                     ? TimeSpan.FromSeconds(_apiConfiguration.CacheDurationInSeconds ?? 10)
                     : TimeSpan.FromTicks(1);
 
@@ -137,7 +144,7 @@ public class CachedHttpClientHandler : DelegatingHandler
             catch (ApiException exception)
             {
                 e.AbsoluteExpirationRelativeToNow = TimeSpan.FromTicks(1);
-                if(exception.StatusCode == (int)HttpStatusCode.TooManyRequests
+                if (exception.StatusCode == (int)HttpStatusCode.TooManyRequests
                    && exception.Headers.TryGetValue("Retry-After", out var value))
                 {
                     var millisecondsDelay = int.Parse(value?.First() ?? "0");
@@ -154,7 +161,7 @@ public class CachedHttpClientHandler : DelegatingHandler
             }
         }).ConfigureAwait(false);
 
-        return new HttpResponseMessage(message.StatusCode){Content = new StringContent(cachedContent)};
+        return new HttpResponseMessage(message.StatusCode) { Content = new StringContent(cachedContent) };
     }
 
     /// <inheritdoc />

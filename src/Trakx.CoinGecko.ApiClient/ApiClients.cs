@@ -5610,6 +5610,9 @@ namespace Trakx.CoinGecko.ApiClient
         [Newtonsoft.Json.JsonProperty("market_cap", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public decimal? Market_cap { get; init; }
 
+        [Newtonsoft.Json.JsonProperty("market_cap_rank", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public int? Market_cap_rank { get; init; }
+
         [Newtonsoft.Json.JsonProperty("total_volume", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public decimal? Total_volume { get; init; }
 

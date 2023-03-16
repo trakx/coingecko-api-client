@@ -6,7 +6,7 @@ using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using Serilog;
-using Trakx.Utils.Testing;
+using Sprache;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -20,32 +20,29 @@ public class CoinGeckoClientTestBase
 
     protected CoinGeckoClientTestBase(CoinGeckoApiFixture apiFixture, ITestOutputHelper output)
     {
-        Logger = new LoggerConfiguration().WriteTo.TestOutput(output).CreateLogger()
+        Logger = new LoggerConfiguration()
+            .WriteTo.TestOutput(output)
+            .CreateLogger()
             .ForContext(MethodBase.GetCurrentMethod()!.DeclaringType!);
+
         ServiceProvider = apiFixture.ServiceProvider;
     }
 
     protected void EnsureAllJsonElementsWereMapped(object? obj)
     {
         if (obj == null) return;
-        else
-        {
-            var fullName = obj.GetType().FullName;
-            if (fullName != null && !fullName.StartsWith("Trakx.")) return;
-        }
+
+        var fullName = obj.GetType().FullName;
+        if (fullName != null && !fullName.StartsWith("Trakx.")) return;
 
         var extendedDataFieldInfo = (from property in obj.GetType().GetProperties()
-            from attribute in property.GetCustomAttributes(typeof(JsonExtensionDataAttribute), true)
-            select property).FirstOrDefault();
+                                     from attribute in property.GetCustomAttributes(typeof(JsonExtensionDataAttribute), true)
+                                     select property).FirstOrDefault();
 
-        if (extendedDataFieldInfo != null &&
-            extendedDataFieldInfo.PropertyType == typeof(IDictionary<string, object>))
+        if (extendedDataFieldInfo?.GetValue(obj) is IDictionary<string, object> notMappedValues && notMappedValues.Any())
         {
-            if (extendedDataFieldInfo.GetValue(obj) is IDictionary<string, object> notMappedValues && notMappedValues.Any())
-            {
-                throw new Exception($"The following element(s) must be mapped to the object '{obj.GetType().FullName}': " +
-                                    $"{string.Join(",", notMappedValues.Keys)}");
-            }
+            throw new Exception($"The following element(s) must be mapped to the object '{obj.GetType().FullName}': " +
+                                $"{string.Join(",", notMappedValues.Keys)}");
         }
 
         foreach (var property in obj.GetType().GetProperties().Where(f => f != extendedDataFieldInfo))
@@ -78,54 +75,5 @@ public class CoinGeckoClientTestBase
                 EnsureAllJsonElementsWereMapped(property.GetValue(obj));
             }
         }
-    }
-
-}
-
-[CollectionDefinition(nameof(ApiTestCollection))]
-public class ApiTestCollection : ICollectionFixture<CoinGeckoApiFixture>
-{
-    // This class has no code, and is never created. Its purpose is simply
-    // to be the place to apply [CollectionDefinition] and all the
-    // ICollectionFixture<> interfaces.
-}
-
-public class CoinGeckoApiFixture : IDisposable
-{
-    public const string CoinGeckoBaseUrl = "https://api.coingecko.com/api/v3";
-    public const string CoinGeckoProBaseUrl = "https://pro-api.coingecko.com/api/v3";
-
-    public ServiceProvider ServiceProvider { get; }
-
-    public CoinGeckoApiFixture( )
-    {
-
-        var configuration = ConfigurationHelper.GetConfigurationFromEnv<CoinGeckoApiConfiguration>()
-            with {
-            BaseUrl = CoinGeckoProBaseUrl,
-            MaxRetryCount = 5,
-            ThrottleDelayPerSecond = 120,
-            CacheDurationInSeconds = 20,
-            InitialRetryDelayInMilliseconds = 100
-        };
-
-        var serviceCollection = new ServiceCollection();
-
-        serviceCollection.AddSingleton(configuration);
-        serviceCollection.AddCoinGeckoClient(configuration);
-
-        ServiceProvider = serviceCollection.BuildServiceProvider();
-    }
-
-    protected virtual void Dispose(bool disposing)
-    {
-        if (!disposing) return;
-        ServiceProvider.Dispose();
-    }
-
-    public void Dispose()
-    {
-        Dispose(true);
-        GC.SuppressFinalize(this);
     }
 }

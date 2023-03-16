@@ -1,6 +1,6 @@
 using System;
-using System.Threading;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
@@ -98,10 +98,12 @@ public class CoinGeckoClientTests : CoinGeckoClientTestBase
             include24HrVol: true);
 
         foreach (var coinId in coinIds)
-        foreach (var quoteCurrency in quoteCurrencies)
         {
-            result.Should().Contain(p => p.CoinGeckoId == coinId && p.Currency == quoteCurrency);
-            result.Should().OnlyContain(p => p.MarketCap > 0 && p.DailyVolume > 0);
+            foreach (var quoteCurrency in quoteCurrencies)
+            {
+                result.Should().Contain(p => p.CoinGeckoId == coinId && p.Currency == quoteCurrency);
+                result.Should().OnlyContain(p => p.MarketCap > 0 && p.DailyVolume > 0);
+            }
         }
 
         result.Should().HaveCount(coinIds.Length * quoteCurrencies.Length);
