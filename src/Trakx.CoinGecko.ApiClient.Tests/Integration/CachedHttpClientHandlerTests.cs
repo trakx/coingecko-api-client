@@ -4,7 +4,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
+using Serilog;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace Trakx.CoinGecko.ApiClient.Tests.Integration;
 
@@ -14,7 +16,7 @@ public class CachedHttpClientHandlerTests : IDisposable
     private readonly ServiceProvider _serviceProvider;
     private readonly ICoinGeckoClient _client;
 
-    public CachedHttpClientHandlerTests()
+    public CachedHttpClientHandlerTests(ITestOutputHelper output)
     {
         _config = new CoinGeckoApiConfiguration
         {
@@ -23,6 +25,11 @@ public class CachedHttpClientHandlerTests : IDisposable
         };
 
         _serviceProvider = BuildServiceProvider();
+        Log.Logger = new LoggerConfiguration()
+            .MinimumLevel.Verbose()
+            .WriteTo.TestOutput(output)
+            .CreateLogger()
+            .ForContext<CachedHttpClientHandlerTests>();
 
         _client = _serviceProvider.GetService<ICoinGeckoClient>()!;
     }
@@ -42,7 +49,8 @@ public class CachedHttpClientHandlerTests : IDisposable
         const int howManyCoinsInTest = 3;
 
         var allCoins = await _client.GetCoinList().ConfigureAwait(false);
-        var ids = allCoins.Take(howManyCoinsInTest).Select(c => c.Id);
+        var ids = allCoins.Where(c => c.Id != "0vix-protocol") //this coin is not quoted in USD
+            .Take(howManyCoinsInTest).Select(c => c.Id);
         var latestPrices = ids
             .Select(async id => await _client.GetLatestPrice(id, "usd"));
         var stopWatch = new Stopwatch();

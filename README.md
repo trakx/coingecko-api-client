@@ -16,13 +16,10 @@ C# implementation of a CoinGecko API client
 In order to be able to run some integration tests, you should create a `.env` file in the `src` folder with the following variables:
 ```secretsEnvVariables
 CoinGeckoApiConfiguration__ApiKey=********
-CoinGeckoApiConfiguration__ApiKey=********
-
 ```
 
 ## AWS Parameters
 In order to be able to run some integration tests you should ensure that you have access to the following AWS parameters :
 ```awsParams
-/Trakx/CoinGecko/ApiClient/CoinGeckoApiConfiguration/ApiKey
+/[environment]/Trakx/CoinGecko/ApiClient/CoinGeckoApiConfiguration/ApiKey
 ```
-
