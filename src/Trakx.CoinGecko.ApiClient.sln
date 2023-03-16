@@ -26,8 +26,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".github", ".github", "{3B1A
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{B3D9C38F-2A69-47EF-BCE7-DA133A5B7CEB}"
 	ProjectSection(SolutionItems) = preProject
-		..\.github\workflows\dotnet-core.yml = ..\.github\workflows\dotnet-core.yml
-		..\.github\workflows\publish.nuget.yml = ..\.github\workflows\publish.nuget.yml
+		..\.github\workflows\automerge.yml = ..\.github\workflows\automerge.yml
+		..\.github\workflows\delete.packages.yml = ..\.github\workflows\delete.packages.yml
+		..\.github\workflows\nuget.yml = ..\.github\workflows\nuget.yml
+		..\.github\workflows\test.yml = ..\.github\workflows\test.yml
 	EndProjectSection
 EndProject
 Global
