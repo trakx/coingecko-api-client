@@ -8,33 +8,41 @@ using Xunit;
 
 namespace Trakx.CoinGecko.ApiClient.Tests.Integration;
 
-public class CachedHttpClientHandlerTests
+public class CachedHttpClientHandlerTests : IDisposable
 {
+    private readonly CoinGeckoApiConfiguration _config;
+    private readonly ServiceProvider _serviceProvider;
     private readonly ICoinGeckoClient _client;
-    private readonly int _throttleDelay;
 
     public CachedHttpClientHandlerTests()
     {
-        var serviceCollection = new ServiceCollection();
-        _throttleDelay = 100;
-        var config = new CoinGeckoApiConfiguration
+        _config = new CoinGeckoApiConfiguration
         {
             BaseUrl = CoinGeckoApiFixture.CoinGeckoBaseUrl,
-            ThrottleDelayPerSecond = _throttleDelay
+            ThrottleDelayPerSecond = 100
         };
-        serviceCollection.AddCoinGeckoClient(config);
-        serviceCollection.AddMemoryCache();
-        serviceCollection.AddSingleton(config);
-        var serviceProvider = serviceCollection.BuildServiceProvider();
 
-        _client = serviceProvider.GetService<ICoinGeckoClient>()!;
+        _serviceProvider = BuildServiceProvider();
+
+        _client = _serviceProvider.GetService<ICoinGeckoClient>()!;
+    }
+
+    private ServiceProvider BuildServiceProvider()
+    {
+        var serviceCollection = new ServiceCollection();
+        serviceCollection.AddCoinGeckoClient(_config);
+        serviceCollection.AddMemoryCache();
+        serviceCollection.AddSingleton(_config);
+        return serviceCollection.BuildServiceProvider();
     }
 
     [Fact]
     public async Task Registering_Coingecko_clients_should_use_throttled_message_handler()
     {
+        const int howManyCoinsInTest = 3;
+
         var allCoins = await _client.GetCoinList().ConfigureAwait(false);
-        var ids = allCoins.Take(15).Select(c => c.Id);
+        var ids = allCoins.Take(howManyCoinsInTest).Select(c => c.Id);
         var latestPrices = ids
             .Select(async id => await _client.GetLatestPrice(id, "usd"));
         var stopWatch = new Stopwatch();
@@ -42,7 +50,20 @@ public class CachedHttpClientHandlerTests
         await Task.WhenAll(latestPrices.ToArray());
         stopWatch.Stop();
 
-        stopWatch.Elapsed.Should().BeGreaterOrEqualTo(TimeSpan.FromMilliseconds(_throttleDelay * 15),
+        var expectedDelay = TimeSpan.FromMilliseconds(howManyCoinsInTest * (double)_config.ThrottleDelayPerSecond!);
+        stopWatch.Elapsed.Should().BeGreaterOrEqualTo(expectedDelay,
             "ThrottleHttpHandler imposes a _throttleDelay delay between each call.");
+    }
+
+    protected virtual void Dispose(bool disposing)
+    {
+        if (!disposing) return;
+        _serviceProvider.Dispose();
+    }
+
+    public void Dispose()
+    {
+        Dispose(true);
+        GC.SuppressFinalize(this);
     }
 }

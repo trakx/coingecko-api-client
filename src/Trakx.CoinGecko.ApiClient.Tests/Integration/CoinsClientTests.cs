@@ -66,7 +66,9 @@ public class CoinsClientTests : CoinGeckoClientTestBase
     public async Task RangeAsync_should_return_historical_data_for_a_range_of_dates()
     {
         var start = DateTimeOffset.Parse("2020-12-01");
-        var end = DateTimeOffset.Parse("2020-12-31");var range = await _coinsClient
+        var end = DateTimeOffset.Parse("2020-12-31");
+
+        var range = await _coinsClient
             .RangeAsync("ethereum", "usd", start.ToUnixTimeSeconds(), end.ToUnixTimeSeconds(), CancellationToken.None)
             .ConfigureAwait(false);
 
@@ -75,10 +77,18 @@ public class CoinsClientTests : CoinGeckoClientTestBase
         range.Result.Market_caps.Count.Should().Be(range.Result.Prices.Count);
         range.Result.Total_volumes.Count.Should().Be(range.Result.Prices.Count);
 
-        DateTimeOffset.FromUnixTimeMilliseconds((long) range.Result.Prices.First()[0]).Should().BeCloseTo(start, TimeSpan.FromDays(1));
-        range.Result.Prices.First()[1].Should().BeApproximately(613d, 15d);
-        DateTimeOffset.FromUnixTimeMilliseconds((long) range.Result.Prices.Last()[0]).Should().BeCloseTo(end, TimeSpan.FromDays(1));
-        range.Result.Prices.Last()[1].Should().BeApproximately(746d, 10d);
+        var first = range.Result.Prices.First();
+        DateTimeOffset
+            .FromUnixTimeMilliseconds((long)first[0])
+            .Should().BeCloseTo(start, TimeSpan.FromDays(1));
+        first[1].Should().BeApproximately(613d, 15d);
+
+        var last = range.Result.Prices.Last();
+        DateTimeOffset
+            .FromUnixTimeMilliseconds((long)last[0])
+            .Should().BeCloseTo(end, TimeSpan.FromDays(1));
+        last[1].Should().BeApproximately(746d, 10d);
+
         EnsureAllJsonElementsWereMapped(range);
     }
 
