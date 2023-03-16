@@ -22,8 +22,19 @@ public class CoinGeckoClient : ICoinGeckoClient
     private readonly IMemoryCache _cache;
     private readonly ICoinsClient _coinsClient;
     private readonly ISimpleClient _simpleClient;
+    private Dictionary<string, string>? _idsBySymbolName;
     private readonly string? _typeName;
 
+    public Dictionary<string, string> IdsBySymbolName
+    {
+        get
+        {
+            var idsBySymbolName = _idsBySymbolName ??= GetCoinList().GetAwaiter().GetResult()
+                .ToDictionary(c => GetSymbolNameKey(c.Symbol, c.Name), c => c.Id);
+            return idsBySymbolName;
+        }
+    }
+		
     public Dictionary<string, CoinFullData> CoinFullDataByIds { get; }
 
     public CoinGeckoClient(
