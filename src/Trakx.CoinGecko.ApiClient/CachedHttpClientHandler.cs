@@ -45,7 +45,7 @@ public class Semaphore : ISemaphore
 public class CachedHttpClientHandler : DelegatingHandler
 {
     private static readonly ILogger Logger =
-        Log.Logger.ForContext(MethodBase.GetCurrentMethod()!.DeclaringType);
+        Log.Logger.ForContext(MethodBase.GetCurrentMethod()!.DeclaringType!);
 
     private readonly IMemoryCache _cache;
     private readonly CoinGeckoApiConfiguration _apiConfiguration;
@@ -98,7 +98,7 @@ public class CachedHttpClientHandler : DelegatingHandler
     /// <param name="request">Http request that should be performed</param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    private async Task<HttpResponseMessage> TryGetOrSetRequestFromCache(HttpRequestMessage request, 
+    private async Task<HttpResponseMessage> TryGetOrSetRequestFromCache(HttpRequestMessage request,
         CancellationToken cancellationToken)
     {
         // Data cache is only applicable for GET operations
@@ -128,7 +128,7 @@ public class CachedHttpClientHandler : DelegatingHandler
                     .ConfigureAwait(false);
                 var content = await response.Content.ReadAsStringAsync(cancellationToken);
 
-                e.AbsoluteExpirationRelativeToNow = response.IsSuccessStatusCode 
+                e.AbsoluteExpirationRelativeToNow = response.IsSuccessStatusCode
                     ? TimeSpan.FromSeconds(_apiConfiguration.CacheDurationInSeconds ?? 10)
                     : TimeSpan.FromTicks(1);
 
