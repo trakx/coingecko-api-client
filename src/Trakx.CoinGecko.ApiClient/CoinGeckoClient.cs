@@ -8,16 +8,17 @@ using System.Threading;
 using System.Threading.Tasks;
 using Ardalis.GuardClauses;
 using Microsoft.Extensions.Caching.Memory;
-using Serilog;
-using Trakx.Utils.Apis;
-using Trakx.Utils.Extensions;
+using Microsoft.Extensions.Logging;
+using Trakx.Common.ApiClient;
+using Trakx.Common.Extensions;
+using Trakx.Common.Logging;
 
 namespace Trakx.CoinGecko.ApiClient;
 
 public class CoinGeckoClient : ICoinGeckoClient
 {
     private static readonly ILogger Logger =
-        Log.Logger.ForContext(MethodBase.GetCurrentMethod()!.DeclaringType!);
+        LoggerProvider.Create(MethodBase.GetCurrentMethod()!.DeclaringType!);
 
     private readonly IMemoryCache _cache;
     private readonly ICoinsClient _coinsClient;
@@ -34,7 +35,7 @@ public class CoinGeckoClient : ICoinGeckoClient
             return idsBySymbolName;
         }
     }
-		
+
     public Dictionary<string, CoinFullData> CoinFullDataByIds { get; }
 
     public CoinGeckoClient(
@@ -59,12 +60,12 @@ public class CoinGeckoClient : ICoinGeckoClient
             .PriceAsync($"{coinGeckoId},{quoteCurrencyId}", "usd")
             .ConfigureAwait(false);
 
-        Logger.Debug("Received latest price {tickerDetails}", JsonSerializer.Serialize(tickerDetails));
+        Logger.LogDebug("Received latest price {tickerDetails}", JsonSerializer.Serialize(tickerDetails));
 
-        var price = tickerDetails.Result[coinGeckoId]["usd"];
+        var price = tickerDetails.Content[coinGeckoId]["usd"];
         var conversionToQuoteCurrency = quoteCurrencyId == "usd"
             ? 1m
-            : tickerDetails.Result[quoteCurrencyId]["usd"];
+            : tickerDetails.Content[quoteCurrencyId]["usd"];
 
         return price / conversionToQuoteCurrency ?? 0m;
     }
@@ -89,13 +90,13 @@ public class CoinGeckoClient : ICoinGeckoClient
         var quoteResponse = await _coinsClient.HistoryAsync(quoteCurrencyId, date, false.ToString())
             .ConfigureAwait(false);
 
-        var fxRate = quoteResponse.Result.Market_data is not null &&
-                     quoteResponse.Result.Market_data.Current_price.ContainsKey(Constants.Usd) ?
-            quoteResponse.Result.Market_data.Current_price[Constants.Usd] : default;
+        var fxRate = quoteResponse.Content.Market_data is not null &&
+                     quoteResponse.Content.Market_data.Current_price.ContainsKey(Constants.Usd) ?
+            quoteResponse.Content.Market_data.Current_price[Constants.Usd] : default;
 
         if (fxRate == null)
         {
-            Logger.Debug($"Current price for '{Constants.Usd}' in coin id '{quoteCurrencyId} for date '{date:dd-MM-yyyy}' is missing.");
+            Logger.LogDebug($"Current price for '{Constants.Usd}' in coin id '{quoteCurrencyId} for date '{date:dd-MM-yyyy}' is missing.");
             throw new FailedToRetrievePriceException($"Failed to retrieve price of {quoteCurrencyId} as of {date}");
         }
 
@@ -118,18 +119,18 @@ public class CoinGeckoClient : ICoinGeckoClient
 
         var fxRate = await GetUsdFxRate(quoteCurrencyId, date);
 
-        if (fullData.Result.Market_data == null)
+        if (fullData.Content.Market_data == null)
             return null;
 
         var marketData = new MarketData
         {
             AsOf = asOf,
-            CoinId = fullData.Result.Id,
-            CoinSymbol = fullData.Result.Symbol,
-            MarketCap = fullData.Result.Market_data.Market_cap[Constants.Usd] / fxRate,
-            Volume = fullData.Result.Market_data.Total_volume[Constants.Usd] / fxRate,
-            Price = fullData.Result.Market_data.Current_price[Constants.Usd] / fxRate,
-            QuoteCurrency = fullData.Result.Symbol
+            CoinId = fullData.Content.Id,
+            CoinSymbol = fullData.Content.Symbol,
+            MarketCap = fullData.Content.Market_data.Market_cap[Constants.Usd] / fxRate,
+            Volume = fullData.Content.Market_data.Total_volume[Constants.Usd] / fxRate,
+            Price = fullData.Content.Market_data.Current_price[Constants.Usd] / fxRate,
+            QuoteCurrency = fullData.Content.Symbol
         };
 
         var entry = _cache.CreateEntry(cacheKey);
@@ -152,7 +153,7 @@ public class CoinGeckoClient : ICoinGeckoClient
             {
                 var coinList = await _coinsClient.ListAllAsync().ConfigureAwait(false);
                 e.AbsoluteExpirationRelativeToNow = TimeSpan.FromDays(1);
-                return coinList.Result!.AsReadOnly();
+                return coinList.Content!.AsReadOnly();
             });
         return result;
     }
@@ -161,7 +162,7 @@ public class CoinGeckoClient : ICoinGeckoClient
     {
         var coinsPrice = await _simpleClient.PriceAsync(ids.ToCsvList(true, true, quoted: false),
             (vsCurrencies ?? new[] { Constants.Usd }).ToCsvList(true, true, quoted: false)).ConfigureAwait(false);
-        return coinsPrice.Result;
+        return coinsPrice.Content;
     }
 
     public async Task<IList<ExtendedPrice>> GetAllPricesExtended(
@@ -179,7 +180,7 @@ public class CoinGeckoClient : ICoinGeckoClient
             .ConfigureAwait(false);
 
         var result = new List<ExtendedPrice>();
-        foreach (var coinInfo in coinPrices.Result)
+        foreach (var coinInfo in coinPrices.Content)
         {
             foreach (string currency in currencies)
             {
@@ -228,7 +229,7 @@ public class CoinGeckoClient : ICoinGeckoClient
             .MarketsAsync(vsCurrency, ids, category, order, per_page, page, cancellationToken: cancellationToken)
             .ConfigureAwait(false);
 
-        return result.Result.ConvertAll(x => new MarketData
+        return result.Content.ConvertAll(x => new MarketData
         {
             CoinId = x.Id,
             Name = x.Name,
@@ -245,17 +246,17 @@ public class CoinGeckoClient : ICoinGeckoClient
 
     private Dictionary<DateTimeOffset, MarketData> BuildMarketData(string id, string vsCurrency, Response<Range> range)
     {
-        return Enumerable.Range(0, range.Result.Prices.Count).Select(i =>
-                new { Index = i, Date = DateTimeOffset.FromUnixTimeMilliseconds((long)range.Result.Prices[i][0]) })
+        return Enumerable.Range(0, range.Content.Prices.Count).Select(i =>
+                new { Index = i, Date = DateTimeOffset.FromUnixTimeMilliseconds((long)range.Content.Prices[i][0]) })
             .ToDictionary(d => d.Date,
                 d => new MarketData
                 {
                     AsOf = d.Date,
                     CoinId = id,
                     CoinSymbol = null,
-                    MarketCap = (decimal)range.Result.Market_caps[d.Index][1],
-                    Price = (decimal)range.Result.Prices[d.Index][1],
-                    Volume = (decimal)range.Result.Total_volumes[d.Index][1],
+                    MarketCap = (decimal)range.Content.Market_caps[d.Index][1],
+                    Price = (decimal)range.Content.Prices[d.Index][1],
+                    Volume = (decimal)range.Content.Total_volumes[d.Index][1],
                     QuoteCurrency = vsCurrency
                 });
     }

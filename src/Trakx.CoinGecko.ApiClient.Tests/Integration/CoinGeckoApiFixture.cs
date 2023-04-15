@@ -1,6 +1,7 @@
 ﻿using System;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Trakx.Utils.Testing;
+using Trakx.Common.Infrastructure.Environment.Aws;
 using Xunit;
 
 namespace Trakx.CoinGecko.ApiClient.Tests.Integration;
@@ -31,16 +32,19 @@ public class CoinGeckoApiFixture : IDisposable
     {
         Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", "Development");
         Environment.SetEnvironmentVariable("OPTIONAL_AWS_CONFIGURATION", "true");
-
-        return ConfigurationHelper.GetConfigurationFromAws<CoinGeckoApiConfiguration>()
-            with
-        {
-            BaseUrl = CoinGeckoProBaseUrl,
-            MaxRetryCount = 5,
-            ThrottleDelayPerSecond = 120,
-            CacheDurationInSeconds = 20,
-            InitialRetryDelayInMilliseconds = 100
-        };
+        var configBuilder = new ConfigurationBuilder().AddAwsSystemManagerConfiguration(
+           assemblyResolver: new Common.Testing.Resolvers.GenericSecretsAssemblyResolver<CoinGeckoApiConfiguration>());
+        var configurationRoot = configBuilder.Build();
+        return
+            configurationRoot.GetSection(nameof(CoinGeckoApiConfiguration)).Get<CoinGeckoApiConfiguration>()!
+                with
+            {
+                BaseUrl = CoinGeckoProBaseUrl,
+                MaxRetryCount = 5,
+                ThrottleDelayPerSecond = 120,
+                CacheDurationInSeconds = 20,
+                InitialRetryDelayInMilliseconds = 100
+            };
     }
 
     private ServiceProvider BuildServiceProvider()
