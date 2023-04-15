@@ -30,9 +30,8 @@ public class CoinGeckoApiFixture : IDisposable
 
     private static CoinGeckoApiConfiguration BuildConfiguration()
     {
-        Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", "Development");
-        Environment.SetEnvironmentVariable("OPTIONAL_AWS_CONFIGURATION", "true");
-        var configBuilder = new ConfigurationBuilder().AddAwsSystemManagerConfiguration(
+        const string environment = "CiCd";
+        var configBuilder = new ConfigurationBuilder().AddAwsSystemManagerConfiguration(environment,
            assemblyResolver: new Common.Testing.Resolvers.GenericSecretsAssemblyResolver<CoinGeckoApiConfiguration>());
         var configurationRoot = configBuilder.Build();
         return
