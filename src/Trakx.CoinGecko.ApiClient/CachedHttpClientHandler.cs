@@ -7,7 +7,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using Ardalis.GuardClauses;
 using Microsoft.Extensions.Caching.Memory;
-using Serilog;
+using Microsoft.Extensions.Logging;
+using Trakx.Common.Logging;
 
 namespace Trakx.CoinGecko.ApiClient;
 
@@ -52,7 +53,7 @@ public class Semaphore : ISemaphore
 public class CachedHttpClientHandler : DelegatingHandler
 {
     private static readonly ILogger Logger =
-        Log.Logger.ForContext(MethodBase.GetCurrentMethod()!.DeclaringType!);
+        LoggerProvider.Create(MethodBase.GetCurrentMethod()!.DeclaringType!);
 
     private readonly IMemoryCache _cache;
     private readonly CoinGeckoApiConfiguration _apiConfiguration;
@@ -151,7 +152,7 @@ public class CachedHttpClientHandler : DelegatingHandler
                     await Task.Delay(millisecondsDelay, cancellationToken);
                 }
 
-                Logger.Warning(exception, "Failed to get response from {uri}", request.RequestUri?.ToString() ?? "unknown URI");
+                Logger.LogWarning(exception, "Failed to get response from {uri}", request.RequestUri?.ToString() ?? "unknown URI");
                 return (new HttpResponseMessage((HttpStatusCode)exception.StatusCode), exception.Message);
             }
             finally

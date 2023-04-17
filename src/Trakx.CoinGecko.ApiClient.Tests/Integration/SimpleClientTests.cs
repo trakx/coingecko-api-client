@@ -27,9 +27,9 @@ public class SimpleClientTests : CoinGeckoClientTestBase
     {
         var price = await _simpleClient.PriceAsync(id, "usd").ConfigureAwait(true);
         price.StatusCode.Should().Be((int)HttpStatusCode.OK);
-        price.Result.Keys.Should().Contain(id);
-        price.Result[id].Keys.Should().Contain(Constants.Usd);
-        price.Result[id][Constants.Usd].Should().BeGreaterThan(0);
+        price.Content.Keys.Should().Contain(id);
+        price.Content[id].Keys.Should().Contain(Constants.Usd);
+        price.Content[id][Constants.Usd].Should().BeGreaterThan(0);
     }
 
 }
