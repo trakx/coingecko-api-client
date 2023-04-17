@@ -1,5 +1,5 @@
 ﻿using System;
-using Trakx.Utils.Attributes;
+using Trakx.Common.Attributes;
 
 namespace Trakx.CoinGecko.ApiClient;
 

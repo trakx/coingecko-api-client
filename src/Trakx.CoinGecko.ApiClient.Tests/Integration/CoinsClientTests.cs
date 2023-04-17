@@ -31,7 +31,7 @@ public class CoinsClientTests : CoinGeckoClientTestBase
         for (int i = 0; i < 15; i++)
         {
             var result = await _coinsClient.ListAllAsync();
-            var list = result.Result;
+            var list = result.Content;
             list.Should().NotBeEmpty();
             EnsureAllJsonElementsWereMapped(list);
         }
@@ -43,8 +43,8 @@ public class CoinsClientTests : CoinGeckoClientTestBase
     public async Task CoinsAsync_should_return_a_valid_coindata_when_passing_a_valid_id(string id)
     {
         var result = await _coinsClient.CoinsAsync(id, "false");
-        var list = result.Result;
-        Assert.NotNull(list);
+        var list = result.Content;
+        list.Should().NotBeNull();
     }
 
     [Theory]
@@ -53,12 +53,12 @@ public class CoinsClientTests : CoinGeckoClientTestBase
     {
         var history = await _coinsClient.HistoryAsync(id, "30-01-2021", "true");
         history.StatusCode.Should().Be((int)HttpStatusCode.OK);
-        history.Result.Id.Should().Be(id);
-        history.Result.Symbol.Should().NotBeNullOrWhiteSpace();
-        history.Result.Image.Thumb.Should().NotBeEmpty();
-        history.Result.Image.Small.Should().NotBeEmpty();
-        history.Result.Market_data.Current_price.Should().NotBeEmpty();
-        history.Result.Market_data.Market_cap.Should().NotBeEmpty();
+        history.Content.Id.Should().Be(id);
+        history.Content.Symbol.Should().NotBeNullOrWhiteSpace();
+        history.Content.Image.Thumb.Should().NotBeEmpty();
+        history.Content.Image.Small.Should().NotBeEmpty();
+        history.Content.Market_data.Current_price.Should().NotBeEmpty();
+        history.Content.Market_data.Market_cap.Should().NotBeEmpty();
         EnsureAllJsonElementsWereMapped(history);
     }
 
@@ -73,17 +73,17 @@ public class CoinsClientTests : CoinGeckoClientTestBase
             .ConfigureAwait(false);
 
         range.StatusCode.Should().Be((int)HttpStatusCode.OK);
-        range.Result.Prices.Count.Should().BeGreaterThan(30);
-        range.Result.Market_caps.Count.Should().Be(range.Result.Prices.Count);
-        range.Result.Total_volumes.Count.Should().Be(range.Result.Prices.Count);
+        range.Content.Prices.Count.Should().BeGreaterThan(30);
+        range.Content.Market_caps.Count.Should().Be(range.Content.Prices.Count);
+        range.Content.Total_volumes.Count.Should().Be(range.Content.Prices.Count);
 
-        var first = range.Result.Prices.First();
+        var first = range.Content.Prices.First();
         DateTimeOffset
             .FromUnixTimeMilliseconds((long)first[0])
             .Should().BeCloseTo(start, TimeSpan.FromDays(1));
         first[1].Should().BeApproximately(613d, 15d);
 
-        var last = range.Result.Prices.Last();
+        var last = range.Content.Prices.Last();
         DateTimeOffset
             .FromUnixTimeMilliseconds((long)last[0])
             .Should().BeCloseTo(end, TimeSpan.FromDays(1));
@@ -110,12 +110,12 @@ public class CoinsClientTests : CoinGeckoClientTestBase
         var data = await _simpleClient.PriceAsync(string.Join(",", coins), "usd");
 
         data.Should().NotBeNull();
-        data.Result.Should().NotBeNullOrEmpty();
+        data.Content.Should().NotBeNullOrEmpty();
 
         _output.WriteLine("\"coin\",\"price\"");
         foreach (var coin in coins)
         {
-            var price = data.Result[coin]["usd"]!.Value;
+            var price = data.Content[coin]["usd"]!.Value;
             _output.WriteLine($"\"{coin}\",\"{price}\"");
         }
     }

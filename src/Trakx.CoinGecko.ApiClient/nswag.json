@@ -1,5 +1,5 @@
 ﻿{
-  "runtime": "Net60",
+  "runtime": "Net70",
   "defaultVariables": null,
   "documentGenerator": {
     "fromDocument": {
@@ -40,9 +40,7 @@
       "className": "{controller}Client",
       "operationGenerationMode": "MultipleClientsFromFirstTagAndOperationId",
       "additionalNamespaceUsages": [
-        "Microsoft.AspNetCore.Mvc",
-        "System.Threading",
-        "Trakx.Utils.Apis"
+        "Trakx.Common.ApiClient"
       ],
       "additionalContractNamespaceUsages": [],
       "generateOptionalParameters": true,
