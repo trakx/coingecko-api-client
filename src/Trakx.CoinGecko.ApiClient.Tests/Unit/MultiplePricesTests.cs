@@ -10,7 +10,7 @@ public class MultiplePricesTests
     [Fact]
     public void GetPrice_returns_direct_price()
     {
-        var mainCurrency = "eur";
+        const string mainCurrency = "eur";
 
         var source = MakePriceBag();
         source["coin1"] = MakeDecimalBag();
@@ -27,13 +27,13 @@ public class MultiplePricesTests
     [Fact]
     public void GetPrice_returns_converted_price()
     {
-        var mainCurrency = "eur";
-        var wantedQuoteCurrency = "gbp";
+        const string mainCurrency = "eur";
+        const string wantedQuoteCurrency = "gbp";
 
-        var basePriceInMainCurrency = 100m;
+        const decimal basePriceInMainCurrency = 100m;
 
-        var rateBetweenWantedAndMain = 1.17m; // the price of 1 GBP in EUR
-        var rateBetweenMainAndWanted = 1 / rateBetweenWantedAndMain;
+        const decimal rateBetweenWantedAndMain = 1.17m; // the price of 1 GBP in EUR
+        const decimal rateBetweenMainAndWanted = 1 / rateBetweenWantedAndMain;
 
         // in pure maths, the formula is: B / Q = (B / M) * (M / Q)
         // base / wanted quote = (base / main currency) * (main currency / wanted quote)
