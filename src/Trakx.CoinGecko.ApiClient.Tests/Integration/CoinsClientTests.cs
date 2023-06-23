@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
+using Trakx.Common.Extensions;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -42,16 +43,17 @@ public class CoinsClientTests : CoinGeckoClientTestBase
     [ClassData(typeof(CoinGeckoIdsTestData))]
     public async Task CoinsAsync_should_return_a_valid_coindata_when_passing_a_valid_id(string id)
     {
-        var result = await _coinsClient.CoinsAsync(id, "false");
-        var list = result.Content;
-        list.Should().NotBeNull();
+        var result = await _coinsClient.CoinsAsync(id, localization: false);
+        var data = result.Content;
+        data.Should().NotBeNull();
+        data.Localization.Should().BeNullOrEmpty();
     }
 
     [Theory]
     [ClassData(typeof(CoinGeckoIdsTestData))]
     public async Task HistoryAsync_should_historical_data_when_passing_valid_id(string id)
     {
-        var history = await _coinsClient.HistoryAsync(id, "30-01-2021", "true");
+        var history = await _coinsClient.HistoryAsync(id, "30-01-2021", localization: false);
         history.StatusCode.Should().Be((int)HttpStatusCode.OK);
         history.Content.Id.Should().Be(id);
         history.Content.Symbol.Should().NotBeNullOrWhiteSpace();
@@ -69,7 +71,7 @@ public class CoinsClientTests : CoinGeckoClientTestBase
         var end = DateTimeOffset.Parse("2020-12-31");
 
         var range = await _coinsClient
-            .RangeAsync("ethereum", "usd", start.ToUnixTimeSeconds(), end.ToUnixTimeSeconds(), CancellationToken.None)
+            .RangeAsync("ethereum", Constants.Usd, start.ToUnixTimeSeconds(), end.ToUnixTimeSeconds(), CancellationToken.None)
             .ConfigureAwait(false);
 
         range.StatusCode.Should().Be((int)HttpStatusCode.OK);
@@ -107,7 +109,9 @@ public class CoinsClientTests : CoinGeckoClientTestBase
             "matic-network", "tron"
         };
 
-        var data = await _simpleClient.PriceAsync(string.Join(",", coins), "usd");
+        var coinList = coins.ToCsvList(distinct: true, toLower: true, quoted: false);
+
+        var data = await _simpleClient.PriceAsync(coinList, Constants.Usd);
 
         data.Should().NotBeNull();
         data.Content.Should().NotBeNullOrEmpty();
@@ -115,7 +119,7 @@ public class CoinsClientTests : CoinGeckoClientTestBase
         _output.WriteLine("\"coin\",\"price\"");
         foreach (var coin in coins)
         {
-            var price = data.Content[coin]["usd"]!.Value;
+            var price = data.Content[coin][Constants.Usd]!.Value;
             _output.WriteLine($"\"{coin}\",\"{price}\"");
         }
     }

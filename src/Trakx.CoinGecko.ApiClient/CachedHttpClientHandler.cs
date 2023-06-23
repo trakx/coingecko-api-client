@@ -123,7 +123,12 @@ public class CachedHttpClientHandler : DelegatingHandler
             }
         }
 
-        var key = $"[{request.Method}]{request.RequestUri}|{request.Content?.ReadAsStringAsync(cancellationToken).GetAwaiter().GetResult()}";
+        string? content
+            = request.Content == null
+            ? null
+            : await request.Content.ReadAsStringAsync(cancellationToken);
+
+        var key = $"[{request.Method}]{request.RequestUri}|{content}";
 
         var (message, cachedContent) = await _cache.GetOrCreateAsync(key, async e =>
         {

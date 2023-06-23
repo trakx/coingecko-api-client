@@ -73,7 +73,7 @@ public class CoinGeckoClient : ICoinGeckoClient
         });
     }
 
-    public async Task<ISet<string>> GetSupportedQuoteCurrencies(CancellationToken cancellationToken = default)
+    public async Task<ICollection<string>> GetSupportedQuoteCurrencies(CancellationToken cancellationToken = default)
     {
         var cacheKey = $"{_typeName}|supported-vs-currencies";
 
@@ -159,8 +159,8 @@ public class CoinGeckoClient : ICoinGeckoClient
 
         var coinPrices = await _simpleClient.PriceAsync(
                 baseIds, quoteIds,
-                include_market_cap: includeMarketCap.ToString().ToLower(),
-                include_24hr_vol: include24HrVol.ToString().ToLower(),
+                include_market_cap: includeMarketCap,
+                include_24hr_vol: include24HrVol,
                 cancellationToken: cancellationToken)
             .ConfigureAwait(false);
 
@@ -201,7 +201,7 @@ public class CoinGeckoClient : ICoinGeckoClient
         return await GetFromCacheOrApi(cacheKey, async () =>
         {
             var fullData = await _coinsClient
-            .HistoryAsync(id, date, false.ToString())
+            .HistoryAsync(id, date, localization: false)
             .ConfigureAwait(false);
 
             var content = fullData.Content;
@@ -275,7 +275,7 @@ public class CoinGeckoClient : ICoinGeckoClient
 
     private static string GetSymbolNameKey(string symbol, string name)
     {
-        return $"{symbol}|{name}".ToLower();
+        return $"{symbol}|{name}".ToLowerInvariant();
     }
 
     private static Dictionary<DateTimeOffset, MarketData> BuildMarketData(string id, string vsCurrency, Range range)
@@ -305,7 +305,7 @@ public class CoinGeckoClient : ICoinGeckoClient
         return await GetFromCacheOrApi(cacheKey, async () =>
         {
             var quoteResponse = await _coinsClient
-                .HistoryAsync(quoteCurrencyId, date, false.ToString())
+                .HistoryAsync(quoteCurrencyId, date, localization: false)
                 .ConfigureAwait(false);
 
             decimal? fxRate = null;
@@ -349,7 +349,7 @@ public class CoinGeckoClient : ICoinGeckoClient
     /// </summary>
     private static (string BaseIds, string QuoteIds) GetIdsForPriceQuery(
         IEnumerable<string> ids, string[]? vsCurrencies,
-        ISet<string> supportedQuoteCurrencies)
+        ICollection<string> supportedQuoteCurrencies)
     {
         List<string> baseIds = new();
         List<string> quoteIds = new();

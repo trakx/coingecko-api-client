@@ -252,7 +252,7 @@ namespace Trakx.CoinGecko.ApiClient
         /// <param name="include_last_updated_at">&lt;b&gt;true/false&lt;/b&gt; to include last_updated_at of price, &lt;b&gt;default: false&lt;/b&gt;</param>
         /// <returns>List all coins with id, name, and symbol</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<Response<System.Collections.Generic.IDictionary<string, System.Collections.Generic.IDictionary<string, decimal?>>>> PriceAsync(string ids, string vs_currencies, string include_market_cap = null, string include_24hr_vol = null, string include_24hr_change = null, string include_last_updated_at = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
+        System.Threading.Tasks.Task<Response<System.Collections.Generic.IDictionary<string, System.Collections.Generic.IDictionary<string, decimal?>>>> PriceAsync(string ids, string vs_currencies, bool? include_market_cap = null, bool? include_24hr_vol = null, bool? include_24hr_change = null, bool? include_last_updated_at = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <summary>
@@ -268,7 +268,7 @@ namespace Trakx.CoinGecko.ApiClient
         /// <param name="include_last_updated_at">&lt;b&gt;true/false&lt;/b&gt; to include last_updated_at of price, &lt;b&gt;default: false&lt;/b&gt;</param>
         /// <returns>price(s) of cryptocurrency</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<Response> Token_priceAsync(string id, string contract_addresses, string vs_currencies, string include_market_cap = null, string include_24hr_vol = null, string include_24hr_change = null, string include_last_updated_at = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
+        System.Threading.Tasks.Task<Response> Token_priceAsync(string id, string contract_addresses, string vs_currencies, bool? include_market_cap = null, bool? include_24hr_vol = null, bool? include_24hr_change = null, bool? include_last_updated_at = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <summary>
@@ -321,7 +321,7 @@ namespace Trakx.CoinGecko.ApiClient
         /// <param name="include_last_updated_at">&lt;b&gt;true/false&lt;/b&gt; to include last_updated_at of price, &lt;b&gt;default: false&lt;/b&gt;</param>
         /// <returns>List all coins with id, name, and symbol</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<Response<System.Collections.Generic.IDictionary<string, System.Collections.Generic.IDictionary<string, decimal?>>>> PriceAsync(string ids, string vs_currencies, string include_market_cap = null, string include_24hr_vol = null, string include_24hr_change = null, string include_last_updated_at = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
+        public virtual async System.Threading.Tasks.Task<Response<System.Collections.Generic.IDictionary<string, System.Collections.Generic.IDictionary<string, decimal?>>>> PriceAsync(string ids, string vs_currencies, bool? include_market_cap = null, bool? include_24hr_vol = null, bool? include_24hr_change = null, bool? include_last_updated_at = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
         {
             if (ids == null)
                 throw new System.ArgumentNullException("ids");
@@ -424,7 +424,7 @@ namespace Trakx.CoinGecko.ApiClient
         /// <param name="include_last_updated_at">&lt;b&gt;true/false&lt;/b&gt; to include last_updated_at of price, &lt;b&gt;default: false&lt;/b&gt;</param>
         /// <returns>price(s) of cryptocurrency</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<Response> Token_priceAsync(string id, string contract_addresses, string vs_currencies, string include_market_cap = null, string include_24hr_vol = null, string include_24hr_change = null, string include_last_updated_at = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
+        public virtual async System.Threading.Tasks.Task<Response> Token_priceAsync(string id, string contract_addresses, string vs_currencies, bool? include_market_cap = null, bool? include_24hr_vol = null, bool? include_24hr_change = null, bool? include_last_updated_at = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
         {
             if (id == null)
                 throw new System.ArgumentNullException("id");
@@ -743,7 +743,7 @@ namespace Trakx.CoinGecko.ApiClient
         /// <param name="sparkline">Include sparkline 7 days data (eg. true, false) &lt;b&gt;[default: false]&lt;/b&gt;</param>
         /// <returns>Get current data for a coin</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<Response<CoinFullData>> CoinsAsync(string id, string localization = null, bool? tickers = null, bool? market_data = null, bool? community_data = null, bool? developer_data = null, bool? sparkline = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
+        System.Threading.Tasks.Task<Response<CoinFullData>> CoinsAsync(string id, bool? localization = null, bool? tickers = null, bool? market_data = null, bool? community_data = null, bool? developer_data = null, bool? sparkline = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <summary>
@@ -763,7 +763,7 @@ namespace Trakx.CoinGecko.ApiClient
         /// <param name="depth">flag to show 2% orderbook depth. valid values: true, false</param>
         /// <returns>Get coin tickers</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<Response> TickersAsync(string id, string exchange_ids = null, string include_exchange_logo = null, int? page = null, string order = null, string depth = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
+        System.Threading.Tasks.Task<Response> TickersAsync(string id, string exchange_ids = null, string include_exchange_logo = null, int? page = null, string order = null, bool? depth = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <summary>
@@ -777,7 +777,7 @@ namespace Trakx.CoinGecko.ApiClient
         /// <param name="localization">Set to false to exclude localized languages in response</param>
         /// <returns>Get historical data at a given date for a coin</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<Response<CoinData>> HistoryAsync(string id, string date, string localization = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
+        System.Threading.Tasks.Task<Response<CoinData>> HistoryAsync(string id, string date, bool? localization = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <summary>
@@ -1097,7 +1097,7 @@ namespace Trakx.CoinGecko.ApiClient
         /// <param name="sparkline">Include sparkline 7 days data (eg. true, false) &lt;b&gt;[default: false]&lt;/b&gt;</param>
         /// <returns>Get current data for a coin</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<Response<CoinFullData>> CoinsAsync(string id, string localization = null, bool? tickers = null, bool? market_data = null, bool? community_data = null, bool? developer_data = null, bool? sparkline = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
+        public virtual async System.Threading.Tasks.Task<Response<CoinFullData>> CoinsAsync(string id, bool? localization = null, bool? tickers = null, bool? market_data = null, bool? community_data = null, bool? developer_data = null, bool? sparkline = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
         {
             if (id == null)
                 throw new System.ArgumentNullException("id");
@@ -1208,7 +1208,7 @@ namespace Trakx.CoinGecko.ApiClient
         /// <param name="depth">flag to show 2% orderbook depth. valid values: true, false</param>
         /// <returns>Get coin tickers</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<Response> TickersAsync(string id, string exchange_ids = null, string include_exchange_logo = null, int? page = null, string order = null, string depth = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
+        public virtual async System.Threading.Tasks.Task<Response> TickersAsync(string id, string exchange_ids = null, string include_exchange_logo = null, int? page = null, string order = null, bool? depth = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
         {
             if (id == null)
                 throw new System.ArgumentNullException("id");
@@ -1303,7 +1303,7 @@ namespace Trakx.CoinGecko.ApiClient
         /// <param name="localization">Set to false to exclude localized languages in response</param>
         /// <returns>Get historical data at a given date for a coin</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<Response<CoinData>> HistoryAsync(string id, string date, string localization = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
+        public virtual async System.Threading.Tasks.Task<Response<CoinData>> HistoryAsync(string id, string date, bool? localization = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
         {
             if (id == null)
                 throw new System.ArgumentNullException("id");
@@ -4565,7 +4565,7 @@ namespace Trakx.CoinGecko.ApiClient
         /// <param name="to_date">lists events before this date yyyy-mm-dd (set upcoming_events_only to false if fetching past events)</param>
         /// <returns>List events</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<Response> EventsAsync(string country_code = null, string type = null, string page = null, string upcoming_events_only = null, string from_date = null, string to_date = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
+        System.Threading.Tasks.Task<Response> EventsAsync(string country_code = null, string type = null, string page = null, bool? upcoming_events_only = null, string from_date = null, string to_date = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <summary>
@@ -4633,7 +4633,7 @@ namespace Trakx.CoinGecko.ApiClient
         /// <param name="to_date">lists events before this date yyyy-mm-dd (set upcoming_events_only to false if fetching past events)</param>
         /// <returns>List events</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<Response> EventsAsync(string country_code = null, string type = null, string page = null, string upcoming_events_only = null, string from_date = null, string to_date = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
+        public virtual async System.Threading.Tasks.Task<Response> EventsAsync(string country_code = null, string type = null, string page = null, bool? upcoming_events_only = null, string from_date = null, string to_date = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
         {
             var urlBuilder_ = new System.Text.StringBuilder();
             urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/events?");

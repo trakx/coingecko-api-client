@@ -44,23 +44,26 @@ paths:
         in: query
         description: '<b>true/false</b> to include market_cap, <b>default: false</b>'
         schema:
-          type: string
+          type: boolean
+          default: false
       - name: include_24hr_vol
         in: query
         description: '<b>true/false</b> to include 24hr_vol, <b>default: false</b>'
         schema:
-          type: string
+          type: boolean
+          default: false
       - name: include_24hr_change
         in: query
         description: '<b>true/false</b> to include 24hr_change, <b>default: false</b>'
         schema:
-          type: string
+          type: boolean
+          default: false
       - name: include_last_updated_at
         in: query
-        description: '<b>true/false</b> to include last_updated_at of price, <b>default:
-          false</b>'
+        description: '<b>true/false</b> to include last_updated_at of price, <b>default: false</b>'
         schema:
-          type: string
+          type: boolean
+          default: false
       responses:
         200:
           description: List all coins with id, name, and symbol
@@ -102,23 +105,26 @@ paths:
         in: query
         description: '<b>true/false</b> to include market_cap, <b>default: false</b>'
         schema:
-          type: string
+          type: boolean
+          default: false
       - name: include_24hr_vol
         in: query
         description: '<b>true/false</b> to include 24hr_vol, <b>default: false</b>'
         schema:
-          type: string
+          type: boolean
+          default: false
       - name: include_24hr_change
         in: query
         description: '<b>true/false</b> to include 24hr_change, <b>default: false</b>'
         schema:
-          type: string
+          type: boolean
+          default: false
       - name: include_last_updated_at
         in: query
-        description: '<b>true/false</b> to include last_updated_at of price, <b>default:
-          false</b>'
+        description: '<b>true/false</b> to include last_updated_at of price, <b>default: false</b>'
         schema:
-          type: string
+          type: boolean
+          default: false
       responses:
         200:
           description: price(s) of cryptocurrency
@@ -150,6 +156,7 @@ paths:
           \ Ethereum based tokens). \n valid values: true, false"
         schema:
           type: boolean
+          default: false
       responses:
         200:
           description: List all coins with id, name, and symbol
@@ -253,36 +260,40 @@ paths:
           type: string
       - name: localization
         in: query
-        description: 'Include all localized languages in response (true/false) <b>[default:
-          true]</b>'
+        description: 'Include all localized languages in response (true/false) <b>[default: true]</b>'
         schema:
-          type: string
+          type: boolean
+          default: true
       - name: tickers
         in: query
         description: 'Include tickers data (true/false) <b>[default: true]</b>'
         schema:
           type: boolean
+          default: true
       - name: market_data
         in: query
         description: 'Include market_data (true/false) <b>[default: true]</b>'
         schema:
           type: boolean
+          default: true
       - name: community_data
         in: query
         description: 'Include community_data data (true/false) <b>[default: true]</b>'
         schema:
           type: boolean
+          default: true
       - name: developer_data
         in: query
         description: 'Include developer_data data (true/false) <b>[default: true]</b>'
         schema:
           type: boolean
+          default: true
       - name: sparkline
         in: query
-        description: 'Include sparkline 7 days data (eg. true, false) <b>[default:
-          false]</b>'
+        description: 'Include sparkline 7 days data (eg. true, false) <b>[default: false]</b>'
         schema:
           type: boolean
+          default: false
       responses:
         200:
           description: Get current data for a coin
@@ -324,15 +335,14 @@ paths:
           type: integer
       - name: order
         in: query
-        description: 'valid values: <b>trust_score_desc (default), trust_score_asc
-          and volume_desc</b>'
+        description: 'valid values: <b>trust_score_desc (default), trust_score_asc and volume_desc</b>'
         schema:
           type: string
       - name: depth
         in: query
         description: 'flag to show 2% orderbook depth. valid values: true, false'
         schema:
-          type: string
+          type: boolean
       responses:
         200:
           description: Get coin tickers
@@ -341,10 +351,8 @@ paths:
     get:
       tags:
       - coins
-      summary: Get historical data (name, price, market, stats) at a given date for
-        a coin
-      description: |
-        Get historical data (name, price, market, stats) at a given date for a coin
+      summary: Get historical data (name, price, market, stats) at a given date for a coin
+      description: Get historical data (name, price, market, stats) at a given date for a coin
       parameters:
       - name: id
         in: path
@@ -362,7 +370,7 @@ paths:
         in: query
         description: Set to false to exclude localized languages in response
         schema:
-          type: string
+          type: boolean
       responses:
         200:
           description: Get historical data at a given date for a coin
@@ -1069,10 +1077,10 @@ paths:
           type: string
       - name: upcoming_events_only
         in: query
-        description: lists only upcoming events. <br>true, false</br> (defaults to
-          true, set to false to list all events)
+        description: lists only upcoming events. <br>true, false</br> (defaults to true, set to false to list all events)
         schema:
-          type: string
+          type: boolean
+          default: true
       - name: from_date
         in: query
         description: lists events after this date yyyy-mm-dd
@@ -1080,8 +1088,7 @@ paths:
           type: string
       - name: to_date
         in: query
-        description: lists events before this date yyyy-mm-dd (set upcoming_events_only
-          to false if fetching past events)
+        description: lists events before this date yyyy-mm-dd (set upcoming_events_only to false if fetching past events)
         schema:
           type: string
       responses:

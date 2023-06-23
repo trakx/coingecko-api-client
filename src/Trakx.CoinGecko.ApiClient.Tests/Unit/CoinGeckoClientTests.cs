@@ -218,7 +218,7 @@ public class CoinGeckoClientTests
         };
 
         _coinsClient
-            .HistoryAsync(id, date.ToString("dd-MM-yyyy"), "False")
+            .HistoryAsync(id, date.ToString("dd-MM-yyyy"), localization: false)
             .Returns(((CoinData)result).AsResponse());
     }
 

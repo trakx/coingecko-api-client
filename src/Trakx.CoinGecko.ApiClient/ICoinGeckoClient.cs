@@ -14,7 +14,7 @@ public interface ICoinGeckoClient
 
     Task<IList<CoinList>> GetCoinList(CancellationToken cancellationToken = default);
 
-    Task<ISet<string>> GetSupportedQuoteCurrencies(CancellationToken cancellationToken = default);
+    Task<ICollection<string>> GetSupportedQuoteCurrencies(CancellationToken cancellationToken = default);
 
 
     // price operations
