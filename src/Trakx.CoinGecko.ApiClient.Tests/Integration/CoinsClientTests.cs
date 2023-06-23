@@ -53,7 +53,7 @@ public class CoinsClientTests : CoinGeckoClientTestBase
     [ClassData(typeof(CoinGeckoIdsTestData))]
     public async Task HistoryAsync_should_historical_data_when_passing_valid_id(string id)
     {
-        var history = await _coinsClient.HistoryAsync(id, "30-01-2021", localization: false);
+        var history = await _coinsClient.HistoryAsync(id, "30-01-2021", localization: true);
         history.StatusCode.Should().Be((int)HttpStatusCode.OK);
         history.Content.Id.Should().Be(id);
         history.Content.Symbol.Should().NotBeNullOrWhiteSpace();
