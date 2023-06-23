@@ -192,15 +192,13 @@ public class CoinGeckoClientTests
 
     private void ConfigurePriceAsync(string id, string currency, decimal coinPrice, decimal currencyPrice)
     {
-        IDictionary<string, IDictionary<string, decimal?>> response = new Dictionary<string, IDictionary<string, decimal?>>
-        {
-            [id] = BagDecimal(coinPrice),
-            [currency] = BagDecimal(currencyPrice),
-        };
+        var bag = MultiplePricesTests.MakePriceBag();
+        bag[id] = BagDecimal(coinPrice);
+        bag[currency] = BagDecimal(currencyPrice);
 
         _simpleClient
             .PriceAsync(Arg.Any<string>(), Arg.Any<string>())
-            .Returns(response.AsResponse());
+            .Returns(bag.AsResponse());
     }
 
     private void ConfigureHistoryAsync(string id, DateTime date, decimal price, decimal volume)
@@ -249,11 +247,10 @@ public class CoinGeckoClientTests
         return supportedQuoteCurrencies;
     }
 
-    private static Dictionary<string, decimal?> BagDecimal(decimal value, string currency = Constants.Usd)
+    internal static Dictionary<string, decimal?> BagDecimal(decimal value, string currency = Constants.Usd)
     {
         return new() { [currency] = value };
     }
-
     #endregion
 
 }

@@ -19,7 +19,9 @@ public class MultiplePrices
         var directPrice = TryGetPrice(coinGeckoId, quoteCurrencyId);
         if (directPrice != default) return directPrice;
 
-        foreach (var supportedQuote in _source.Keys)
+        var supportedQuotes = _source.Values.SelectMany(p => p.Keys).Distinct();
+
+        foreach (var supportedQuote in supportedQuotes)
         {
             var conversionRate = TryGetPrice(quoteCurrencyId, supportedQuote);
             if (conversionRate == default) continue;
@@ -36,10 +38,10 @@ public class MultiplePrices
 
     private decimal TryGetPrice(string coinGeckoId, string quoteCurrencyId)
     {
-        _source.TryGetValue(coinGeckoId, out var prices);
-        if (prices == null) return default;
+        _source.TryGetValue(coinGeckoId, out var pricesForSymbol);
+        if (pricesForSymbol == null) return default;
 
-        prices.TryGetValue(quoteCurrencyId, out var price);
+        pricesForSymbol.TryGetValue(quoteCurrencyId, out var price);
         return price.GetValueOrDefault();
     }
 }
