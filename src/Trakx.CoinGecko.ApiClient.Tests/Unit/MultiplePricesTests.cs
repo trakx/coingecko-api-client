@@ -39,7 +39,7 @@ public class MultiplePricesTests
 
         // in pure maths, the formula is: B / Q = (B / M) * (M / Q)
         // base / wanted quote = (base / main currency) * (main currency / wanted quote)
-        var expectedPrice = basePriceInMainCurrency * rateBetweenMainAndWanted;
+        const decimal expectedPrice = basePriceInMainCurrency * rateBetweenMainAndWanted;
 
         var source = MakePriceBag();
         source[Coin1] = MakeDecimalBag();
