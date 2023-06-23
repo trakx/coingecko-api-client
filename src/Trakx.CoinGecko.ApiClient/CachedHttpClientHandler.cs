@@ -82,21 +82,19 @@ public class CachedHttpClientHandler : DelegatingHandler
     /// <param name="request"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request,
-        CancellationToken cancellationToken)
+    protected override async Task<HttpResponseMessage> SendAsync(
+        HttpRequestMessage request, CancellationToken cancellationToken)
     {
-        Guard.Against.Null(request, nameof(request));
+        Guard.Against.Null(request);
 
         return await TryGetOrSetRequestFromCache(request, cancellationToken)
             .ConfigureAwait(false);
     }
 
-    protected override HttpResponseMessage Send(HttpRequestMessage request, CancellationToken cancellationToken)
+    protected override HttpResponseMessage Send(
+        HttpRequestMessage request, CancellationToken cancellationToken)
     {
-        Guard.Against.Null(request, nameof(request));
-
-        return TryGetOrSetRequestFromCache(request, cancellationToken)
-            .ConfigureAwait(false).GetAwaiter().GetResult();
+        return SendAsync(request, cancellationToken).GetAwaiter().GetResult();
     }
 
     /// <summary>

@@ -314,7 +314,10 @@ public class CoinGeckoClient : ICoinGeckoClient
 
             if (fxRate != null) return fxRate.Value;
 
-            Logger.LogDebug($"Current price for '{MainQuoteCurrency}' in coin id '{quoteCurrencyId} for date '{date:dd-MM-yyyy}' is missing.");
+            Logger.LogDebug(
+                "Current price for '{quoteCrrency}' in coin id '{quoteCurrencyId} for date '{date:dd-MM-yyyy}' is missing.",
+                MainQuoteCurrency, quoteCurrencyId, date);
+
             throw new FailedToRetrievePriceException($"Failed to retrieve price of {quoteCurrencyId} as of {date}");
         });
     }

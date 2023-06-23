@@ -16,13 +16,11 @@ public static partial class AddCoinGeckoClientExtension
     public static IServiceCollection AddCoinGeckoClient(
         this IServiceCollection services, IConfiguration configuration)
     {
-        services.AddOptions();
-        services.Configure<CoinGeckoApiConfiguration>(configuration.GetSection(nameof(CoinGeckoApiConfiguration)));
-        var typedConfig = configuration.GetSection(nameof(CoinGeckoApiConfiguration))
-            .Get<CoinGeckoApiConfiguration>();
-        AddCoinGeckoClient(services, typedConfig);
+        var section = configuration.GetSection(nameof(CoinGeckoApiConfiguration));
+        services.Configure<CoinGeckoApiConfiguration>(section);
 
-        return services;
+        var typedConfig = section.Get<CoinGeckoApiConfiguration>()!;
+        return services.AddCoinGeckoClient(typedConfig);
     }
 
     public static IServiceCollection AddCoinGeckoClient(
