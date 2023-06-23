@@ -54,7 +54,7 @@ public class CoinGeckoClientTests
     public async Task GetMarketDataAsOfFromId_should_return_valid_data_when_passing_valid_id()
     {
         var asOf = _mockCreator.GetUtcDateTime();
-        var asOfString = asOf.ToString("dd-MM-yyyy");
+        var asOfString = CoinGeckoClient.GetDateString(asOf);
 
         var coin = _mockCreator.GetString(10);
         var coinPrice = _mockCreator.GetPrice();
@@ -217,8 +217,10 @@ public class CoinGeckoClientTests
             }
         };
 
+        var timestamp = CoinGeckoClient.GetDateString(date);
+
         _coinsClient
-            .HistoryAsync(id, date.ToString("dd-MM-yyyy"), localization: false)
+            .HistoryAsync(id, timestamp, localization: false)
             .Returns(((CoinData)result).AsResponse());
     }
 

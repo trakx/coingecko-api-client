@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text.Json;
 using System.Threading;
@@ -22,12 +23,9 @@ public class CoinGeckoClient : ICoinGeckoClient
     private readonly IMemoryCache _cache;
     private readonly ICoinsClient _coinsClient;
     private readonly ISimpleClient _simpleClient;
-    private Dictionary<string, string>? _idsBySymbolName;
     private readonly string? _typeName;
 
     private static readonly ILogger Logger = LoggerProvider.Create<CoinGeckoClient>();
-
-    public Dictionary<string, string> IdsBySymbolName => _idsBySymbolName ??= GetIdsBySymbolName();
 
     public Dictionary<string, CoinFullData> CoinFullDataByIds { get; }
 
@@ -192,10 +190,15 @@ public class CoinGeckoClient : ICoinGeckoClient
         return result;
     }
 
+    internal static string GetDateString(DateTime date)
+    {
+        return date.ToString("dd-MM-yyyy", CultureInfo.InvariantCulture);
+    }
+
     /// <inheritdoc />
     public async Task<MarketData?> GetMarketDataAsOfFromId(string id, DateTime asOf, string quoteCurrencyId = Constants.UsdCoin)
     {
-        var date = asOf.ToString("dd-MM-yyyy");
+        var date = GetDateString(asOf);
         var cacheKey = $"{_typeName}|market-data|{id}|{quoteCurrencyId}|{date}";
 
         return await GetFromCacheOrApi(cacheKey, async () =>
@@ -273,11 +276,6 @@ public class CoinGeckoClient : ICoinGeckoClient
         });
     }
 
-    private static string GetSymbolNameKey(string symbol, string name)
-    {
-        return $"{symbol}|{name}".ToLowerInvariant();
-    }
-
     private static Dictionary<DateTimeOffset, MarketData> BuildMarketData(string id, string vsCurrency, Range range)
     {
         return Enumerable
@@ -314,9 +312,12 @@ public class CoinGeckoClient : ICoinGeckoClient
 
             if (fxRate != null) return fxRate.Value;
 
-            Logger.LogDebug(
-                "Current price for '{quoteCrrency}' in coin id '{quoteCurrencyId} for date '{date:dd-MM-yyyy}' is missing.",
-                MainQuoteCurrency, quoteCurrencyId, date);
+            if (Logger.IsEnabled(LogLevel.Debug))
+            {
+                Logger.LogDebug(
+                    "Current price for '{quoteCurrency}' in coin id '{quoteCurrencyId}' for '{date}' is missing.",
+                    MainQuoteCurrency, quoteCurrencyId, date);
+            }
 
             throw new FailedToRetrievePriceException($"Failed to retrieve price of {quoteCurrencyId} as of {date}");
         });
@@ -331,14 +332,6 @@ public class CoinGeckoClient : ICoinGeckoClient
         });
 
         return value!;
-    }
-
-    private Dictionary<string, string> GetIdsBySymbolName()
-    {
-        return GetCoinList()
-            .GetAwaiter()
-            .GetResult()
-            .ToDictionary(c => GetSymbolNameKey(c.Symbol, c.Name), c => c.Id);
     }
 
     /// <summary>
@@ -375,4 +368,26 @@ public class CoinGeckoClient : ICoinGeckoClient
         var quoteList = quoteIds.ToCsvList(distinct: true, toLower: true, quoted: false);
         return (baseList, quoteList);
     }
+
+    #region Ids By Symbol Name
+
+    /// <summary>Not used anywhere, maybe only here for some manual data checks</summary>
+    public Dictionary<string, string> IdsBySymbolName => _idsBySymbolName ??= GetIdsBySymbolName();
+
+    private Dictionary<string, string>? _idsBySymbolName;
+
+    private Dictionary<string, string> GetIdsBySymbolName()
+    {
+        return GetCoinList()
+            .GetAwaiter()
+            .GetResult()
+            .ToDictionary(c => GetSymbolNameKey(c.Symbol, c.Name), c => c.Id);
+    }
+
+    private static string GetSymbolNameKey(string symbol, string name)
+    {
+        return $"{symbol}|{name}".ToLowerInvariant();
+    }
+
+    #endregion
 }
