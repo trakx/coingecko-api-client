@@ -6,12 +6,10 @@ namespace Trakx.CoinGecko.ApiClient.Models;
 public class MultiplePrices
 {
     private readonly IDictionary<string, IDictionary<string, decimal?>> _source;
-    private readonly string[] _quoteCurrencies;
 
     public MultiplePrices(IDictionary<string, IDictionary<string, decimal?>> source)
     {
         _source = source;
-        _quoteCurrencies = _source.Values.SelectMany(p => p.Keys).Distinct().ToArray();
     }
 
     public int TotalPriceCount => _source.Sum(p => p.Value.Count);
@@ -21,7 +19,7 @@ public class MultiplePrices
         var directPrice = TryGetPrice(coinGeckoId, quoteCurrencyId);
         if (directPrice != default) return directPrice;
 
-        foreach (var supportedQuote in _quoteCurrencies)
+        foreach (var supportedQuote in _source.Keys)
         {
             var conversionRate = TryGetPrice(quoteCurrencyId, supportedQuote);
             if (conversionRate == default) continue;
