@@ -8,6 +8,7 @@ using FluentAssertions;
 using Microsoft.Extensions.Caching.Memory;
 using NSubstitute;
 using Trakx.Common.ApiClient.Extensions;
+using Trakx.Common.Extensions;
 using Trakx.Common.Testing.Mocks;
 using Xunit;
 using Xunit.Abstractions;
@@ -16,12 +17,11 @@ namespace Trakx.CoinGecko.ApiClient.Tests.Unit;
 
 public class CoinGeckoClientTests
 {
-
-    private readonly ICoinGeckoClient _coinGeckoClient;
     private readonly ISimpleClient _simpleClient;
     private readonly ICoinsClient _coinsClient;
     private readonly MockCreator _mockCreator;
     private readonly IMemoryCache _memoryCache;
+    private readonly CoinGeckoClient _coinGeckoClient;
 
     public CoinGeckoClientTests(ITestOutputHelper output)
     {
@@ -40,8 +40,13 @@ public class CoinGeckoClientTests
         var currency = _mockCreator.GetString(5);
         var coinPrice = _mockCreator.GetPrice();
         var currencyPrice = _mockCreator.GetPrice();
+
         ConfigurePriceAsync(id, currency, coinPrice, currencyPrice);
+
+        ConfigureSupportedQuoteCurrencies(Constants.Usd);
+
         var result = await _coinGeckoClient.GetLatestPrice(id, currency);
+
         result.Should().Be(coinPrice / currencyPrice);
     }
 
@@ -49,11 +54,12 @@ public class CoinGeckoClientTests
     public async Task GetMarketDataAsOfFromId_should_return_valid_data_when_passing_valid_id()
     {
         var asOf = _mockCreator.GetUtcDateTime();
-        var asOfString = asOf.ToString("dd-MM-yyyy");
+        var asOfString = CoinGeckoClient.GetDateString(asOf);
 
         var coin = _mockCreator.GetString(10);
         var coinPrice = _mockCreator.GetPrice();
         var coinVolume = _mockCreator.GetValue();
+
         ConfigureHistoryAsync(coin, asOf, coinPrice, coinVolume);
 
         var currency = _mockCreator.GetString(10);
@@ -71,9 +77,9 @@ public class CoinGeckoClientTests
         result.QuoteCurrency.Should().Be(coin);
 
         Expression<Predicate<object>> fxRatePredicate =
-            o =>  o.ToString()!.Contains(asOfString) && o.ToString()!.Contains("fx-rate") && o.ToString()!.Contains(currency);
+            o => o.ToString()!.Contains(asOfString) && o.ToString()!.Contains("fx-rate") && o.ToString()!.Contains(currency);
         Expression<Predicate<object>> marketDataPredicate =
-            o =>  o.ToString()!.Contains(asOfString) && o.ToString()!.Contains("market-data") && o.ToString()!.Contains(currency) && o.ToString()!.Contains(coin);
+            o => o.ToString()!.Contains(asOfString) && o.ToString()!.Contains("market-data") && o.ToString()!.Contains(currency) && o.ToString()!.Contains(coin);
 
         _memoryCache.Received(1).TryGetValue(Arg.Is(fxRatePredicate), out _);
         _memoryCache.Received(1).CreateEntry(Arg.Is(fxRatePredicate));
@@ -111,27 +117,28 @@ public class CoinGeckoClientTests
     }
 
     [Fact]
-    public async Task GetAllPrices_should_return_a_valid_list_of_prices_when_passing_valid_ids_and_currencies()
+    public async Task GetAllPrices_should_return_multiple_prices_when_passing_valid_ids_and_currencies()
     {
         var id = _mockCreator.GetString(10);
         var currency = _mockCreator.GetString(10);
         var coinPrice = _mockCreator.GetPrice();
         var currentPrice = _mockCreator.GetPrice();
+
         ConfigurePriceAsync(id, currency, coinPrice, currentPrice);
-        var result = await _coinGeckoClient.GetAllPrices(new[] { id }, new[] { currency });
-        result.Keys.Should().Contain(id);
-        result.Keys.Should().Contain(currency);
-        foreach (var prices in result.Values)
-        {
-            prices.Keys.Should().OnlyContain(f => f == "usd");
-            prices.Values.Should().OnlyContain(f => f > 0);
-        }
+
+        var baseIds = id.AsSingletonArray();
+        var quoteIds = currency.AsSingletonArray();
+        var supportedQuoteCurrencies = ConfigureSupportedQuoteCurrencies(Constants.Usd);
+
+        var result = await _coinGeckoClient.GetAllPrices(baseIds, quoteIds);
+
+        Integration.CoinGeckoClientTests.AssertMultiplePrices(result, baseIds, quoteIds, supportedQuoteCurrencies);
     }
 
     [Fact]
     public async Task GetMarketDataForDateRange_should_call_Range_and_transform_data()
     {
-        var dates = new double[] {1619756926435, 1619757185872};
+        var dates = new double[] { 1619756926435, 1619757185872 };
         var range = new Range
         {
             Market_caps = new List<TimestampedValue>
@@ -155,13 +162,16 @@ public class CoinGeckoClientTests
         var start = _mockCreator.GetUtcDateTimeOffset();
         var end = _mockCreator.GetUtcDateTimeOffset();
 
-        _coinsClient.RangeAsync(id, vsCurrency, start.ToUnixTimeSeconds(), end.ToUnixTimeSeconds(), CancellationToken.None)
+        _coinsClient
+            .RangeAsync(id, vsCurrency, start.ToUnixTimeSeconds(), end.ToUnixTimeSeconds(), CancellationToken.None)
             .Returns(range.AsResponse());
 
-        var result = await _coinGeckoClient.GetMarketDataForDateRange(id, vsCurrency, start, end, CancellationToken.None)
+        var result = await _coinGeckoClient
+            .GetMarketDataForDateRange(id, vsCurrency, start, end, CancellationToken.None)
             .ConfigureAwait(false);
 
-        await _coinsClient.Received(1)
+        await _coinsClient
+            .Received(1)
             .RangeAsync(id, vsCurrency, start.ToUnixTimeSeconds(), end.ToUnixTimeSeconds(), CancellationToken.None)
             .ConfigureAwait(false);
 
@@ -180,20 +190,15 @@ public class CoinGeckoClientTests
 
     #region Helper Methods
 
-    private void ConfigurePriceAsync(string id, string currency, decimal? coinPrice,
-        decimal? currencyPrice)
+    private void ConfigurePriceAsync(string id, string currency, decimal coinPrice, decimal currencyPrice)
     {
-        IDictionary<string, IDictionary<string, decimal?>> response = new Dictionary<string, IDictionary<string, decimal?>>();
-        response[id] = new Dictionary<string, decimal?>
-        {
-            [Constants.Usd] = coinPrice
-        };
-        response[currency] = new Dictionary<string, decimal?>
-        {
-            [Constants.Usd] = currencyPrice
-        };
-        _simpleClient.PriceAsync(Arg.Any<string>(), Arg.Any<string>())
-            .Returns(response.AsResponse());
+        var bag = MultiplePricesTests.MakePriceBag();
+        bag[id] = BagDecimal(coinPrice);
+        bag[currency] = BagDecimal(currencyPrice);
+
+        _simpleClient
+            .PriceAsync(Arg.Any<string>(), Arg.Any<string>())
+            .Returns(bag.AsResponse());
     }
 
     private void ConfigureHistoryAsync(string id, DateTime date, decimal price, decimal volume)
@@ -204,21 +209,16 @@ public class CoinGeckoClientTests
             Symbol = id,
             Market_data = new Market_data
             {
-                Current_price = new Dictionary<string, decimal?>
-                {
-                    {Constants.Usd, price}
-                },
-                Market_cap = new Dictionary<string, decimal?>
-                {
-                    {Constants.Usd, 0}
-                },
-                Total_volume = new Dictionary<string, decimal?>
-                {
-                    {Constants.Usd, volume}
-                },
+                Market_cap = BagDecimal(0),
+                Total_volume = BagDecimal(volume),
+                Current_price = BagDecimal(price),
             }
         };
-        _coinsClient.HistoryAsync(id, date.ToString("dd-MM-yyyy"), "False")
+
+        var timestamp = CoinGeckoClient.GetDateString(date);
+
+        _coinsClient
+            .HistoryAsync(id, timestamp, localization: false)
             .Returns(((CoinData)result).AsResponse());
     }
 
@@ -231,10 +231,26 @@ public class CoinGeckoClientTests
                 Symbol = symbol ?? _mockCreator.GetString(30)
             }).ToList();
 
-        _coinsClient.ListAllAsync()
+        _coinsClient
+            .ListAllAsync()
             .Returns(list.AsResponse());
     }
 
+    private List<string> ConfigureSupportedQuoteCurrencies(params string[] quoteCurrencies)
+    {
+        var supportedQuoteCurrencies = quoteCurrencies.ToList();
+
+        _simpleClient
+            .Supported_vs_currenciesAsync()
+            .Returns(supportedQuoteCurrencies.AsResponse());
+
+        return supportedQuoteCurrencies;
+    }
+
+    internal static Dictionary<string, decimal?> BagDecimal(decimal value, string currency = Constants.Usd)
+    {
+        return new() { [currency] = value };
+    }
     #endregion
 
 }

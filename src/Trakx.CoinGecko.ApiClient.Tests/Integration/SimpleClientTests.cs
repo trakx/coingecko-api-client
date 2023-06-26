@@ -25,7 +25,7 @@ public class SimpleClientTests : CoinGeckoClientTestBase
     [InlineData("binancecoin")]
     public async Task PriceAsync_should_return_price_when_passing_valid_symbol(string id)
     {
-        var price = await _simpleClient.PriceAsync(id, "usd").ConfigureAwait(true);
+        var price = await _simpleClient.PriceAsync(id, Constants.Usd).ConfigureAwait(true);
         price.StatusCode.Should().Be((int)HttpStatusCode.OK);
         price.Content.Keys.Should().Contain(id);
         price.Content[id].Keys.Should().Contain(Constants.Usd);
