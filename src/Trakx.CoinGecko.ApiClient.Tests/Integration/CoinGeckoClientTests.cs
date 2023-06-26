@@ -148,11 +148,7 @@ public class CoinGeckoClientTests : CoinGeckoClientTestBase
     /// <summary>
     /// Asserts the prices collected from <see cref="SimpleClient.PriceAsync"/>
     /// and saved in a <see cref="MultiplePrices"/> result.
-    /// 
     /// </summary>
-    /// <param name="baseIds"></param>
-    /// <param name="unsupportedQuoteIds"></param>
-    /// <param name="result"></param>
     internal static void AssertMultiplePrices(MultiplePrices result,
         string[] baseIds,
         string[] quoteIds,
