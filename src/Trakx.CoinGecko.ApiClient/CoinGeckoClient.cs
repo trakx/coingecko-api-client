@@ -231,7 +231,7 @@ public class CoinGeckoClient : ICoinGeckoClient
     public async Task<IDictionary<DateTimeOffset, MarketData>> GetMarketDataForDateRange(
         string id, string vsCurrency,
         DateTimeOffset start, DateTimeOffset end,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken = default)
     {
         var range = await _coinsClient
             .RangeAsync(id, vsCurrency, start.ToUnixTimeSeconds(), end.ToUnixTimeSeconds(), cancellationToken)

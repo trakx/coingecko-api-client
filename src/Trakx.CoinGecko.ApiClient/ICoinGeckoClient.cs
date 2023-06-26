@@ -54,7 +54,7 @@ public interface ICoinGeckoClient
     Task<IDictionary<DateTimeOffset, MarketData>> GetMarketDataForDateRange(
         string id, string vsCurrency,
         DateTimeOffset start, DateTimeOffset end,
-        CancellationToken cancellationToken);
+        CancellationToken cancellationToken = default);
 
     Task<List<MarketData>> Search(
         string vsCurrency,
