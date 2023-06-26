@@ -52,7 +52,7 @@ public class CachedHttpClientHandlerTests : IDisposable
         var ids = allCoins.Where(c => c.Id != "0vix-protocol") //this coin is not quoted in USD
             .Take(howManyCoinsInTest).Select(c => c.Id);
         var latestPrices = ids
-            .Select(async id => await _client.GetLatestPrice(id, "usd"));
+            .Select(async id => await _client.GetLatestPrice(id, Constants.Usd));
         var stopWatch = new Stopwatch();
         stopWatch.Start();
         await Task.WhenAll(latestPrices.ToArray());

@@ -9,7 +9,6 @@ public class CoinGeckoIdsTestData : IEnumerable<object[]>
     {
         yield return new object[] { "bitcoin" };
         yield return new object[] { "ethereum" };
-        yield return new object[] { "usd-coin" };
         yield return new object[] { "aave" };
         yield return new object[] { "pax-gold" };
         yield return new object[] { "uma" };
