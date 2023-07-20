@@ -35,7 +35,7 @@
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
     <PackageReference Include="Trakx.Common.Testing" Version="0.3.2" />
-    <PackageReference Include="Trakx.Common.Testing.Documentation" Version="0.3.2" />
+    <PackageReference Include="Trakx.Common.Testing.Documentation" Version="0.3.3" />
   </ItemGroup>
 
   <ItemGroup>
