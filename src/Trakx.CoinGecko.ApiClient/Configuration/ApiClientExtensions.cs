@@ -10,6 +10,7 @@ using Polly;
 using Polly.Contrib.WaitAndRetry;
 using Polly.Extensions.Http;
 using Trakx.Common.ApiClient;
+using Trakx.Common.DateAndTime;
 using Trakx.Common.Logging;
 
 namespace Trakx.CoinGecko.ApiClient;
@@ -82,7 +83,7 @@ public static partial class ApiClientExtensions
         services
             .AddHttpClient<TInterface, TImplementation>(clientType.FullName!, configurator.ApplyConfiguration)
             .AddHttpMessageHandler<CachedHttpClientHandler>()
-            .AddPolicyHandler((_, request) =>
+            .AddPolicyHandler((serviceProvider, _) =>
                 Policy<HttpResponseMessage>
                 .Handle<ApiException>()
                 .OrTransientHttpStatusCode()
@@ -90,7 +91,7 @@ public static partial class ApiClientExtensions
                     retryCount: maxRetryCount,
 
                     sleepDurationProvider: (retryCount, response, _) =>
-                        GetServerWaitDuration(response, delays[retryCount - 1]),
+                        GetServerWaitDuration(serviceProvider, response, delays[retryCount - 1]),
 
                     onRetryAsync: async (result, timeSpan, retryCount, context) =>
                     {
@@ -103,14 +104,21 @@ public static partial class ApiClientExtensions
         return services;
     }
 
-    private static TimeSpan GetServerWaitDuration(DelegateResult<HttpResponseMessage> response, TimeSpan minDelay)
+    private static TimeSpan GetServerWaitDuration(
+        IServiceProvider serviceProvider,
+        DelegateResult<HttpResponseMessage> response, TimeSpan minDelay)
     {
         var retryAfter = response.Result?.Headers?.RetryAfter;
-        if (retryAfter == null) return TimeSpan.Zero;
+        if (retryAfter == null) return default;
 
-        var waitDuration = retryAfter.Date.HasValue
-            ? retryAfter.Date.Value - DateTime.UtcNow
-            : retryAfter.Delta.GetValueOrDefault(TimeSpan.Zero);
+        var waitDuration = retryAfter.Delta.GetValueOrDefault();
+
+        if (retryAfter.Date.HasValue)
+        {
+            var timeProvider = serviceProvider.GetRequiredService<IDateTimeProvider>();
+            var now = timeProvider.UtcNow;
+            waitDuration = retryAfter.Date.Value - now;
+        }
 
         return new[] { waitDuration, minDelay }.Max();
     }
