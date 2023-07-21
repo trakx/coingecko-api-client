@@ -24,6 +24,7 @@ public static partial class ApiClientExtensions
         services.Configure<CoinGeckoApiConfiguration>(section);
 
         var typedConfig = section.Get<CoinGeckoApiConfiguration>()!;
+
         return services.AddCoinGeckoClient(typedConfig);
     }
 
@@ -36,6 +37,7 @@ public static partial class ApiClientExtensions
         services.AddSingleton<ICoinGeckoClient, CoinGeckoClient>();
         services.AddTransient<CachedHttpClientHandler>();
 
+        services.AddSingleton<IDateTimeProvider, DateTimeProvider>();
         services.AddSingleton<ISemaphore>(new Semaphore(new SemaphoreSlim(1, 1)));
         services.AddMemoryCache();
 
