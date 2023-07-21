@@ -34,13 +34,13 @@ public class ApiClientExtensionsTests
     }
 }
 
-internal interface IExtensionsTestClient
+public interface IExtensionsTestClient
 {
     HttpClient HttpClient { get; }
     Uri Url { get; }
 }
 
-internal class ExtensionsTestClient : AuthorisedClient, IExtensionsTestClient
+public class ExtensionsTestClient : AuthorisedClient, IExtensionsTestClient
 {
     public HttpClient HttpClient { get; }
 

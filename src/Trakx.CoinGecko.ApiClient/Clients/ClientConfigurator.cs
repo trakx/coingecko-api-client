@@ -2,13 +2,13 @@
 
 namespace Trakx.CoinGecko.ApiClient;
 
-internal class ClientConfigurator
+public class ClientConfigurator
 {
     private const string ProHeader = "X-Cg-Pro-Api-Key";
 
-    internal CoinGeckoApiConfiguration Configuration { get; }
+    public CoinGeckoApiConfiguration Configuration { get; }
 
-    internal ClientConfigurator(CoinGeckoApiConfiguration configuration)
+    public ClientConfigurator(CoinGeckoApiConfiguration configuration)
     {
         Configuration = configuration;
     }

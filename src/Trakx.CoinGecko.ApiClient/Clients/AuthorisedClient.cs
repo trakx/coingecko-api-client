@@ -1,8 +1,8 @@
 ﻿namespace Trakx.CoinGecko.ApiClient;
 
-internal abstract class AuthorisedClient
+public abstract class AuthorisedClient
 {
-    internal string BaseUrl { get; }
+    public string BaseUrl { get; }
 
     protected AuthorisedClient(ClientConfigurator configurator)
     {

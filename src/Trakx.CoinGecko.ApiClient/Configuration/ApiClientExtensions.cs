@@ -82,14 +82,14 @@ public static partial class ApiClientExtensions
         services
             .AddHttpClient<TInterface, TImplementation>(clientType.FullName!, configurator.ApplyConfiguration)
             .AddHttpMessageHandler<CachedHttpClientHandler>()
-            .AddPolicyHandler((s, request) =>
+            .AddPolicyHandler((_, request) =>
                 Policy<HttpResponseMessage>
                 .Handle<ApiException>()
                 .OrTransientHttpStatusCode()
                 .WaitAndRetryAsync(
                     retryCount: maxRetryCount,
 
-                    sleepDurationProvider: (retryCount, response, context) =>
+                    sleepDurationProvider: (retryCount, response, _) =>
                         GetServerWaitDuration(response, delays[retryCount - 1]),
 
                     onRetryAsync: async (result, timeSpan, retryCount, context) =>

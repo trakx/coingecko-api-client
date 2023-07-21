@@ -12,7 +12,7 @@ public class CachedHttpClientHandlerTests : IDisposable
     private readonly ServiceProvider _serviceProvider;
     private readonly ICoinGeckoClient _client;
 
-    public CachedHttpClientHandlerTests(ITestOutputHelper output)
+    public CachedHttpClientHandlerTests()
     {
         _config = new CoinGeckoApiConfiguration
         {
