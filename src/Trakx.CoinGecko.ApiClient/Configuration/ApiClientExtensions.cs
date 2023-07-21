@@ -84,28 +84,31 @@ public static partial class ApiClientExtensions
             .AddHttpClient<TInterface, TImplementation>(clientType.FullName!, configurator.ApplyConfiguration)
             .AddHttpMessageHandler<CachedHttpClientHandler>()
             .AddPolicyHandler((serviceProvider, _) =>
-                Policy<HttpResponseMessage>
+            {
+                var dateTimeProvider = serviceProvider.GetRequiredService<IDateTimeProvider>();
+
+                return Policy<HttpResponseMessage>
                 .Handle<ApiException>()
                 .OrTransientHttpStatusCode()
                 .WaitAndRetryAsync(
                     retryCount: maxRetryCount,
 
                     sleepDurationProvider: (retryCount, response, _) =>
-                        GetServerWaitDuration(serviceProvider, response, delays[retryCount - 1]),
+                        GetServerWaitDuration(dateTimeProvider, response, delays[retryCount - 1]),
 
                     onRetryAsync: async (result, timeSpan, retryCount, context) =>
                     {
                         ILogger logger = LoggerProvider.Create(clientType);
                         await logger.LogApiFailureAsync(result, timeSpan, retryCount, context);
                     })
-
-                .WithPolicyKey(clientType.FullName));
+                .WithPolicyKey(clientType.FullName);
+            });
 
         return services;
     }
 
     private static TimeSpan GetServerWaitDuration(
-        IServiceProvider serviceProvider,
+        IDateTimeProvider dateTimeProvider,
         DelegateResult<HttpResponseMessage> response, TimeSpan minDelay)
     {
         var retryAfter = response.Result?.Headers?.RetryAfter;
@@ -115,8 +118,7 @@ public static partial class ApiClientExtensions
 
         if (retryAfter.Date.HasValue)
         {
-            var timeProvider = serviceProvider.GetRequiredService<IDateTimeProvider>();
-            var now = timeProvider.UtcNow;
+            var now = dateTimeProvider.UtcNow;
             waitDuration = retryAfter.Date.Value - now;
         }
 
