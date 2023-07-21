@@ -32,6 +32,7 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
+    <PackageReference Include="Trakx.Common.Testing" Version="0.3.3" />
     <PackageReference Include="Trakx.Common.Testing.Documentation" Version="0.3.3" />
   </ItemGroup>
 
