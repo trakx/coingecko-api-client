@@ -70,7 +70,7 @@ public class CachedHttpClientHandler : DelegatingHandler
     {
         _cache = cache;
         _apiConfiguration = apiConfiguration;
-        _millisecondsDelay = apiConfiguration.InitialRetryDelayInMilliseconds ?? 100;
+        _millisecondsDelay = (int)apiConfiguration.InitialRetryDelay.TotalMilliseconds;
         _semaphore = semaphore;
     }
 
@@ -140,7 +140,7 @@ public class CachedHttpClientHandler : DelegatingHandler
                 var content = await response.Content.ReadAsStringAsync(cancellationToken);
 
                 e.AbsoluteExpirationRelativeToNow = response.IsSuccessStatusCode
-                    ? TimeSpan.FromSeconds(_apiConfiguration.CacheDurationInSeconds ?? 10)
+                    ? _apiConfiguration.CacheDuration
                     : TimeSpan.FromTicks(1);
 
                 return (response, content);

@@ -7,8 +7,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using Serilog;
 using Sprache;
-using Xunit;
-using Xunit.Abstractions;
 
 namespace Trakx.CoinGecko.ApiClient.Tests.Integration;
 

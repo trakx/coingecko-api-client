@@ -4,11 +4,7 @@ using System.Linq;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
-using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
-using Trakx.Common.Extensions;
-using Xunit;
-using Xunit.Abstractions;
 
 namespace Trakx.CoinGecko.ApiClient.Tests.Integration;
 

@@ -4,8 +4,9 @@ on:
   push:
     branches: [ dev ]
   pull_request:
-    branches: [ dev, stage, master ]
+    branches: [ dev, stage, master, prod ]
   workflow_call:
+  workflow_dispatch:
 
 jobs:
 
