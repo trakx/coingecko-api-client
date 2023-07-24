@@ -2,7 +2,7 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Trakx.Common.Infrastructure.Environment.Aws;
-using Xunit;
+using Trakx.Common.Infrastructure.Environment.Resolvers;
 
 namespace Trakx.CoinGecko.ApiClient.Tests.Integration;
 
@@ -16,8 +16,8 @@ public class ApiTestCollection : ICollectionFixture<CoinGeckoApiFixture>
 
 public class CoinGeckoApiFixture : IDisposable
 {
-    public const string CoinGeckoBaseUrl = "https://api.coingecko.com/api/v3";
-    public const string CoinGeckoProBaseUrl = "https://pro-api.coingecko.com/api/v3";
+    internal static readonly Uri FreeBaseUrl = new("https://api.coingecko.com/api/v3");
+    internal static readonly Uri ProBaseUrl = new("https://pro-api.coingecko.com/api/v3");
 
     public ServiceProvider ServiceProvider { get; }
     public CoinGeckoApiConfiguration Configuration { get; }
@@ -32,17 +32,16 @@ public class CoinGeckoApiFixture : IDisposable
     {
         const string environment = "CiCd";
         var configBuilder = new ConfigurationBuilder().AddAwsSystemManagerConfiguration(environment,
-           assemblyResolver: new Common.Testing.Resolvers.GenericSecretsAssemblyResolver<CoinGeckoApiConfiguration>());
-        var configurationRoot = configBuilder.Build();
+           assemblyResolver: new GenericSecretsAssemblyResolver<CoinGeckoApiConfiguration>());
+        IConfiguration configurationRoot = configBuilder.Build();
+
         return
             configurationRoot.GetSection(nameof(CoinGeckoApiConfiguration)).Get<CoinGeckoApiConfiguration>()!
                 with
             {
-                BaseUrl = CoinGeckoProBaseUrl,
+                BaseUrl = ProBaseUrl,
                 MaxRetryCount = 5,
-                ThrottleDelayPerSecond = 120,
-                CacheDurationInSeconds = 20,
-                InitialRetryDelayInMilliseconds = 100
+                CacheDuration = TimeSpan.FromSeconds(20),
             };
     }
 

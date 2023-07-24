@@ -2,11 +2,7 @@
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
-using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
-using Serilog;
-using Xunit;
-using Xunit.Abstractions;
 
 namespace Trakx.CoinGecko.ApiClient.Tests.Integration;
 
@@ -16,21 +12,14 @@ public class CachedHttpClientHandlerTests : IDisposable
     private readonly ServiceProvider _serviceProvider;
     private readonly ICoinGeckoClient _client;
 
-    public CachedHttpClientHandlerTests(ITestOutputHelper output)
+    public CachedHttpClientHandlerTests()
     {
         _config = new CoinGeckoApiConfiguration
         {
-            BaseUrl = CoinGeckoApiFixture.CoinGeckoBaseUrl,
-            ThrottleDelayPerSecond = 100
+            BaseUrl = CoinGeckoApiFixture.FreeBaseUrl
         };
 
         _serviceProvider = BuildServiceProvider();
-        Log.Logger = new LoggerConfiguration()
-            .MinimumLevel.Verbose()
-            .WriteTo.TestOutput(output)
-            .CreateLogger()
-            .ForContext<CachedHttpClientHandlerTests>();
-
         _client = _serviceProvider.GetService<ICoinGeckoClient>()!;
     }
 

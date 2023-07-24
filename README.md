@@ -21,5 +21,10 @@ CoinGeckoApiConfiguration__ApiKey=********
 ## AWS Parameters
 In order to be able to run some integration tests you should ensure that you have access to the following AWS parameters :
 ```awsParams
+# REPOSITORY SECRETS
 /[environment]/Trakx/CoinGecko/ApiClient/CoinGeckoApiConfiguration/ApiKey
+
+# GLOBAL SECRETS
+# Instead of creating a specific repository secret, can use the global one with the same [Key]
+/[environment]/Global/CoinGeckoApiConfiguration/ApiKey
 ```

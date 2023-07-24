@@ -1,7 +1,5 @@
 using System.Collections.Generic;
-using FluentAssertions;
 using Trakx.CoinGecko.ApiClient.Models;
-using Xunit;
 
 namespace Trakx.CoinGecko.ApiClient.Tests.Unit;
 

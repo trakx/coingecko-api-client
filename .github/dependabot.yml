@@ -9,12 +9,20 @@ registries:
     type: nuget-feed
     url: https://api.nuget.org/v3/index.json
 
+# grouping updates is now supported
+# https://docs.github.com/en/code-security/dependabot/dependabot-version-updates/configuration-options-for-the-dependabot.yml-file#groups
+
 updates:
   # Maintain dependencies for GitHub Actions
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
       interval: "daily"
+    groups:
+      github-actions: # group name
+        patterns:
+          - "*"
+
   # Maintain dependencies for docker
   - package-ecosystem: "docker"
     directory: "/"
@@ -28,3 +36,12 @@ updates:
     directory: "/"
     schedule:
       interval: "daily"
+    groups:
+      trakx-nuget: # group name
+        patterns:
+          - "trakx*"
+      official-nuget: # group name
+        patterns:
+          - "*"
+        exclude-patterns:
+          - "trakx*"
