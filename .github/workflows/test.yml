@@ -4,8 +4,9 @@ on:
   push:
     branches: [ dev ]
   pull_request:
-    branches: [ dev, stage, master ]
+    branches: [ dev, stage, master, prod ]
   workflow_call:
+  workflow_dispatch:
 
 jobs:
 
@@ -14,7 +15,7 @@ jobs:
     steps:
       - name: Test and cover solutions
         id: test
-        uses: trakx/github-actions/test-dotnet@v10.0.7
+        uses: trakx/github-actions/test-dotnet@v10.0.19
         with:
           packageReadonlyPat: ${{secrets.TRAKX_BOT_READONLY_PAT}}
           codacyToken: ${{secrets.CODACY_TOKEN}}

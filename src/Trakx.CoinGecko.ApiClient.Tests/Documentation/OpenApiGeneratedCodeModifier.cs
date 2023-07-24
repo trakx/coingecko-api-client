@@ -1,6 +1,5 @@
 ﻿using System.IO;
 using Trakx.Common.Infrastructure.Environment.Env;
-using Xunit.Abstractions;
 
 namespace Trakx.CoinGecko.ApiClient.Tests.Integration;
 

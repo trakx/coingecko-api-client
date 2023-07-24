@@ -4,14 +4,9 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
-using FluentAssertions;
 using Microsoft.Extensions.Caching.Memory;
-using NSubstitute;
 using Trakx.Common.ApiClient.Extensions;
-using Trakx.Common.Extensions;
 using Trakx.Common.Testing.Mocks;
-using Xunit;
-using Xunit.Abstractions;
 
 namespace Trakx.CoinGecko.ApiClient.Tests.Unit;
 
