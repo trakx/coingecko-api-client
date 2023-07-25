@@ -1,6 +1,8 @@
 ﻿using System;
+using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Trakx.Common.Configuration;
 using Trakx.Common.Infrastructure.Caching;
 using Trakx.Common.Infrastructure.Environment.Aws;
@@ -30,8 +32,19 @@ public class CoinGeckoApiFixture : IDisposable
 
         var serviceCollection = new ServiceCollection();
         serviceCollection.AddCoinGeckoClient(apiConfiguration, cacheConfiguration);
+        SetupMemoryDistributedCache(serviceCollection);
 
         ServiceProvider = serviceCollection.BuildServiceProvider();
+    }
+
+    private static void SetupMemoryDistributedCache(ServiceCollection serviceCollection)
+    {
+        ServiceDescriptor descriptor = new(
+            typeof(IDistributedCache),
+            typeof(MemoryDistributedCache),
+            ServiceLifetime.Singleton);
+
+        serviceCollection.Replace(descriptor);
     }
 
     private static IConfigurationRoot BuildConfiguration()
