@@ -11,7 +11,7 @@ on:
 jobs:
 
   test:
-    runs-on: ubuntu-latest
+    runs-on: dev-trakx-runner
     steps:
       - name: Test and cover solutions
         id: test
