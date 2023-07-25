@@ -20,23 +20,16 @@ public class ApiTestCollection : ICollectionFixture<CoinGeckoApiFixture>
 public class CoinGeckoApiFixture : IDisposable
 {
     public ServiceProvider ServiceProvider { get; }
-    public CoinGeckoApiConfiguration Configuration { get; }
 
     public CoinGeckoApiFixture()
     {
         var configurationRoot = BuildConfiguration();
 
-        Configuration = configurationRoot.GetConfiguration<CoinGeckoApiConfiguration>()
-            with
-        {
-            //MaxRetryCount = 5,
-            //CacheDuration = TimeSpan.FromSeconds(20),
-        };
-
+        var apiConfiguration = configurationRoot.GetConfiguration<CoinGeckoApiConfiguration>();
         var cacheConfiguration = configurationRoot.GetConfiguration<RedisCacheConfiguration>();
 
         var serviceCollection = new ServiceCollection();
-        serviceCollection.AddCoinGeckoClient(Configuration, cacheConfiguration);
+        serviceCollection.AddCoinGeckoClient(apiConfiguration, cacheConfiguration);
 
         ServiceProvider = serviceCollection.BuildServiceProvider();
     }
