@@ -1,100 +1,69 @@
-﻿using System;
-using System.Linq;
-using System.Net;
+﻿using System.Net;
 using System.Net.Http;
-using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using Ardalis.GuardClauses;
-using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Logging;
+using Trakx.Common.Caching;
 using Trakx.Common.Logging;
 
 namespace Trakx.CoinGecko.ApiClient;
 
-public interface ISemaphore : IDisposable
-{
-    Task WaitAsync(CancellationToken cancellationToken);
-    int Release(int count);
-}
-
-public class Semaphore : ISemaphore
-{
-    private readonly SemaphoreSlim _semaphoreImplementation;
-
-    public Semaphore(SemaphoreSlim semaphoreImplementation)
-    {
-        _semaphoreImplementation = semaphoreImplementation;
-    }
-
-    public async Task WaitAsync(CancellationToken cancellationToken)
-    {
-        await _semaphoreImplementation.WaitAsync(cancellationToken);
-    }
-
-    public int Release(int count)
-    {
-        return _semaphoreImplementation.Release(count);
-    }
-
-    protected virtual void Dispose(bool disposing)
-    {
-        if (!disposing) return;
-        _semaphoreImplementation.Dispose();
-    }
-
-    public void Dispose()
-    {
-        Dispose(true);
-        GC.SuppressFinalize(this);
-    }
-}
+public sealed record CachedHttpResponse(HttpStatusCode StatusCode, string Content);
 
 public class CachedHttpClientHandler : DelegatingHandler
 {
-    private static readonly ILogger Logger =
-        LoggerProvider.Create(MethodBase.GetCurrentMethod()!.DeclaringType!);
+    private readonly IDistributedCache _cache;
+    private readonly DistributedCacheEntryOptions _cacheOptions;
 
-    private readonly IMemoryCache _cache;
-    private readonly CoinGeckoApiConfiguration _apiConfiguration;
-    private readonly ISemaphore _semaphore;
-    private readonly int _millisecondsDelay;
+    private static readonly ILogger Logger = LoggerProvider.Create<CachedHttpClientHandler>();
 
     /// <summary>
-    /// An <see cref="DelegatingHandler"></see> with a throttle to limit the maximum rate at which queries are sent
-    /// and also periodically caching the results being retrieved to avoid unnecessary requests to coin gecko external api.
+    /// A <see cref="DelegatingHandler" /> which caches results for <see cref="CoinGeckoApiConfiguration.CacheDuration"/> time.<br />
+    /// The goal is to avoid unnecessary requests to the external CoinGecko API.
     /// </summary>
-    public CachedHttpClientHandler(IMemoryCache cache,
-        ISemaphore semaphore,
-        CoinGeckoApiConfiguration apiConfiguration)
+    public CachedHttpClientHandler(IDistributedCache cache, CoinGeckoApiConfiguration apiConfiguration)
     {
         _cache = cache;
-        _apiConfiguration = apiConfiguration;
-        _millisecondsDelay = (int)apiConfiguration.InitialRetryDelay.TotalMilliseconds;
-        _semaphore = semaphore;
+
+        _cacheOptions = new()
+        {
+            AbsoluteExpirationRelativeToNow = apiConfiguration.CacheDuration
+        };
     }
 
-    /// <summary>
-    /// Any time an http client request is invoked this method will first check
-    /// if the throttle request is inside the maximum limit range defined in <see cref="CoinGeckoApiConfiguration.InitialRetryDelayInMilliseconds"/>;
-    /// after that tries to retrieve the result from cache via <see cref="TryGetOrSetRequestFromCache"/>
-    /// </summary>
-    /// <param name="request"></param>
-    /// <param name="cancellationToken"></param>
-    /// <returns></returns>
-    protected override async Task<HttpResponseMessage> SendAsync(
-        HttpRequestMessage request, CancellationToken cancellationToken)
-    {
-        Guard.Against.Null(request);
-
-        return await TryGetOrSetRequestFromCache(request, cancellationToken)
-            .ConfigureAwait(false);
-    }
-
+    /// <inheritdoc cref="SendAsyncInternal"/>
     protected override HttpResponseMessage Send(
         HttpRequestMessage request, CancellationToken cancellationToken)
     {
         return SendAsync(request, cancellationToken).GetAwaiter().GetResult();
+    }
+
+    /// <inheritdoc cref="SendAsyncInternal"/>
+    protected override async Task<HttpResponseMessage> SendAsync(
+        HttpRequestMessage request, CancellationToken cancellationToken)
+    {
+        return await SendAsyncInternal(request, cancellationToken);
+    }
+
+    /// <summary>
+    /// Any time an http client request is invoked,
+    /// this method will try to retrieve the result from cache via <see cref="GetRequestFromCacheOrSendAsync"/>
+    /// </summary>
+    /// <param name="request"></param>
+    /// <param name="cancellationToken"></param>
+    internal async Task<HttpResponseMessage> SendAsyncInternal(HttpRequestMessage request, CancellationToken cancellationToken)
+    {
+        Guard.Against.Null(request);
+
+        // Data cache is only applicable for GET operations
+        if (request.Method != HttpMethod.Get)
+        {
+            return await base.SendAsync(request, cancellationToken);
+        }
+
+        return await GetRequestFromCacheOrSendAsync(request, cancellationToken);
     }
 
     /// <summary>
@@ -103,80 +72,50 @@ public class CachedHttpClientHandler : DelegatingHandler
     /// </summary>
     /// <param name="request">Http request that should be performed</param>
     /// <param name="cancellationToken"></param>
-    /// <returns></returns>
-    private async Task<HttpResponseMessage> TryGetOrSetRequestFromCache(HttpRequestMessage request,
-        CancellationToken cancellationToken)
+    internal async Task<HttpResponseMessage> GetRequestFromCacheOrSendAsync(
+        HttpRequestMessage request, CancellationToken cancellationToken)
     {
-        // Data cache is only applicable for GET operations
-        if (request.Method != HttpMethod.Get)
+        var cacheKey = await GetCacheKey(request, cancellationToken);
+
+        var cachedResponse = await _cache.GetAsync<CachedHttpResponse>(cacheKey, cancellationToken);
+        if (cachedResponse != null)
         {
-            try
-            {
-                await _semaphore.WaitAsync(cancellationToken).ConfigureAwait(false);
-                return await base.SendAsync(request, cancellationToken)
-                    .ConfigureAwait(false);
-            }
-            finally
-            {
-                await Task.Delay(_millisecondsDelay, cancellationToken).ConfigureAwait(false);
-                _semaphore.Release(1);
-            }
+            Logger.LogDebug("Reusing cached response for {cacheKey}", cacheKey);
+            return CreateResponse(cachedResponse.StatusCode, cachedResponse.Content);
         }
 
-        string? content
+        HttpResponseMessage freshResponse;
+        try
+        {
+            freshResponse = await base.SendAsync(request, cancellationToken);
+            if (!freshResponse.IsSuccessStatusCode) return freshResponse;
+        }
+        catch (ApiException exception)
+        {
+            Logger.LogError(exception, "Failed to get response from {uri}", request.RequestUri?.ToString() ?? "unknown URI");
+            return CreateResponse((HttpStatusCode)exception.StatusCode, exception.Message);
+        }
+
+        // cache the fresh response
+        var freshContent = await freshResponse.Content.ReadAsStringAsync(cancellationToken);
+        cachedResponse = new CachedHttpResponse(freshResponse.StatusCode, freshContent);
+        await _cache.SetAsync(cacheKey, cachedResponse, _cacheOptions, cancellationToken);
+
+        return CreateResponse(cachedResponse.StatusCode, cachedResponse.Content);
+    }
+
+    internal static async Task<string> GetCacheKey(HttpRequestMessage request, CancellationToken cancellationToken)
+    {
+        string? payload
             = request.Content == null
             ? null
             : await request.Content.ReadAsStringAsync(cancellationToken);
 
-        var key = $"[{request.Method}]{request.RequestUri}|{content}";
-
-        var (message, cachedContent) = await _cache.GetOrCreateAsync(key, async e =>
-        {
-            try
-            {
-                await _semaphore.WaitAsync(cancellationToken).ConfigureAwait(false);
-                var response = await base.SendAsync(request, cancellationToken)
-                    .ConfigureAwait(false);
-                var content = await response.Content.ReadAsStringAsync(cancellationToken);
-
-                e.AbsoluteExpirationRelativeToNow = response.IsSuccessStatusCode
-                    ? _apiConfiguration.CacheDuration
-                    : TimeSpan.FromTicks(1);
-
-                return (response, content);
-            }
-            catch (ApiException exception)
-            {
-                e.AbsoluteExpirationRelativeToNow = TimeSpan.FromTicks(1);
-                if (exception.StatusCode == (int)HttpStatusCode.TooManyRequests
-                   && exception.Headers.TryGetValue("Retry-After", out var value))
-                {
-                    var millisecondsDelay = int.Parse(value?.First() ?? "0");
-                    await Task.Delay(millisecondsDelay, cancellationToken);
-                }
-
-                Logger.LogWarning(exception, "Failed to get response from {uri}", request.RequestUri?.ToString() ?? "unknown URI");
-                return (new HttpResponseMessage((HttpStatusCode)exception.StatusCode), exception.Message);
-            }
-            finally
-            {
-                await Task.Delay(_millisecondsDelay, cancellationToken).ConfigureAwait(false);
-                _semaphore.Release(1);
-            }
-        }).ConfigureAwait(false);
-
-        return new HttpResponseMessage(message.StatusCode) { Content = new StringContent(cachedContent) };
+        return $"{request.RequestUri}|{payload}";
     }
 
-    /// <inheritdoc />
-    protected override void Dispose(bool disposing)
+    internal static HttpResponseMessage CreateResponse(HttpStatusCode statusCode, string content)
     {
-        if (disposing)
-        {
-            _semaphore.Dispose();
-        }
-
-        base.Dispose(disposing);
+        return new() { StatusCode = statusCode, Content = new StringContent(content) };
     }
-
 }

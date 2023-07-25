@@ -1,7 +1,10 @@
 ﻿using System;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Trakx.Common.Configuration;
+using Trakx.Common.Infrastructure.Caching;
 using Trakx.Common.Infrastructure.Environment.Aws;
+using Trakx.Common.Infrastructure.Environment.Env;
 using Trakx.Common.Infrastructure.Environment.Resolvers;
 
 namespace Trakx.CoinGecko.ApiClient.Tests.Integration;
@@ -16,41 +19,37 @@ public class ApiTestCollection : ICollectionFixture<CoinGeckoApiFixture>
 
 public class CoinGeckoApiFixture : IDisposable
 {
-    internal static readonly Uri FreeBaseUrl = new("https://api.coingecko.com/api/v3");
-    internal static readonly Uri ProBaseUrl = new("https://pro-api.coingecko.com/api/v3");
-
     public ServiceProvider ServiceProvider { get; }
     public CoinGeckoApiConfiguration Configuration { get; }
 
     public CoinGeckoApiFixture()
     {
-        Configuration = BuildConfiguration();
-        ServiceProvider = BuildServiceProvider();
+        var configurationRoot = BuildConfiguration();
+
+        Configuration = configurationRoot.GetConfiguration<CoinGeckoApiConfiguration>()
+            with
+        {
+            //MaxRetryCount = 5,
+            //CacheDuration = TimeSpan.FromSeconds(20),
+        };
+
+        var cacheConfiguration = configurationRoot.GetConfiguration<RedisCacheConfiguration>();
+
+        var serviceCollection = new ServiceCollection();
+        serviceCollection.AddCoinGeckoClient(Configuration, cacheConfiguration);
+
+        ServiceProvider = serviceCollection.BuildServiceProvider();
     }
 
-    private static CoinGeckoApiConfiguration BuildConfiguration()
+    private static IConfigurationRoot BuildConfiguration()
     {
-        const string environment = "CiCd";
-        var configBuilder = new ConfigurationBuilder().AddAwsSystemManagerConfiguration(environment,
-           assemblyResolver: new GenericSecretsAssemblyResolver<CoinGeckoApiConfiguration>());
-        IConfiguration configurationRoot = configBuilder.Build();
+        var environment = EnvironmentProvider.DeploymentEnvironment;
+        var assemblyResolver = new GenericSecretsAssemblyResolver<CoinGeckoApiConfiguration>();
 
         return
-            configurationRoot.GetSection(nameof(CoinGeckoApiConfiguration)).Get<CoinGeckoApiConfiguration>()!
-                with
-            {
-                BaseUrl = ProBaseUrl,
-                MaxRetryCount = 5,
-                CacheDuration = TimeSpan.FromSeconds(20),
-            };
-    }
-
-    private ServiceProvider BuildServiceProvider()
-    {
-        var serviceCollection = new ServiceCollection();
-        serviceCollection.AddSingleton(Configuration);
-        serviceCollection.AddCoinGeckoClient(Configuration);
-        return serviceCollection.BuildServiceProvider();
+            new ConfigurationBuilder()
+            .AddAwsSystemManagerConfiguration(environment, assemblyResolver)
+            .Build();
     }
 
     protected virtual void Dispose(bool disposing)

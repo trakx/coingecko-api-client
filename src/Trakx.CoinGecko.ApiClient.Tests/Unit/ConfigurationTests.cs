@@ -1,4 +1,3 @@
-using Trakx.CoinGecko.ApiClient.Tests.Integration;
 using Trakx.Common.Configuration;
 using Trakx.Common.Testing.Configuration;
 
@@ -13,12 +12,12 @@ public class ConfigurationTests
             {
                 "CoinGeckoApiConfiguration":
                 {
-                    "BaseUrl": "{{CoinGeckoApiFixture.FreeBaseUrl.OriginalString}}"
+                    "BaseUrl": "{{Constants.PublicBaseUrl.OriginalString}}"
                 }
             }
             """);
 
         var configurationObject = configurationSource.GetConfiguration<CoinGeckoApiConfiguration>();
-        configurationObject.BaseUrl.Should().Be(CoinGeckoApiFixture.FreeBaseUrl);
+        configurationObject.BaseUrl.Should().Be(Constants.PublicBaseUrl);
     }
 }
