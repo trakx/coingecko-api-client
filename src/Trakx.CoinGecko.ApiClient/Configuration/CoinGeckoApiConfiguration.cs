@@ -6,7 +6,7 @@ namespace Trakx.CoinGecko.ApiClient;
 
 public record CoinGeckoApiConfiguration
 {
-    public Uri BaseUrl { get; init; } = new("about:blank");
+    public Uri BaseUrl { get; init; } = Constants.ProBaseUrl;
 
     public int MaxRetryCount { get; init; } = 10;
 
