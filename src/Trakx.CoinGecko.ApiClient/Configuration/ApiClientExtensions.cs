@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
-using System.Threading;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -10,7 +9,9 @@ using Polly;
 using Polly.Contrib.WaitAndRetry;
 using Polly.Extensions.Http;
 using Trakx.Common.ApiClient;
+using Trakx.Common.Configuration;
 using Trakx.Common.DateAndTime;
+using Trakx.Common.Infrastructure.Caching;
 using Trakx.Common.Logging;
 
 namespace Trakx.CoinGecko.ApiClient;
@@ -20,27 +21,28 @@ public static partial class ApiClientExtensions
     public static IServiceCollection AddCoinGeckoClient(
         this IServiceCollection services, IConfiguration configuration)
     {
-        var section = configuration.GetSection(nameof(CoinGeckoApiConfiguration));
-        services.Configure<CoinGeckoApiConfiguration>(section);
-
-        var typedConfig = section.Get<CoinGeckoApiConfiguration>()!;
-
-        return services.AddCoinGeckoClient(typedConfig);
+        var apiConfiguration = configuration.GetConfiguration<CoinGeckoApiConfiguration>();
+        var cacheConfiguration = configuration.GetConfiguration<RedisCacheConfiguration>();
+        return services.AddCoinGeckoClient(apiConfiguration, cacheConfiguration);
     }
 
     public static IServiceCollection AddCoinGeckoClient(
-        this IServiceCollection services, CoinGeckoApiConfiguration apiConfiguration)
+        this IServiceCollection services,
+        CoinGeckoApiConfiguration apiConfiguration,
+        RedisCacheConfiguration cacheConfiguration)
     {
+        // api configuration
         services.AddSingleton(apiConfiguration);
-        services.AddSingleton(services => new ClientConfigurator(apiConfiguration));
+        services.AddSingleton(new ClientConfigurator(apiConfiguration));
 
-        services.AddSingleton<ICoinGeckoClient, CoinGeckoClient>();
-        services.AddTransient<CachedHttpClientHandler>();
-
+        // required common services
         services.AddSingleton<IDateTimeProvider, DateTimeProvider>();
-        services.AddSingleton<ISemaphore>(new Semaphore(new SemaphoreSlim(1, 1)));
+        services.AddDistributedCache(cacheConfiguration);
         services.AddMemoryCache();
 
+        // clients: api and http
+        services.AddSingleton<ICoinGeckoClient, CoinGeckoClient>();
+        services.AddTransient<CachedHttpClientHandler>();
         services.AddHttpClientsForCoinGeckoClients(apiConfiguration);
 
         return services;

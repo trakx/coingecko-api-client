@@ -1,7 +1,7 @@
 using System;
 using System.Net.Http;
 using Microsoft.Extensions.DependencyInjection;
-using Trakx.CoinGecko.ApiClient.Tests.Integration;
+using Trakx.Common.Infrastructure.Caching;
 
 namespace Trakx.CoinGecko.ApiClient.Tests.Unit;
 
@@ -12,7 +12,7 @@ public class ApiClientExtensionsTests
     {
         var configuration = new CoinGeckoApiConfiguration
         {
-            BaseUrl = CoinGeckoApiFixture.FreeBaseUrl,
+            BaseUrl = Constants.PublicBaseUrl,
             Timeout = TimeSpan.FromSeconds(123)
         };
 
@@ -20,7 +20,7 @@ public class ApiClientExtensionsTests
         var delays = configuration.InitialRetryDelay.AsSingletonList();
 
         var serviceCollection = new ServiceCollection();
-        serviceCollection.AddCoinGeckoClient(configuration);
+        serviceCollection.AddCoinGeckoClient(configuration, new RedisCacheConfiguration());
 
         // custom test client
         serviceCollection.AddHttpClientForCoinGeckoClient<IExtensionsTestClient, ExtensionsTestClient>(configurator, delays);
