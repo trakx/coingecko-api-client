@@ -24,10 +24,10 @@
       </PackageReference>
     <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="7.0.10" />
     <PackageReference Include="Polly.Caching.Memory" Version="3.0.2" />
-    <PackageReference Include="Trakx.Common.ApiClient" Version="0.4.3" />
-    <PackageReference Include="Trakx.Common.Caching" Version="0.4.3" />
-    <PackageReference Include="Trakx.Common.Configuration" Version="0.4.3" />
-    <PackageReference Include="Trakx.Common.Infrastructure.Caching" Version="0.4.3" />
+    <PackageReference Include="Trakx.Common.ApiClient" Version="0.4.4" />
+    <PackageReference Include="Trakx.Common.Caching" Version="0.4.4" />
+    <PackageReference Include="Trakx.Common.Configuration" Version="0.4.4" />
+    <PackageReference Include="Trakx.Common.Infrastructure.Caching" Version="0.4.4" />
   </ItemGroup>
 
   <Target Name="NSwag" BeforeTargets="Build" Condition="'$(GenerateApiClient)'=='True' ">
