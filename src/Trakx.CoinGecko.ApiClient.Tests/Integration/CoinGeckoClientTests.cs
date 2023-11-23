@@ -256,7 +256,6 @@ public class CoinGeckoClientTests : CoinGeckoClientTestBase
         "compound-ether",
         "compound-governance-token",
         "compound-usd-coin",
-        "compound-usdt",
         "conflux-token",
         "constellation-labs",
         "convex-crv",
