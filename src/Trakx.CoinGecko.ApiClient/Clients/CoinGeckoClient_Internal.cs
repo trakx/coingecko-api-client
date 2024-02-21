@@ -79,8 +79,8 @@ public partial class CoinGeckoClient : ICoinGeckoClient
     {
         var result = await _coinsClient.MarketsAsync(vsCurrency, ids, category, order, per_page, page, cancellationToken: cancellationToken);
 
-        if (result == null) return [];
-        if (result.Content.IsNullOrEmpty()) return [];
+        if (result == null) return new();
+        if (result.Content.IsNullOrEmpty()) return new();
 
         return result.Content.ConvertAll(x => new MarketData
         {
@@ -212,7 +212,7 @@ public partial class CoinGeckoClient : ICoinGeckoClient
 
         if (ids != null) baseIds.AddRange(ids);
 
-        vsCurrencies ??= [];
+        vsCurrencies ??= Array.Empty<string>();
 
         foreach (var id in vsCurrencies)
         {
