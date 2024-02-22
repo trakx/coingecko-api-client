@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
-using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -63,12 +62,10 @@ public class CoinsClientTests : CoinGeckoClientTestBase
     [Fact]
     public async Task RangeAsync_should_return_historical_data_for_a_range_of_dates()
     {
-        var start = DateTimeOffset.Parse("2020-12-01");
-        var end = DateTimeOffset.Parse("2020-12-31");
+        var start = (2020, 12, 01).ToDateTimeOffset();
+        var end = (2020, 12, 31).ToDateTimeOffset();
 
-        var range = await _coinsClient
-            .RangeAsync("ethereum", Constants.Usd, start.ToUnixTimeSeconds(), end.ToUnixTimeSeconds(), CancellationToken.None)
-            .ConfigureAwait(false);
+        var range = await _coinsClient.RangeAsync("ethereum", Constants.Usd, start.ToUnixTimeSeconds(), end.ToUnixTimeSeconds());
 
         range.StatusCode.Should().Be((int)HttpStatusCode.OK);
         range.Content.Prices.Count.Should().BeGreaterThan(30);
