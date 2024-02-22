@@ -6,6 +6,6 @@ public abstract class AuthorisedClient
 
     protected AuthorisedClient(ClientConfigurator configurator)
     {
-        BaseUrl = configurator.Configuration.BaseUrl.OriginalString;
+        BaseUrl = configurator.Configuration.BaseUrl.AbsoluteUri;
     }
 }
