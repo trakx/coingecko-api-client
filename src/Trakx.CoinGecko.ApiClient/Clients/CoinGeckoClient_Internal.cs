@@ -64,7 +64,8 @@ public partial class CoinGeckoClient : ICoinGeckoClient
         string id, string vsCurrency, int days,
         CancellationToken cancellationToken)
     {
-        var range = await _coinsClient.Market_chartAsync(id, vsCurrency, days.ToString(), "daily", cancellationToken: cancellationToken);
+        var daysString = days.ToString(CultureInfo.InvariantCulture);
+        var range = await _coinsClient.Market_chartAsync(id, vsCurrency, daysString, "daily", cancellationToken: cancellationToken);
         return BuildMarketData(id, vsCurrency, range.Content);
     }
 
@@ -129,7 +130,10 @@ public partial class CoinGeckoClient : ICoinGeckoClient
         for (int page = 1; page <= pageCount; page++)
         {
             var partialResult = await Search(page: page, per_page: pageSize, cancellationToken: cancellationToken);
-            if (partialResult.IsNullOrEmpty()) break;
+
+            if (partialResult.IsNullOrEmpty())
+                return result;
+
             result.AddRange(partialResult);
         }
 

@@ -13,11 +13,12 @@ namespace Trakx.CoinGecko.ApiClient.Tests.Unit;
 public class CoinGeckoClientTests
 {
     internal const string VsCurrency = Constants.Usd;
+    private const string First = nameof(First);
+    private const string Second = nameof(Second);
 
     private readonly ISimpleClient _simpleClient;
     private readonly ICoinsClient _coinsClient;
     private readonly MockCreator _mockCreator;
-    private readonly DateTimeOffset _now;
     private readonly IMemoryCache _memoryCache;
 
     private readonly CoinGeckoClient _coinGeckoClient;
@@ -33,15 +34,15 @@ public class CoinGeckoClientTests
         _memoryCache = Substitute.For<IMemoryCache>();
         _mockCreator = new MockCreator(output);
 
-        _now = _mockCreator.GetUtcDateTimeOffset();
+        var now = _mockCreator.GetUtcDateTimeOffset();
         var dateTimeProvider = Substitute.For<IDateTimeProvider>();
-        dateTimeProvider.UtcNowAsOffset.Returns(_now);
+        dateTimeProvider.UtcNowAsOffset.Returns(now);
 
         _coinGeckoClient = new CoinGeckoClient(_memoryCache, _coinsClient, _simpleClient, dateTimeProvider);
 
         _coin = _mockCreator.GetString(5);
-        _start = _now.AddMonths(-2);
-        _end = _now.AddMonths(-1);
+        _start = now.AddMonths(-2);
+        _end = now.AddMonths(-1);
     }
 
     [Fact]
@@ -189,15 +190,15 @@ public class CoinGeckoClientTests
         var marketData = new List<SearchCoinData>
         {
             new() { Id = "null", Symbol = symbol, Market_cap_rank = null },
-            new() { Id = "first", Symbol = symbol, Market_cap_rank = 1 },
-            new() { Id = "second", Symbol = "second", Market_cap_rank  = 2 },
+            new() { Id = First, Symbol = symbol, Market_cap_rank = 1 },
+            new() { Id = Second, Symbol = Second, Market_cap_rank  = 2 },
             new() { Id = "third", Symbol = symbol, Market_cap_rank = 3 },
         };
 
         SetupMarketsPage(marketData);
 
         var result = await _coinGeckoClient.GetCoinGeckoIdFromSymbol(symbol);
-        result.Should().Be("first");
+        result.Should().Be(First);
     }
 
     [Fact]
@@ -260,8 +261,8 @@ public class CoinGeckoClientTests
     {
         var marketData = new List<SearchCoinData>
         {
-            new() { Id = "first", Symbol = "first", Market_cap_rank = 1 },
-            new() { Id = "second", Symbol = "second", Market_cap_rank  = 2 },
+            new() { Id = First, Symbol = First, Market_cap_rank = 1 },
+            new() { Id = Second, Symbol = Second, Market_cap_rank  = 2 },
             new() { Id = "third", Symbol = "third", Market_cap_rank = 3 },
         };
 
@@ -394,7 +395,7 @@ public class CoinGeckoClientTests
         };
     }
 
-    private Dictionary<DateTimeOffset, MarketData> SetupMarketDataResponse()
+    private void SetupMarketDataResponse()
     {
         var marketData = new Dictionary<DateTimeOffset, MarketData>();
 
@@ -405,7 +406,5 @@ public class CoinGeckoClientTests
                 call[1] = marketData;
                 return true;
             });
-
-        return marketData;
     }
 }
