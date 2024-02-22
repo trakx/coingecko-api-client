@@ -9,6 +9,7 @@ using Polly;
 using Polly.Contrib.WaitAndRetry;
 using Polly.Extensions.Http;
 using Trakx.Common.ApiClient;
+using Trakx.Common.ApiClient.Exceptions;
 using Trakx.Common.Configuration;
 using Trakx.Common.DateAndTime;
 using Trakx.Common.Infrastructure.Caching;

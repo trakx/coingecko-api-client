@@ -1,15 +1,19 @@
 ﻿using System;
-using System.Runtime.Serialization;
 
 namespace Trakx.CoinGecko.ApiClient;
 
 [Serializable]
 public class FailedToRetrievePriceException : Exception
 {
-    public FailedToRetrievePriceException(string message)
-        : base(message) { }
+    public FailedToRetrievePriceException()
+    {
+    }
 
-    protected FailedToRetrievePriceException(SerializationInfo info, StreamingContext context) : base(info, context)
+    public FailedToRetrievePriceException(string? message) : base(message)
+    {
+    }
+
+    public FailedToRetrievePriceException(string? message, Exception? innerException) : base(message, innerException)
     {
     }
 }

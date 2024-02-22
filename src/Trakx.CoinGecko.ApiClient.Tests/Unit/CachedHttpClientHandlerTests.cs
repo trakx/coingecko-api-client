@@ -5,6 +5,7 @@ using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Caching.Distributed;
+using Trakx.Common.ApiClient.Exceptions;
 
 namespace Trakx.CoinGecko.ApiClient.Tests.Unit;
 

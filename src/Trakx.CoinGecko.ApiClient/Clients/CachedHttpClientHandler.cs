@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Ardalis.GuardClauses;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Logging;
+using Trakx.Common.ApiClient.Exceptions;
 using Trakx.Common.Caching;
 using Trakx.Common.Logging;
 
