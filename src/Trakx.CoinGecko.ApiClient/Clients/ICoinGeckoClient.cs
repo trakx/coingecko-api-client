@@ -8,9 +8,12 @@ namespace Trakx.CoinGecko.ApiClient;
 
 public interface ICoinGeckoClient
 {
+    internal const string MainQuoteCurrency = Constants.Usd;
+    internal const int MarketRankDefaultLimit = 1000;
+
     // symbol operations
 
-    Task<string?> GetCoinGeckoIdFromSymbol(string symbol);
+    Task<string?> GetCoinGeckoIdFromSymbol(string symbol, CancellationToken cancellationToken = default);
 
     Task<IList<CoinList>> GetCoinList(CancellationToken cancellationToken = default);
 
@@ -44,6 +47,10 @@ public interface ICoinGeckoClient
 
     // market data
 
+    Task<IList<MarketData>> GetMarketRank(
+        int limit = MarketRankDefaultLimit,
+        CancellationToken cancellationToken = default);
+
     Task<MarketData?> GetMarketDataAsOfFromId(
         string id, DateTime asOf, string quoteCurrencyId = Constants.UsdCoin);
 
@@ -57,10 +64,10 @@ public interface ICoinGeckoClient
         CancellationToken cancellationToken = default);
 
     Task<List<MarketData>> Search(
-        string vsCurrency,
+        string vsCurrency = MainQuoteCurrency,
         string? ids = null,
         string? category = null,
-        string? order = null,
+        string order = "market_cap_desc",
         int? per_page = null,
         int? page = null,
         CancellationToken cancellationToken = default);

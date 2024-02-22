@@ -1,10 +1,8 @@
 ﻿openapi: 3.0.1
 info:
   title: CoinGecko API V3
-  description: ""
+  description: "https://api.coingecko.com/api/v3"
   version: 3.0.0
-servers:
-- url: https://api.coingecko.com/api/v3
 paths:
   /ping:
     get:
@@ -1733,8 +1731,10 @@ components:
                 properties:
                     ico_start_date:
                         type: datetime
+                        nullable: true
                     ico_end_date:
                         type: datetime
+                        nullable: true
                     short_desc:
                         type: string
                     description:
