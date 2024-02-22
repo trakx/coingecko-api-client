@@ -195,8 +195,8 @@ public class CoinGeckoClientTests : CoinGeckoClientTestBase
         return ids;
     }
 
-    private static readonly string[] LotsOfTokens = new[]
-    {
+    private static readonly string[] LotsOfTokens =
+    [
         "0x",
         "1inch",
         "aave",
@@ -446,5 +446,5 @@ public class CoinGeckoClientTests : CoinGeckoClientTestBase
         "zcash",
         "zelcash",
         "zilliqa",
-    };
+    ];
 }

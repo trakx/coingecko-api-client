@@ -4,7 +4,7 @@ on:
   push:
     branches: [ dev ]
   pull_request:
-    branches: [ dev, stage, master, prod ]
+    branches: [ dev, stage, prod ]
   workflow_call:
   workflow_dispatch:
 
@@ -21,3 +21,4 @@ jobs:
           codacyToken: ${{secrets.CODACY_TOKEN}}
           awsAccessKeyId: ${{secrets.AWS_ACCESS_KEY_ID}}
           awsAccessKeySecret: ${{secrets.AWS_ACCESS_KEY_SECRET}}
+          dotnetVersion: 8.x

@@ -1,7 +1,7 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net7.0</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
     <GenerateApiClient>false</GenerateApiClient>
   </PropertyGroup>
 
@@ -9,30 +9,26 @@
   <Import Project="../Packable.Projects.props" />
 
   <ItemGroup>
-    <None Include="..\..\LICENSE" Link="LICENSE" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="Ardalis.GuardClauses" Version="4.2.0" />
-    <PackageReference Include="NSwag.ApiDescription.Client" Version="13.20.0">
+    <PackageReference Include="Ardalis.GuardClauses" Version="4.4.0" />
+    <PackageReference Include="NSwag.ApiDescription.Client" Version="14.0.2">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="NSwag.MSBuild" Version="13.20.0">
+    <PackageReference Include="NSwag.MSBuild" Version="14.0.2">
         <PrivateAssets>all</PrivateAssets>
         <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       </PackageReference>
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="7.0.13" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="8.0.2" />
     <PackageReference Include="Polly.Caching.Memory" Version="3.0.2" />
-    <PackageReference Include="Trakx.Common.ApiClient" Version="0.5.2" />
-    <PackageReference Include="Trakx.Common.Caching" Version="0.5.2" />
-    <PackageReference Include="Trakx.Common.Configuration" Version="0.5.2" />
-    <PackageReference Include="Trakx.Common.Infrastructure.Caching" Version="0.5.2" />
+    <PackageReference Include="Trakx.Common.ApiClient" Version="1.0.4" />
+    <PackageReference Include="Trakx.Common.Caching" Version="1.0.4" />
+    <PackageReference Include="Trakx.Common.Configuration" Version="1.0.4" />
+    <PackageReference Include="Trakx.Common.Infrastructure.Caching" Version="1.0.4" />
   </ItemGroup>
 
   <Target Name="NSwag" BeforeTargets="Build" Condition="'$(GenerateApiClient)'=='True' ">
     <Copy SourceFiles="@(Reference)" DestinationFolder="$(OutDir)References" />
-    <Exec EnvironmentVariables="ASPNETCORE_ENVIRONMENT=Development" Command="$(NSwagExe_Net70) run nswag.json /variables:Configuration=$(Configuration) /runtime:Net70" />
+    <Exec EnvironmentVariables="ASPNETCORE_ENVIRONMENT=Development" Command="$(NSwagExe_Net80) run nswag.json /variables:Configuration=$(Configuration)" />
     <RemoveDir Directories="$(OutDir)References" />
   </Target>
 

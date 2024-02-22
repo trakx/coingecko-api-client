@@ -101,7 +101,7 @@ public partial class CoinGeckoClient : ICoinGeckoClient
     {
         if (vsCurrencies == null || vsCurrencies.Length == 0)
         {
-            vsCurrencies = new[] { MainQuoteCurrency };
+            vsCurrencies = [MainQuoteCurrency];
         }
 
         var supportedCurrencies = await GetSupportedQuoteCurrencies(cancellationToken);

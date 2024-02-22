@@ -26,7 +26,7 @@ public class CoinGeckoClientTestBase
         ServiceProvider = apiFixture.ServiceProvider;
     }
 
-    protected void EnsureAllJsonElementsWereMapped(object? obj)
+    protected static void EnsureAllJsonElementsWereMapped(object? obj)
     {
         if (obj == null) return;
 

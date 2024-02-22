@@ -13,7 +13,7 @@ using Trakx.Common.Logging;
 
 namespace Trakx.CoinGecko.ApiClient;
 
-public partial class CoinGeckoClient : ICoinGeckoClient
+public partial class CoinGeckoClient
 {
     private static readonly TimeSpan DefaultCacheLifeSpan = TimeSpan.FromDays(1);
 
@@ -216,7 +216,7 @@ public partial class CoinGeckoClient : ICoinGeckoClient
 
         if (ids != null) baseIds.AddRange(ids);
 
-        vsCurrencies ??= Array.Empty<string>();
+        vsCurrencies ??= [];
 
         foreach (var id in vsCurrencies)
         {

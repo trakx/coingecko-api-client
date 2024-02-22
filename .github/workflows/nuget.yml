@@ -9,11 +9,11 @@ on:
   workflow_run:
     workflows: ["Build and Test"]
     types: [completed]
-    branches-ignore: [ stage, master, prod ]
+    branches-ignore: [ stage, prod ]
 
   # so we treat these releases branches specially, using the push trigger directly.
   push:
-    branches: [ stage, master, prod ]
+    branches: [ stage, prod ]
 
   workflow_dispatch:
     inputs:
@@ -38,21 +38,21 @@ jobs:
     needs: [test]
     runs-on: ubuntu-latest
     if: |
-      always() && 
-        (needs.test.result == 'success' || (needs.test.result == 'skipped' 
-            && github.event_name == 'workflow_run' 
+      always() &&
+        (needs.test.result == 'success' || (needs.test.result == 'skipped'
+            && github.event_name == 'workflow_run'
             && github.event.workflow_run.conclusion == 'success' ))
 
     steps:
       - name: Default input values
         id: default-inputs
         run: |
-          debuggable="${{github.event.inputs.debuggable}}"
+          debuggable="${{inputs.debuggable}}"
           debuggable=${debuggable:-true}
           echo "debuggable=$debuggable" >> $GITHUB_OUTPUT
-          
-          semverIncrementLevel="${{github.event.inputs.semverIncrementLevel}}"
-          semverIncrementLevel=${semverIncrementLevel:-true}
+
+          semverIncrementLevel="${{inputs.semverIncrementLevel}}"
+          semverIncrementLevel=${semverIncrementLevel:-patch}
           echo "semverIncrementLevel=$semverIncrementLevel" >> $GITHUB_OUTPUT
 
       - name: Build and publish nuget packages
@@ -63,3 +63,4 @@ jobs:
           githubToken: ${{secrets.GITHUB_TOKEN}}
           debuggable: ${{steps.default-inputs.outputs.debuggable}}
           semverIncrementLevel: ${{steps.default-inputs.outputs.semverIncrementLevel}}
+          dotnetVersion: 8.x
