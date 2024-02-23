@@ -54,6 +54,7 @@ public class CoinGeckoApiFixture : IDisposable
 
         return
             new ConfigurationBuilder()
+            .AddJsonFile("appsettings.json")
             .AddAwsSystemManagerConfiguration(environment, assemblyResolver)
             .Build();
     }
