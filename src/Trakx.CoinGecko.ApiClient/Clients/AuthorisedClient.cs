@@ -7,5 +7,6 @@ public abstract class AuthorisedClient
     protected AuthorisedClient(ClientConfigurator configurator)
     {
         BaseUrl = configurator.Configuration.BaseUrl.AbsoluteUri;
+        if (BaseUrl[^1] != '/') BaseUrl += "/";
     }
 }
