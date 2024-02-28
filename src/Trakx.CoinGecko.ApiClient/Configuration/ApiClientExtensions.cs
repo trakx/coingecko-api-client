@@ -85,7 +85,7 @@ public static partial class ApiClientExtensions
 
         var clientType = typeof(TImplementation);
 
-        services
+        var httpClientBuilder = services
             .AddHttpClient<TInterface, TImplementation>(clientType.FullName!, configurator.ApplyConfiguration)
             .AddHttpMessageHandler<CachedHttpClientHandler>()
             .AddPolicyHandler((serviceProvider, _) =>
@@ -108,6 +108,14 @@ public static partial class ApiClientExtensions
                     })
                 .WithPolicyKey(clientType.FullName);
             });
+
+        httpClientBuilder.RemoveAllLoggers();
+        httpClientBuilder.AddLogger(s =>
+        {
+            var innerLogger = s.GetRequiredService<ILogger<HttpClientLogger>>();
+            return new HttpClientLogger(innerLogger);
+        });
+
 
         return services;
     }
