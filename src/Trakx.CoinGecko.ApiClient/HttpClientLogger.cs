@@ -17,10 +17,9 @@ public class HttpClientLogger : IHttpClientLogger
     public object? LogRequestStart(HttpRequestMessage request)
     {
         _logger.LogInformation(
-            "{Request.Method} {Request.Host}{Request.Path}",
+            "{Method} {OriginalString}",
             request.Method,
-            request.RequestUri?.GetComponents(UriComponents.SchemeAndServer, UriFormat.Unescaped),
-            request.RequestUri!.PathAndQuery);
+            request.RequestUri!.OriginalString);
 
         return null;
     }
@@ -35,7 +34,7 @@ public class HttpClientLogger : IHttpClientLogger
         if (response.StatusCode == System.Net.HttpStatusCode.OK) return;
 
         _logger.LogInformation(
-            "Received '{Response.StatusCodeInt} {Response.StatusCodeString}' after {Response.ElapsedMilliseconds}ms",
+            "Received '{StatusCodeInt} {StatusCodeString}' after {TotalMilliseconds}ms",
             (int)response.StatusCode,
             response.StatusCode,
             elapsed.TotalMilliseconds);
@@ -50,9 +49,8 @@ public class HttpClientLogger : IHttpClientLogger
     {
         _logger.LogError(
             exception,
-            "Request '{Request.Host}{Request.Path}' failed after {Response.ElapsedMilliseconds}ms",
-            request.RequestUri?.GetComponents(UriComponents.SchemeAndServer, UriFormat.Unescaped),
-            request.RequestUri!.PathAndQuery,
+            "Request '{OriginalString}' failed after {TotalMilliseconds}ms",
+            request.RequestUri!.OriginalString,
             elapsed.TotalMilliseconds);
     }
 }
