@@ -2,11 +2,11 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using Serilog;
 using Sprache;
+using Trakx.Common.Testing.Logging;
 
 namespace Trakx.CoinGecko.ApiClient.Tests.Integration;
 
@@ -18,10 +18,9 @@ public class CoinGeckoClientTestBase
 
     protected CoinGeckoClientTestBase(CoinGeckoApiFixture apiFixture, ITestOutputHelper output)
     {
-        Logger = new LoggerConfiguration()
-            .WriteTo.TestOutput(output)
-            .CreateLogger()
-            .ForContext(MethodBase.GetCurrentMethod()!.DeclaringType!);
+        Logger = output.SetupLoggingAndGetDefaultLogger();
+
+        apiFixture.ServiceCollection.SetupTestLoggerProvider(builder => builder.AddXUnit(output));
 
         ServiceProvider = apiFixture.ServiceProvider;
     }

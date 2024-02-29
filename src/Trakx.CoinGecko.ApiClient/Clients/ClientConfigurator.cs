@@ -15,7 +15,7 @@ public class ClientConfigurator
 
     internal void ApplyConfiguration(HttpClient client)
     {
-        if (Configuration.IsPro)
+        if (Configuration.IsPro && !client.DefaultRequestHeaders.Contains(ProHeader))
             client.DefaultRequestHeaders.Add(ProHeader, Configuration.ApiKey);
 
         if (Configuration.Timeout != default)

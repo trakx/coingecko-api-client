@@ -21,7 +21,10 @@ public class ApiTestCollection : ICollectionFixture<CoinGeckoApiFixture>
 
 public class CoinGeckoApiFixture : IDisposable
 {
-    public ServiceProvider ServiceProvider { get; }
+    private ServiceProvider? _serviceProvider;
+    public ServiceProvider ServiceProvider => _serviceProvider ??= ServiceCollection.BuildServiceProvider();
+
+    public ServiceCollection ServiceCollection { get; }
 
     public CoinGeckoApiFixture()
     {
@@ -30,11 +33,9 @@ public class CoinGeckoApiFixture : IDisposable
         var apiConfiguration = configurationRoot.GetConfiguration<CoinGeckoApiConfiguration>();
         var cacheConfiguration = configurationRoot.GetConfiguration<RedisCacheConfiguration>();
 
-        var serviceCollection = new ServiceCollection();
-        serviceCollection.AddCoinGeckoClient(apiConfiguration, cacheConfiguration);
-        SetupMemoryDistributedCache(serviceCollection);
-
-        ServiceProvider = serviceCollection.BuildServiceProvider();
+        ServiceCollection = new ServiceCollection();
+        ServiceCollection.AddCoinGeckoClient(apiConfiguration, cacheConfiguration);
+        SetupMemoryDistributedCache(ServiceCollection);
     }
 
     private static void SetupMemoryDistributedCache(ServiceCollection serviceCollection)
