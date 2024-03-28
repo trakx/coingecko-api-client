@@ -10,7 +10,7 @@
 
   <ItemGroup>
     <PackageReference Include="Ardalis.GuardClauses" Version="4.5.0" />
-    <PackageReference Include="NSwag.ApiDescription.Client" Version="14.0.3">
+    <PackageReference Include="NSwag.ApiDescription.Client" Version="14.0.4">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
@@ -18,11 +18,11 @@
         <PrivateAssets>all</PrivateAssets>
         <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       </PackageReference>
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="8.0.2" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="8.0.3" />
     <PackageReference Include="Polly.Caching.Memory" Version="3.0.2" />
-    <PackageReference Include="Trakx.Common.ApiClient" Version="1.0.4" />
-    <PackageReference Include="Trakx.Common.Caching" Version="1.0.4" />
-    <PackageReference Include="Trakx.Common.Infrastructure.Caching" Version="1.0.4" />
+    <PackageReference Include="Trakx.Common.ApiClient" Version="1.1.1" />
+    <PackageReference Include="Trakx.Common.Caching" Version="1.1.1" />
+    <PackageReference Include="Trakx.Common.Infrastructure.Caching" Version="1.1.1" />
   </ItemGroup>
 
   <Target Name="NSwag" BeforeTargets="Build" Condition="'$(GenerateApiClient)'=='True' ">
