@@ -17,7 +17,6 @@ public record CoinGeckoApiConfiguration
     public string ApiKey { get; init; } = string.Empty;
 
     /// <summary>How long to cache requests to the API, to reuse them and reduce usage. Default is 10 seconds.</summary>
-    [AwsParameter(AllowGlobal = true)]
     public TimeSpan CacheDuration { get; init; } = TimeSpan.FromSeconds(10);
 
     /// <summary>Timeout waiting for a response from the API. Default is 10 seconds.</summary>
