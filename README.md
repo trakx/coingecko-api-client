@@ -23,10 +23,14 @@ In order to be able to run some integration tests you should ensure that you hav
 ```awsParams
 # REPOSITORY SECRETS
 /[environment]/Trakx/CoinGecko/ApiClient/CoinGeckoApiConfiguration/ApiKey
+/[environment]/Trakx/CoinGecko/ApiClient/CoinGeckoApiConfiguration/BaseUrl
+/[environment]/Trakx/CoinGecko/ApiClient/CoinGeckoApiConfiguration/CacheDuration
 /[environment]/Trakx/CoinGecko/ApiClient/RedisCacheConfiguration/ConnectionString
 
 # GLOBAL SECRETS
 # Instead of creating a specific repository secret, can use the global one with the same [Key]
 /[environment]/Global/CoinGeckoApiConfiguration/ApiKey
+/[environment]/Global/CoinGeckoApiConfiguration/BaseUrl
+/[environment]/Global/CoinGeckoApiConfiguration/CacheDuration
 /[environment]/Global/RedisCacheConfiguration/ConnectionString
 ```

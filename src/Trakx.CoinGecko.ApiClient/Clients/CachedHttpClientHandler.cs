@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using System;
+using System.Net;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
@@ -16,7 +17,7 @@ public sealed record CachedHttpResponse(HttpStatusCode StatusCode, string Conten
 public class CachedHttpClientHandler : DelegatingHandler
 {
     private readonly IDistributedCache _cache;
-    private readonly DistributedCacheEntryOptions _cacheOptions;
+    private readonly DistributedCacheEntryOptions _cacheOptions = new();
 
     private static readonly ILogger Logger = LoggerProvider.Create<CachedHttpClientHandler>();
 
@@ -28,10 +29,10 @@ public class CachedHttpClientHandler : DelegatingHandler
     {
         _cache = cache;
 
-        _cacheOptions = new()
+        if (apiConfiguration.CacheDuration > TimeSpan.Zero)
         {
-            AbsoluteExpirationRelativeToNow = apiConfiguration.CacheDuration
-        };
+            _cacheOptions.AbsoluteExpirationRelativeToNow = apiConfiguration.CacheDuration;
+        }
     }
 
     /// <inheritdoc cref="SendAsyncInternal"/>
