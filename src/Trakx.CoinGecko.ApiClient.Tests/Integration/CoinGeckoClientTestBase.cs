@@ -5,7 +5,6 @@ using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using Sprache;
 using Trakx.Common.Testing.Logging;
 
 namespace Trakx.CoinGecko.ApiClient.Tests.Integration;

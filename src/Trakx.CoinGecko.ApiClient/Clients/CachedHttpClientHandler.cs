@@ -3,7 +3,6 @@ using System.Net;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-using Ardalis.GuardClauses;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Logging;
 using Trakx.Common.ApiClient.Exceptions;
@@ -57,7 +56,7 @@ public class CachedHttpClientHandler : DelegatingHandler
     /// <param name="cancellationToken"></param>
     internal async Task<HttpResponseMessage> SendAsyncInternal(HttpRequestMessage request, CancellationToken cancellationToken)
     {
-        Guard.Against.Null(request);
+        if (request == null) throw new ArgumentNullException(nameof(request));
 
         // Data cache is only applicable for GET operations
         if (request.Method != HttpMethod.Get)
