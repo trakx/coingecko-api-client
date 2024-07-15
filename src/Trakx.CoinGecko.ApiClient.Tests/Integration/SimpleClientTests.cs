@@ -29,4 +29,11 @@ public class SimpleClientTests : CoinGeckoClientTestBase
         price.Content[id][Constants.Usd].Should().BeGreaterThan(0);
     }
 
+    [Fact]
+    public async Task Supported_vs_currencies()
+    {
+        var currencies = await _simpleClient.Supported_vs_currenciesAsync(default);
+        currencies.StatusCode.Should().Be((int)HttpStatusCode.OK);
+        currencies.Content.Should().NotBeEmpty();
+    }
 }

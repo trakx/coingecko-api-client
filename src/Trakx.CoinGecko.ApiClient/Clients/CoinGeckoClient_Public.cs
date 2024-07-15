@@ -4,7 +4,6 @@ using System.Linq;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using Ardalis.GuardClauses;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using Trakx.CoinGecko.ApiClient.Models;
@@ -54,8 +53,8 @@ public partial class CoinGeckoClient : ICoinGeckoClient
         string quoteCurrencyId = Constants.UsdCoin,
         CancellationToken cancellationToken = default)
     {
-        Guard.Against.NullOrWhiteSpace(coinGeckoId);
-        Guard.Against.NullOrWhiteSpace(quoteCurrencyId);
+        if(coinGeckoId.IsNullOrWhiteSpace()) throw new ArgumentException($"{nameof(coinGeckoId)} cannot be null or empty");
+        if(quoteCurrencyId.IsNullOrWhiteSpace()) throw new ArgumentException($"{nameof(quoteCurrencyId)} cannot be null or empty");
 
         var prices = await GetAllPrices(
             coinGeckoId.AsSingletonIEnumerable(),
@@ -72,7 +71,7 @@ public partial class CoinGeckoClient : ICoinGeckoClient
         string[]? vsCurrencies = default,
         CancellationToken cancellationToken = default)
     {
-        Guard.Against.Null(ids);
+        if (ids == null) throw new ArgumentNullException(nameof(ids));
 
         var supportedCurrencies = await GetSupportedQuoteCurrencies(cancellationToken);
 
