@@ -4,12 +4,9 @@ using System.Globalization;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Ardalis.GuardClauses;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
-using StackExchange.Redis;
 using Trakx.Common.Extensions;
-using Trakx.Common.Logging;
 
 namespace Trakx.CoinGecko.ApiClient;
 
@@ -165,7 +162,10 @@ public partial class CoinGeckoClient
 
     private async Task<decimal> GetUsdFxRate(string quoteCurrencyId, string date)
     {
-        Guard.Against.NullOrWhiteSpace(quoteCurrencyId);
+        if (quoteCurrencyId.IsNullOrWhiteSpace())
+            throw new ArgumentException($"{nameof(quoteCurrencyId)} can not be null or whitespace",
+                nameof(quoteCurrencyId));
+
         var cacheKey = $"{_typeName}|usd-fx-rate|{quoteCurrencyId}|{date}";
         return await GetFromCacheOrApi(cacheKey, async () => await GetUsdFxRateFromApi(quoteCurrencyId, date));
     }
