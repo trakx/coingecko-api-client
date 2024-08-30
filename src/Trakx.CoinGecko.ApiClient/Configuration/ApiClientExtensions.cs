@@ -109,13 +109,7 @@ public static partial class ApiClientExtensions
                 .WithPolicyKey(clientType.FullName);
             });
 
-        httpClientBuilder.RemoveAllLoggers();
-        httpClientBuilder.AddLogger(s =>
-        {
-            var innerLogger = s.GetRequiredService<ILogger<HttpClientLogger>>();
-            return new HttpClientLogger(innerLogger);
-        });
-
+        httpClientBuilder.SetCustomLogger();
 
         return services;
     }
