@@ -28,22 +28,31 @@
       "exposeJsonSerializerSettings": false,
       "clientClassAccessModifier": "internal",
       "typeAccessModifier": "public",
-      "generateContractsOutput": false,
-      "contractsNamespace": null,
-      "contractsOutputFilePath": null,
+
       "parameterDateTimeFormat": "s",
       "parameterDateFormat": "yyyy-MM-dd",
       "generateUpdateJsonSerializerSettingsMethod": true,
       "useRequestAndResponseSerializationSettings": false,
       "serializeTypeInformation": false,
       "queryNullValue": "",
-      "className": "{controller}Client",
       "operationGenerationMode": "MultipleClientsFromFirstTagAndOperationId",
+      
+      "className": "{controller}Client",
+      "namespace": "Trakx.CoinGecko.ApiClient",
+      "output": "ApiClients.cs",
       "additionalNamespaceUsages": [
         "Trakx.Common.ApiClient",
         "Trakx.Common.ApiClient.Exceptions"
       ],
-      "additionalContractNamespaceUsages": [],
+      
+      "generateContractsOutput": true,
+      "contractsNamespace": "Trakx.CoinGecko.ApiClient",
+      "contractsOutputFilePath": "ApiClientInterfaces.cs",
+      "additionalContractNamespaceUsages": [
+        "Trakx.Common.ApiClient",
+        "Trakx.Common.ApiClient.Exceptions"
+      ],
+
       "generateOptionalParameters": true,
       "generateJsonMethods": false,
       "enforceFlagEnums": false,
@@ -55,7 +64,6 @@
       "wrapResponseMethods": [],
       "generateResponseClasses": false,
       "responseClass": "Response",
-      "namespace": "Trakx.CoinGecko.ApiClient",
       "requiredPropertiesMustBeDefined": true,
       "dateType": "System.DateTimeOffset",
       "jsonConverters": null,
@@ -89,8 +97,7 @@
       "propertyNameGeneratorType": null,
       "enumNameGeneratorType": null,
       "serviceHost": null,
-      "serviceSchemes": null,
-      "output": "ApiClients.cs"
+      "serviceSchemes": null
     }
   }
 }
