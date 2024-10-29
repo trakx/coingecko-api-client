@@ -171,7 +171,7 @@ public partial class CoinGeckoClientTests
     }
 
     [Fact]
-    public async Task GetCoinGeckoIdFromSymbol_only_returns_valid_data_if_coin_is_ranked()
+    public async Task GetCoinGeckoIdFromSymbol_queries_markets_for_highest_ranked_symbols()
     {
         var symbol = _mockCreator.GetString(30);
         // no market rank setup
