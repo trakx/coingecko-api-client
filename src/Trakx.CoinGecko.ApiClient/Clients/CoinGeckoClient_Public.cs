@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Caching.Memory;
@@ -53,8 +52,8 @@ public partial class CoinGeckoClient : ICoinGeckoClient
         string quoteCurrencyId = Constants.UsdCoin,
         CancellationToken cancellationToken = default)
     {
-        if(coinGeckoId.IsNullOrWhiteSpace()) throw new ArgumentException($"{nameof(coinGeckoId)} cannot be null or empty");
-        if(quoteCurrencyId.IsNullOrWhiteSpace()) throw new ArgumentException($"{nameof(quoteCurrencyId)} cannot be null or empty");
+        if (coinGeckoId.IsNullOrWhiteSpace()) throw new ArgumentException($"{nameof(coinGeckoId)} cannot be null or empty");
+        if (quoteCurrencyId.IsNullOrWhiteSpace()) throw new ArgumentException($"{nameof(quoteCurrencyId)} cannot be null or empty");
 
         var prices = await GetAllPrices(
             coinGeckoId.AsSingletonIEnumerable(),
@@ -71,20 +70,9 @@ public partial class CoinGeckoClient : ICoinGeckoClient
         string[]? vsCurrencies = default,
         CancellationToken cancellationToken = default)
     {
-        if (ids == null) throw new ArgumentNullException(nameof(ids));
+        ArgumentNullException.ThrowIfNull(ids);
 
-        var supportedCurrencies = await GetSupportedQuoteCurrencies(cancellationToken);
-
-        (var baseIds, var quoteIds) = GetIdsForPriceQuery(ids, vsCurrencies, supportedCurrencies);
-
-        var response = await _simpleClient
-            .PriceAsync(baseIds, quoteIds, cancellationToken: cancellationToken)
-            .ConfigureAwait(false);
-
-        if (Logger.IsEnabled(LogLevel.Debug))
-        {
-            Logger.LogDebug("Received latest price {PriceAsyncResponse}", JsonSerializer.Serialize(response));
-        }
+        var response = await GetAllPricesInternal(ids, vsCurrencies, cancellationToken);
 
         var prices = new MultiplePrices(response.Content);
         return prices;
@@ -103,9 +91,7 @@ public partial class CoinGeckoClient : ICoinGeckoClient
             vsCurrencies = [MainQuoteCurrency];
         }
 
-        var supportedCurrencies = await GetSupportedQuoteCurrencies(cancellationToken);
-
-        (var baseIds, var quoteIds) = GetIdsForPriceQuery(ids, vsCurrencies, supportedCurrencies);
+        (var baseIds, var quoteIds) = await GetIdsForPriceQuery(ids, vsCurrencies, cancellationToken);
 
         var coinPrices = await _simpleClient.PriceAsync(
             baseIds, quoteIds,
@@ -144,8 +130,43 @@ public partial class CoinGeckoClient : ICoinGeckoClient
     /// <inheritdoc />
     public async Task<string?> GetCoinGeckoIdFromSymbol(string symbol, CancellationToken cancellationToken = default)
     {
-        var cacheKey = $"{_typeName}|coingeckoid-from|{symbol}";
-        return await GetFromCacheOrApi(cacheKey, async () => await GetCoinGeckoIdFromSymbolFromApi(symbol, cancellationToken));
+        var map = await GetSymbolToCoinGeckoIdMap(cancellationToken);
+        var coingeckoIds = map.GetValueOrDefault(symbol);
+        return coingeckoIds?.FirstOrDefault();
+    }
+
+    /// <inheritdoc />
+    public async Task<PricesForSymbols> GetAllPricesForSymbols(
+        IList<string> symbols,
+        string[]? vsCurrencies = default,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(symbols);
+
+        // Map each symbol e.g. "btc" to the corresponding coingeckoid e.g. "bitcoin".
+        // The result is a map / lookup because some symbols can be mapped to multiple tokens, like "UNI".
+        var symbolIdMap = await GetSymbolToCoinGeckoIdMap(cancellationToken);
+
+        var ids = symbolIdMap.SelectMany(p => p.Value).ToList();
+
+        var priceResponse = await GetAllPricesInternal(ids, vsCurrencies, cancellationToken);
+        var pricesPerId = priceResponse.Content;
+
+        return new PricesForSymbols()
+        {
+            // these prices are indexed by coingecko id
+            Prices = new MultiplePrices(priceResponse.Content),
+
+            // necessary so the caller can navigate symbol -> coingeckoid(s) -> price(s)
+            SymbolToIdMap = symbolIdMap,
+        };
+    }
+
+    /// <inheritdoc />
+    public async Task<SymbolToCoinGeckoIdsMap> GetSymbolToCoinGeckoIdMap(CancellationToken cancellationToken = default)
+    {
+        var cacheKey = $"{_typeName}|symbol-to-ids-map";
+        return await GetFromCacheOrApi(cacheKey, async () => await GetSymbolToCoinGeckoIdMapInternal(cancellationToken));
     }
 
     /// <inheritdoc />

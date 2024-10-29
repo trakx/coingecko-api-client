@@ -173,12 +173,17 @@ public class CoinGeckoClientTests
     }
 
     [Fact]
-    public async Task GetCoinGeckoIdFromSymbol_should_return_valid_data_when_passing_valid_id()
+    public async Task GetCoinGeckoIdFromSymbol_only_returns_valid_data_if_coin_is_ranked()
     {
         var symbol = _mockCreator.GetString(30);
-        ConfigureListAllAsync(_coin, symbol);
+        // no market rank setup
+
         var result = await _coinGeckoClient.GetCoinGeckoIdFromSymbol(symbol);
-        result.Should().Be(_coin);
+        result.Should().Be(null);
+
+        await _coinsClient
+            .ReceivedWithAnyArgs()
+            .MarketsAsync(Arg.Any<string>(), result, null, null, null, null);
     }
 
     [Fact]
