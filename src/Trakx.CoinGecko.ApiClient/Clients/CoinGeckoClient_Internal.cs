@@ -17,6 +17,16 @@ public partial class CoinGeckoClient
 {
     private static readonly TimeSpan DefaultCacheLifeSpan = TimeSpan.FromDays(1);
 
+    private async Task<string?> GetCoinGeckoIdFromSymbolInternal(string symbol, CancellationToken cancellationToken)
+    {
+        var map = await GetSymbolToCoinGeckoIdMap(cancellationToken);
+        var id = map.GetValueOrDefault(symbol)?.FirstOrDefault();
+        if (id != null) return id;
+
+        // TODO: search the API for tokens with the symbol
+        return null;
+    }
+
     private async Task<SymbolToCoinGeckoIdsMap> GetSymbolToCoinGeckoIdMapInternal(CancellationToken cancellationToken)
     {
         // get the highest ranked coin
@@ -32,8 +42,7 @@ public partial class CoinGeckoClient
         var bestCandidates = rankLookup.ToDictionary(
             group => group.Key,
             group => group
-                .Where(p => p.MarketCapRank > 0)
-                .OrderBy(p => p.MarketCapRank)
+                .OrderBy(p => p.MarketCapRank ?? int.MaxValue)
                 .Select(p => p.CoinId!).ToArray());
 
         return bestCandidates;

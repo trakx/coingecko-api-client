@@ -145,9 +145,9 @@ public partial class CoinGeckoClient : ICoinGeckoClient
 
         // Map each symbol e.g. "btc" to the corresponding coingeckoid e.g. "bitcoin".
         // The result is a map / lookup because some symbols can be mapped to multiple tokens, like "UNI".
-        var symbolIdMap = await GetSymbolToCoinGeckoIdMap(cancellationToken);
+        var symbolIdMap = await GetIdsFromSymbols(symbols, cancellationToken);
 
-        var ids = GetIdsFromSymbols(symbols, symbolIdMap);
+        var ids = symbolIdMap.SelectMany(p => p.Value).ToList();
 
         var priceResponse = await GetAllPricesInternal(ids, vsCurrencies, cancellationToken);
 
@@ -161,18 +161,14 @@ public partial class CoinGeckoClient : ICoinGeckoClient
         };
     }
 
-    private static List<string> GetIdsFromSymbols(IList<string> symbols, SymbolToCoinGeckoIdsMap symbolIdMap)
+    private async Task<SymbolToCoinGeckoIdsMap> GetIdsFromSymbols(IList<string> symbols, CancellationToken cancellationToken)
     {
-        List<string> ids = [];
+        var fullMap = await GetSymbolToCoinGeckoIdMap(cancellationToken);
+        var symbolsSet = symbols.ToHashSet(StringComparer.OrdinalIgnoreCase);
 
-        foreach (var symbol in symbols)
-        {
-            var mappedCoinGeckoIds = symbolIdMap.GetValueOrDefault(symbol);
-            if (mappedCoinGeckoIds == null) continue;
-            ids.AddRange(mappedCoinGeckoIds);
-        }
-
-        return ids;
+        return fullMap
+            .Where(p => symbolsSet.Contains(p.Key))
+            .ToDictionary(p => p.Key, p => p.Value);
     }
 
     /// <inheritdoc />

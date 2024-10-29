@@ -56,7 +56,7 @@ public class CachedHttpClientHandler : DelegatingHandler
     /// <param name="cancellationToken"></param>
     internal async Task<HttpResponseMessage> SendAsyncInternal(HttpRequestMessage request, CancellationToken cancellationToken)
     {
-        if (request == null) throw new ArgumentNullException(nameof(request));
+        ArgumentNullException.ThrowIfNull(request);
 
         // Data cache is only applicable for GET operations
         if (request.Method != HttpMethod.Get)
