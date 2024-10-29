@@ -99,13 +99,13 @@ public partial class CoinGeckoClientTests
         {
             Market_caps = new List<TimestampedValue>
             {
-                new() { dates[0], 318992245176.35913 },
-                new() { dates[1], 319632242563.95764 },
+                new() { dates[0], 318_992_245_176.35913 },
+                new() { dates[1], 319_632_242_563.95764 },
             },
             Total_volumes = new List<TimestampedValue>
             {
-                new() { dates[0], 38069451649.54143 },
-                new() { dates[1], 38825217290.29339 },
+                new() { dates[0], 38_069_451_649.54143 },
+                new() { dates[1], 38_825_217_290.29339 },
             },
             Prices = new List<TimestampedValue>
             {
