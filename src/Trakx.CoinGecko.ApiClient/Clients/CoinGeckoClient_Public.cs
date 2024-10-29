@@ -147,7 +147,7 @@ public partial class CoinGeckoClient : ICoinGeckoClient
         // The result is a map / lookup because some symbols can be mapped to multiple tokens, like "UNI".
         var symbolIdMap = await GetSymbolToCoinGeckoIdMap(cancellationToken);
 
-        var ids = symbolIdMap.SelectMany(p => p.Value).ToList();
+        var ids = GetIdsFromSymbols(symbols, symbolIdMap);
 
         var priceResponse = await GetAllPricesInternal(ids, vsCurrencies, cancellationToken);
 
@@ -159,6 +159,20 @@ public partial class CoinGeckoClient : ICoinGeckoClient
             // necessary so the caller can navigate symbol -> coingeckoid(s) -> price(s)
             SymbolToIdMap = symbolIdMap,
         };
+    }
+
+    private static List<string> GetIdsFromSymbols(IList<string> symbols, SymbolToCoinGeckoIdsMap symbolIdMap)
+    {
+        List<string> ids = [];
+
+        foreach (var symbol in symbols)
+        {
+            var mappedCoinGeckoIds = symbolIdMap.GetValueOrDefault(symbol);
+            if (mappedCoinGeckoIds == null) continue;
+            ids.AddRange(mappedCoinGeckoIds);
+        }
+
+        return ids;
     }
 
     /// <inheritdoc />
