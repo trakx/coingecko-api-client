@@ -150,7 +150,6 @@ public partial class CoinGeckoClient : ICoinGeckoClient
         var ids = symbolIdMap.SelectMany(p => p.Value).ToList();
 
         var priceResponse = await GetAllPricesInternal(ids, vsCurrencies, cancellationToken);
-        var pricesPerId = priceResponse.Content;
 
         return new PricesForSymbols()
         {
