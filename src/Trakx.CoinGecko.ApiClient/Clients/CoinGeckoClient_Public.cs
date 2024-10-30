@@ -52,8 +52,8 @@ public partial class CoinGeckoClient : ICoinGeckoClient
         string quoteCurrencyId = Constants.UsdCoin,
         CancellationToken cancellationToken = default)
     {
-        if (coinGeckoId.IsNullOrWhiteSpace()) throw new ArgumentException($"{nameof(coinGeckoId)} cannot be null or empty");
-        if (quoteCurrencyId.IsNullOrWhiteSpace()) throw new ArgumentException($"{nameof(quoteCurrencyId)} cannot be null or empty");
+        ArgumentException.ThrowIfNullOrWhiteSpace(coinGeckoId);
+        ArgumentException.ThrowIfNullOrWhiteSpace(quoteCurrencyId);
 
         var prices = await GetAllPrices(
             coinGeckoId.AsSingletonIEnumerable(),

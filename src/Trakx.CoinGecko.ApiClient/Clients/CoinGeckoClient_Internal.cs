@@ -173,10 +173,7 @@ public partial class CoinGeckoClient
 
     private async Task<decimal> GetUsdFxRate(string quoteCurrencyId, string date)
     {
-        if (quoteCurrencyId.IsNullOrWhiteSpace())
-            throw new ArgumentException($"{nameof(quoteCurrencyId)} can not be null or whitespace",
-                nameof(quoteCurrencyId));
-
+        ArgumentException.ThrowIfNullOrWhiteSpace(quoteCurrencyId);
         var cacheKey = $"{_typeName}|usd-fx-rate|{quoteCurrencyId}|{date}";
         return await GetFromCacheOrApi(cacheKey, async () => await GetUsdFxRateFromApi(quoteCurrencyId, date));
     }
