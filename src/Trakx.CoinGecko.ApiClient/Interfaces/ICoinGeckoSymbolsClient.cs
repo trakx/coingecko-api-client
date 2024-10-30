@@ -1,4 +1,4 @@
-﻿namespace Trakx.CoinGecko.ApiClient;
+namespace Trakx.CoinGecko.ApiClient;
 
 public interface ICoinGeckoSymbolsClient
 {
