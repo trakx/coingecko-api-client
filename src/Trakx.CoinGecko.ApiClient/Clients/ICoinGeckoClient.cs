@@ -11,17 +11,37 @@ public interface ICoinGeckoClient
     internal const string MainQuoteCurrency = Constants.Usd;
     internal const int MarketRankDefaultLimit = 1000;
 
+
     // symbol operations
 
+    /// <summary>Convert a token symbol to its corresponding CoinGecko Id.</summary>
     Task<string?> GetCoinGeckoIdFromSymbol(string symbol, CancellationToken cancellationToken = default);
 
+    /// <summary>List all supported coins id, name and symbol (no pagination required)</summary>
     Task<IList<CoinList>> GetCoinList(CancellationToken cancellationToken = default);
 
+    /// <summary>List all <see cref="Coins"/> which symbol match <paramref name="symbol"/> exactly.</summary>
+    Task<List<Coins>> GetCoinsFromSymbol(string symbol, CancellationToken cancellationToken);
+
+    /// <summary>Map all symbols of ranked tokens with their respective CoinGecko Ids.</summary>
+    Task<SymbolToCoinGeckoIdsMap> MapRankedSymbolsToCoinGeckoIds(CancellationToken cancellationToken = default);
+
+    /// <summary>Get list of supported quote currencies (vs_currencies).</summary>
     Task<ICollection<string>> GetSupportedQuoteCurrencies(CancellationToken cancellationToken = default);
 
 
     // price operations
 
+    /// <summary>
+    /// As of 2023-06-23, CoinGecko does not support USDc as a quote currency.
+    /// <see href="https://api.coingecko.com/api/v3/simple/supported_vs_currencies"/>
+    /// As such, we need to:
+    /// <list type="bullet">
+    /// <item><description>Use USD as the 'vs currency' in the API call</description></item>
+    /// <item><description>Also get the price of the wanted quote currency</description></item>
+    /// <item><description>Convert the prices to the wanted quote currency</description></item>
+    /// </list>
+    /// </summary>
     Task<decimal?> GetLatestPrice(
         string coinGeckoId,
         string quoteCurrencyId = Constants.UsdCoin,
@@ -37,6 +57,7 @@ public interface ICoinGeckoClient
         string[]? vsCurrencies = default,
         CancellationToken cancellationToken = default);
 
+    /// <summary>Returns a collection of extended prices.</summary>
     Task<IList<ExtendedPrice>> GetAllPricesExtended(
         IEnumerable<string> ids,
         string[]? vsCurrencies = default,

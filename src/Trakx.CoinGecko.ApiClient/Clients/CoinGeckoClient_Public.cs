@@ -40,16 +40,7 @@ public partial class CoinGeckoClient : ICoinGeckoClient
         _typeName = GetType().FullName;
     }
 
-    /// <summary>
-    /// As of 2023-06-23, CoinGecko does not support USDc as a quote currency.
-    /// <see href="https://api.coingecko.com/api/v3/simple/supported_vs_currencies"/>
-    /// As such, we need to:
-    /// <list type="bullet">
-    /// <item><description>Use USD as the 'vs currency' in the API call</description></item>
-    /// <item><description>Also get the price of the wanted quote currency</description></item>
-    /// <item><description>Convert the prices to the wanted quote currency</description></item>
-    /// </list>
-    /// </summary>
+    /// <inheritdoc />
     public async Task<decimal?> GetLatestPrice(
         string coinGeckoId,
         string quoteCurrencyId = Constants.UsdCoin,
@@ -133,9 +124,8 @@ public partial class CoinGeckoClient : ICoinGeckoClient
     /// <inheritdoc />
     public async Task<string?> GetCoinGeckoIdFromSymbol(string symbol, CancellationToken cancellationToken = default)
     {
-        var map = await GetSymbolToCoinGeckoIdMap(cancellationToken);
-        var coingeckoIds = map.GetValueOrDefault(symbol);
-        return coingeckoIds?.FirstOrDefault();
+        var cacheKey = $"{_typeName}|id-from-symbol|{symbol}";
+        return await GetFromCacheOrApi(cacheKey, async () => await GetCoinGeckoIdFromSymbolInternal(symbol, cancellationToken));
     }
 
     /// <inheritdoc />
@@ -148,7 +138,7 @@ public partial class CoinGeckoClient : ICoinGeckoClient
 
         // Map each symbol e.g. "btc" to the corresponding coingeckoid e.g. "bitcoin".
         // The result is a map / lookup because some symbols can be mapped to multiple tokens, like "UNI".
-        var symbolIdMap = await GetIdsFromSymbols(symbols, cancellationToken);
+        var symbolIdMap = await GetIdsFromSymbolsInternal(symbols, cancellationToken);
 
         var ids = symbolIdMap.SelectMany(p => p.Value).ToList();
 
@@ -164,32 +154,15 @@ public partial class CoinGeckoClient : ICoinGeckoClient
         };
     }
 
-    private async Task<SymbolToCoinGeckoIdsMap> GetIdsFromSymbols(IList<string> symbols, CancellationToken cancellationToken)
+    /// <inheritdoc />
+    public async Task<List<Coins>> GetCoinsFromSymbol(string symbol, CancellationToken cancellationToken)
     {
-        // we can get a full "symbol -> coingecko id" map from the market data rank
-        // which is needed for a few things and cached for a day
-        var fullMap = await GetSymbolToCoinGeckoIdMap(cancellationToken);
-        var symbolsSet = symbols.ToHashSet(StringComparer.OrdinalIgnoreCase);
-
-        var result = fullMap
-            .Where(p => symbolsSet.Contains(p.Key))
-            .ToDictionary(p => p.Key, p => p.Value, StringComparer.OrdinalIgnoreCase);
-
-        // for any unranked coins, we can search the API for the symbol
-        foreach (var symbol in symbolsSet)
-        {
-            if (result.ContainsKey(symbol)) continue;
-            var coins = await GetCoinsFromSymbolInternal(symbol, cancellationToken);
-            if (coins.IsNullOrEmpty()) continue;
-            var ids = coins.Select(p => p.Id).ToArray();
-            result.Add(symbol, ids);
-        }
-
-        return result;
+        var cacheKey = $"{_typeName}|coins-from-symbol|{symbol}";
+        return await GetFromCacheOrApi(cacheKey, async () => await GetCoinsFromSymbolInternal(symbol, cancellationToken));
     }
 
     /// <inheritdoc />
-    public async Task<SymbolToCoinGeckoIdsMap> GetSymbolToCoinGeckoIdMap(CancellationToken cancellationToken = default)
+    public async Task<SymbolToCoinGeckoIdsMap> MapRankedSymbolsToCoinGeckoIds(CancellationToken cancellationToken = default)
     {
         var cacheKey = $"{_typeName}|symbol-to-ids-map";
         return await GetFromCacheOrApi(cacheKey, async () => await GetSymbolToCoinGeckoIdMapInternal(cancellationToken));
@@ -217,6 +190,7 @@ public partial class CoinGeckoClient : ICoinGeckoClient
         return await GetFromCacheOrApi(cacheKey, async () => await GetMarketDataAsOfFromIdFromApi(id, asOf, quoteCurrencyId, date));
     }
 
+    /// <inheritdoc />
     public async Task<IDictionary<DateTimeOffset, MarketData>> GetMarketDataForDateRange(
         string id, string vsCurrency,
         DateTimeOffset start, DateTimeOffset end,
@@ -234,6 +208,7 @@ public partial class CoinGeckoClient : ICoinGeckoClient
         return await GetFromCacheOrApi(cacheKey, async () => await GetMarketDataForDateRangeFromApi(id, vsCurrency, startUnix, endUnix, cancellationToken));
     }
 
+    /// <inheritdoc />
     public async Task<IDictionary<DateTimeOffset, MarketData>> GetMarketData(
         string id, string vsCurrency, int days, CancellationToken cancellationToken = default)
     {
@@ -245,6 +220,7 @@ public partial class CoinGeckoClient : ICoinGeckoClient
         return await GetFromCacheOrApi(cacheKey, async () => await GetMarketDataFromApi(id, vsCurrency, days, cancellationToken));
     }
 
+    /// <inheritdoc />
     public async Task<List<MarketData>> Search(
         string vsCurrency = Constants.Usd,
         string? ids = null,
@@ -259,7 +235,9 @@ public partial class CoinGeckoClient : ICoinGeckoClient
     }
 
     /// <inheritdoc />
-    public async Task<IList<MarketData>> GetMarketRank(int limit = ICoinGeckoClient.MarketRankDefaultLimit, CancellationToken cancellationToken = default)
+    public async Task<IList<MarketData>> GetMarketRank(
+        int limit = ICoinGeckoClient.MarketRankDefaultLimit,
+        CancellationToken cancellationToken = default)
     {
         // The default limit is 1000 coins in the results.
         // We can cache the calls to get 1000 ranked coins daily.
