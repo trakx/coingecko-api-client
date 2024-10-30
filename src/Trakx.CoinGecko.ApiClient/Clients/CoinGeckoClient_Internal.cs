@@ -23,8 +23,20 @@ public partial class CoinGeckoClient
         var id = map.GetValueOrDefault(symbol)?.FirstOrDefault();
         if (id != null) return id;
 
-        // TODO: search the API for tokens with the symbol
-        return null;
+        var coins = await GetCoinsFromSymbolInternal(symbol, cancellationToken);
+
+        // coins come ordered by market rank desc (i.e. most valuable first)
+        return coins?.FirstOrDefault()?.Api_symbol;
+    }
+
+    private async Task<List<Coins>> GetCoinsFromSymbolInternal(string symbol, CancellationToken cancellationToken)
+    {
+        var search = await _searchClient.SearchDataAsync(symbol, cancellationToken);
+        return search
+            ?.Content?.Coins
+            ?.Where(p => p.Symbol.EqualsIgnoreCase(symbol))
+            ?.ToList()
+            ?? [];
     }
 
     private async Task<SymbolToCoinGeckoIdsMap> GetSymbolToCoinGeckoIdMapInternal(CancellationToken cancellationToken)

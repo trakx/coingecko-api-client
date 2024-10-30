@@ -19,6 +19,7 @@ public partial class CoinGeckoClient : ICoinGeckoClient
     private readonly IMemoryCache _cache;
     private readonly ICoinsClient _coinsClient;
     private readonly ISimpleClient _simpleClient;
+    private readonly ISearchClient _searchClient;
     private readonly IDateTimeProvider _dateTimeProvider;
     private readonly string? _typeName;
 
@@ -28,11 +29,13 @@ public partial class CoinGeckoClient : ICoinGeckoClient
         IMemoryCache cache,
         ICoinsClient coinsClient,
         ISimpleClient simpleClient,
+        ISearchClient searchClient,
         IDateTimeProvider dateTimeProvider)
     {
         _cache = cache;
         _coinsClient = coinsClient;
         _simpleClient = simpleClient;
+        _searchClient = searchClient;
         _dateTimeProvider = dateTimeProvider;
         _typeName = GetType().FullName;
     }
@@ -163,12 +166,26 @@ public partial class CoinGeckoClient : ICoinGeckoClient
 
     private async Task<SymbolToCoinGeckoIdsMap> GetIdsFromSymbols(IList<string> symbols, CancellationToken cancellationToken)
     {
+        // we can get a full "symbol -> coingecko id" map from the market data rank
+        // which is needed for a few things and cached for a day
         var fullMap = await GetSymbolToCoinGeckoIdMap(cancellationToken);
         var symbolsSet = symbols.ToHashSet(StringComparer.OrdinalIgnoreCase);
 
-        return fullMap
+        var result = fullMap
             .Where(p => symbolsSet.Contains(p.Key))
-            .ToDictionary(p => p.Key, p => p.Value);
+            .ToDictionary(p => p.Key, p => p.Value, StringComparer.OrdinalIgnoreCase);
+
+        // for any unranked coins, we can search the API for the symbol
+        foreach (var symbol in symbolsSet)
+        {
+            if (result.ContainsKey(symbol)) continue;
+            var coins = await GetCoinsFromSymbolInternal(symbol, cancellationToken);
+            if (coins.IsNullOrEmpty()) continue;
+            var ids = coins.Select(p => p.Id).ToArray();
+            result.Add(symbol, ids);
+        }
+
+        return result;
     }
 
     /// <inheritdoc />

@@ -28,6 +28,7 @@ public partial class CoinGeckoClientTests
     public CoinGeckoClientTests(ITestOutputHelper output)
     {
         _simpleClient = Substitute.For<ISimpleClient>();
+        var searchClient = Substitute.For<ISearchClient>();
         _coinsClient = Substitute.For<ICoinsClient>();
         _memoryCache = Substitute.For<IMemoryCache>();
         _mockCreator = new MockCreator(output);
@@ -36,7 +37,12 @@ public partial class CoinGeckoClientTests
         var dateTimeProvider = Substitute.For<IDateTimeProvider>();
         dateTimeProvider.UtcNowAsOffset.Returns(now);
 
-        _coinGeckoClient = new CoinGeckoClient(_memoryCache, _coinsClient, _simpleClient, dateTimeProvider);
+        _coinGeckoClient = new CoinGeckoClient(
+            _memoryCache,
+            _coinsClient,
+            _simpleClient,
+            searchClient,
+            dateTimeProvider);
 
         _coin = _mockCreator.GetString(5);
         _start = now.AddMonths(-2);
