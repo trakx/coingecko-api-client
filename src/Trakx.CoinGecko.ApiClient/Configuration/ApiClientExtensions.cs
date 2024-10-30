@@ -73,7 +73,8 @@ public static partial class ApiClientExtensions
             .AddHttpClientForCoinGeckoClient<IPingClient, PingClient>(configurator, delays)
             .AddHttpClientForCoinGeckoClient<ISimpleClient, SimpleClient>(configurator, delays)
             .AddHttpClientForCoinGeckoClient<IStatus_updatesClient, Status_updatesClient>(configurator, delays)
-            .AddHttpClientForCoinGeckoClient<ITrendingClient, TrendingClient>(configurator, delays);
+            .AddHttpClientForCoinGeckoClient<ITrendingClient, TrendingClient>(configurator, delays)
+            .AddHttpClientForCoinGeckoClient<ISearchClient, SearchClient>(configurator, delays);
     }
 
     internal static IServiceCollection AddHttpClientForCoinGeckoClient<TInterface, TImplementation>(
