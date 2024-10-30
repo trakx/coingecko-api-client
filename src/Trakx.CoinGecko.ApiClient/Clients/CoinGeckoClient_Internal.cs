@@ -19,12 +19,47 @@ public partial class CoinGeckoClient
 
     private async Task<string?> GetCoinGeckoIdFromSymbolInternal(string symbol, CancellationToken cancellationToken)
     {
-        var map = await GetSymbolToCoinGeckoIdMap(cancellationToken);
+        var map = await MapRankedSymbolsToCoinGeckoIds(cancellationToken);
         var id = map.GetValueOrDefault(symbol)?.FirstOrDefault();
         if (id != null) return id;
 
-        // TODO: search the API for tokens with the symbol
-        return null;
+        var coins = await GetCoinsFromSymbolInternal(symbol, cancellationToken);
+
+        // coins come ordered by market rank desc (i.e. most valuable first)
+        return coins?.FirstOrDefault()?.Api_symbol;
+    }
+
+    private async Task<List<Coins>> GetCoinsFromSymbolInternal(string symbol, CancellationToken cancellationToken)
+    {
+        var search = await _searchClient.SearchDataAsync(symbol, cancellationToken);
+        return search
+            ?.Content?.Coins
+            ?.Where(p => p.Symbol.EqualsIgnoreCase(symbol))
+            ?.ToList()
+            ?? [];
+    }
+
+    private async Task<SymbolToCoinGeckoIdsMap> GetIdsFromSymbolsInternal(IList<string> symbols, CancellationToken cancellationToken)
+    {
+        // we can get a full "symbol -> coingecko id" map from the market data rank, which is cached for a day
+        var fullMap = await MapRankedSymbolsToCoinGeckoIds(cancellationToken);
+
+        var result = new SymbolToCoinGeckoIdsMap(StringComparer.OrdinalIgnoreCase);
+
+        foreach (var symbol in symbols)
+        {
+            var ids = fullMap[symbol];
+            if (ids == null)
+            {
+                // symbol is unranked, search API for the symbol
+                var coins = await GetCoinsFromSymbol(symbol, cancellationToken);
+                if (coins.IsNullOrEmpty()) continue;
+                ids = coins.Select(p => p.Id).ToArray();
+            }
+            result[symbol] = ids;
+        }
+
+        return result;
     }
 
     private async Task<SymbolToCoinGeckoIdsMap> GetSymbolToCoinGeckoIdMapInternal(CancellationToken cancellationToken)
