@@ -4,7 +4,6 @@
     <GenerateApiClient>false</GenerateApiClient>
   </PropertyGroup>
 
-  <Import Project="../Common.Projects.props" />
   <Import Project="../Packable.Projects.props" />
 
   <ItemGroup>
