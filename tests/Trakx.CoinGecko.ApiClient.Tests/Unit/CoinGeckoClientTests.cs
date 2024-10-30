@@ -1,8 +1,4 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Expressions;
-using System.Threading.Tasks;
 using Microsoft.Extensions.Caching.Memory;
 using Trakx.Common.Testing.Mocks;
 
@@ -11,24 +7,28 @@ namespace Trakx.CoinGecko.ApiClient.Tests.Unit;
 public partial class CoinGeckoClientTests
 {
     internal const string VsCurrency = Constants.Usd;
-    private const string First = nameof(First);
-    private const string Second = nameof(Second);
 
-    private readonly ISimpleClient _simpleClient;
-    private readonly ICoinsClient _coinsClient;
-    private readonly MockCreator _mockCreator;
-    private readonly IMemoryCache _memoryCache;
+    protected const string Symbol = nameof(Symbol);
+    protected const string First = nameof(First);
+    protected const string Second = nameof(Second);
+    protected const string Third = nameof(Third);
 
-    private readonly CoinGeckoClient _coinGeckoClient;
+    protected readonly ISimpleClient _simpleClient;
+    protected readonly ISearchClient _searchClient;
+    protected readonly ICoinsClient _coinsClient;
+    protected readonly MockCreator _mockCreator;
+    protected readonly IMemoryCache _memoryCache;
 
-    private readonly string _coin;
-    private readonly DateTimeOffset _start;
-    private readonly DateTimeOffset _end;
+    protected readonly CoinGeckoClient _coinGeckoClient;
+
+    protected readonly string _coin;
+    protected readonly DateTimeOffset _start;
+    protected readonly DateTimeOffset _end;
 
     public CoinGeckoClientTests(ITestOutputHelper output)
     {
         _simpleClient = Substitute.For<ISimpleClient>();
-        var searchClient = Substitute.For<ISearchClient>();
+        _searchClient = Substitute.For<ISearchClient>();
         _coinsClient = Substitute.For<ICoinsClient>();
         _memoryCache = Substitute.For<IMemoryCache>();
         _mockCreator = new MockCreator(output);
@@ -41,36 +41,12 @@ public partial class CoinGeckoClientTests
             _memoryCache,
             _coinsClient,
             _simpleClient,
-            searchClient,
+            _searchClient,
             dateTimeProvider);
 
         _coin = _mockCreator.GetString(5);
         _start = now.AddMonths(-2);
         _end = now.AddMonths(-1);
-    }
-
-    [Fact]
-    public async Task GetCoinGeckoIdFromSymbol_caches_results()
-    {
-        ConfigureListAllAsync();
-        _ = await _coinGeckoClient.GetCoinGeckoIdFromSymbol("symbol");
-        _memoryCache.ReceivedCalls().Should().NotBeEmpty();
-    }
-
-    [Fact]
-    public async Task GetCoinList_caches_results()
-    {
-        ConfigureListAllAsync();
-        _ = await _coinGeckoClient.GetCoinList();
-        _memoryCache.ReceivedCalls().Should().NotBeEmpty();
-    }
-
-    [Fact]
-    public async Task GetSupportedQuoteCurrencies_caches_results()
-    {
-        ConfigureSupportedQuoteCurrencies(Constants.Usd);
-        _ = await _coinGeckoClient.GetSupportedQuoteCurrencies();
-        _memoryCache.ReceivedCalls().Should().NotBeEmpty();
     }
 
     [Fact]
@@ -177,49 +153,6 @@ public partial class CoinGeckoClientTests
     }
 
     [Fact]
-    public async Task GetCoinGeckoIdFromSymbol_queries_markets_for_highest_ranked_symbols()
-    {
-        var symbol = _mockCreator.GetString(30);
-        // no market rank setup
-
-        var result = await _coinGeckoClient.GetCoinGeckoIdFromSymbol(symbol);
-        result.Should().Be(null);
-
-        await _coinsClient
-            .ReceivedWithAnyArgs()
-            .MarketsAsync(Arg.Any<string>(), result, null, null, null, null);
-    }
-
-    [Fact]
-    public async Task GetCoinGeckoIdFromSymbol_should_return_highest_ranked_coin_if_there_are_multiple_coins_with_the_same_symbol()
-    {
-        var symbol = _mockCreator.GetString(30);
-        ConfigureListAllAsync(symbol: symbol, count: 2);
-
-        var marketData = new List<SearchCoinData>
-        {
-            new() { Id = "null", Symbol = symbol, Market_cap_rank = null },
-            new() { Id = First, Symbol = symbol, Market_cap_rank = 1 },
-            new() { Id = Second, Symbol = Second, Market_cap_rank  = 2 },
-            new() { Id = "third", Symbol = symbol, Market_cap_rank = 3 },
-        };
-
-        SetupMarketsPage(marketData);
-
-        var result = await _coinGeckoClient.GetCoinGeckoIdFromSymbol(symbol);
-        result.Should().Be(First);
-    }
-
-    [Fact]
-    public async Task GetCoinList_should_return_the_full_list_when_passing_no_arguments()
-    {
-        ConfigureListAllAsync(count: 5);
-        var result = await _coinGeckoClient.GetCoinList();
-        result.Count.Should().Be(5);
-        _memoryCache.Received(1).CreateEntry(Arg.Is<object>(o => o.ToString()!.Contains("coin-list")));
-    }
-
-    [Fact]
     public async Task GetAllPrices_should_return_multiple_prices_when_passing_valid_ids_and_currencies()
     {
         var currency = _mockCreator.GetString(10);
@@ -272,7 +205,7 @@ public partial class CoinGeckoClientTests
         {
             new() { Id = First, Symbol = First, Market_cap_rank = 1 },
             new() { Id = Second, Symbol = Second, Market_cap_rank  = 2 },
-            new() { Id = "third", Symbol = "third", Market_cap_rank = 3 },
+            new() { Id = Third, Symbol = "third", Market_cap_rank = 3 },
         };
 
         SetupMarketsPage(marketData);
