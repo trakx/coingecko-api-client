@@ -4,14 +4,10 @@
     <IsPackable>false</IsPackable>
   </PropertyGroup>
 
-  <Import Project="../Common.Projects.props" />
-
   <ItemGroup>
-    <None Include="..\..\LICENSE">
-      <Link>LICENSE</Link>
-    </None>
+    <ProjectReference Include="..\..\src\Trakx.CoinGecko.ApiClient\Trakx.CoinGecko.ApiClient.csproj" />
   </ItemGroup>
-
+  
   <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.11.1" />
     <PackageReference Include="MartinCostello.Logging.XUnit" Version="0.4.0" />
@@ -33,10 +29,6 @@
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
     <PackageReference Include="Trakx.Common.Testing.Documentation" Version="1.4.4" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\Trakx.CoinGecko.ApiClient\Trakx.CoinGecko.ApiClient.csproj" />
   </ItemGroup>
 
   <ItemGroup>
