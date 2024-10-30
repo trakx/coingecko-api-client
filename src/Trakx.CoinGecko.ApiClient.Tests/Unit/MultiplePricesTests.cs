@@ -3,6 +3,8 @@ using Trakx.CoinGecko.ApiClient.Models;
 
 namespace Trakx.CoinGecko.ApiClient.Tests.Unit;
 
+using PriceInMultipleCurrencies = IDictionary<string, decimal?>;
+
 public class MultiplePricesTests
 {
     private const string Coin1 = "coin1";
@@ -53,9 +55,9 @@ public class MultiplePricesTests
         price.Should().Be(expectedPrice);
     }
 
-    internal static IDictionary<string, IDictionary<string, decimal?>> MakePriceBag()
+    internal static IDictionary<string, PriceInMultipleCurrencies> MakePriceBag()
     {
-        return new Dictionary<string, IDictionary<string, decimal?>>();
+        return new Dictionary<string, PriceInMultipleCurrencies>();
     }
 
     internal static IDictionary<string, decimal?> MakeDecimalBag()

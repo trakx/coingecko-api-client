@@ -2,11 +2,14 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
+using Trakx.Common.ApiClient;
 using Trakx.Common.Extensions;
+using Trakx.Common.Logging;
 
 namespace Trakx.CoinGecko.ApiClient;
 
@@ -14,27 +17,35 @@ public partial class CoinGeckoClient
 {
     private static readonly TimeSpan DefaultCacheLifeSpan = TimeSpan.FromDays(1);
 
-    private async Task<string?> GetCoinGeckoIdFromSymbolFromApi(string symbol, CancellationToken cancellationToken)
+    private async Task<string?> GetCoinGeckoIdFromSymbolInternal(string symbol, CancellationToken cancellationToken)
     {
-        var coinList = await GetCoinList(cancellationToken);
+        var map = await GetSymbolToCoinGeckoIdMap(cancellationToken);
+        var id = map.GetValueOrDefault(symbol)?.FirstOrDefault();
+        if (id != null) return id;
 
-        var symbolList = coinList
-            .Where(c => c.Symbol.EqualsIgnoreCase(symbol))
-            .ToList();
+        // TODO: search the API for tokens with the symbol
+        return null;
+    }
 
-        if (symbolList.Count == 0) return null;
-        if (symbolList.Count == 1) return symbolList.First().Id;
-
-        // multiple options, return the highest ranked coin
+    private async Task<SymbolToCoinGeckoIdsMap> GetSymbolToCoinGeckoIdMapInternal(CancellationToken cancellationToken)
+    {
+        // get the highest ranked coin
         var rank = await GetMarketRank(cancellationToken: cancellationToken);
-        var rankLookup = rank.ToLookup(p => p.CoinSymbol, StringComparer.OrdinalIgnoreCase);
 
-        var bestCandidate = rankLookup[symbol]
-            .Where(p => p.MarketCapRank > 0)
-            .OrderBy(p => p.MarketCapRank)
-            .FirstOrDefault();
+        // rank coin symbols, having the most popular option at the top
+        // example: there's a UNI token at #28 market cap and another with rank ~2300
+        // there's a really, really, really high chance we want the most popular token
+        var rankLookup = rank
+            .Where(p => p.CoinSymbol != null && p.CoinId != null)
+            .ToLookup(p => p.CoinSymbol!, StringComparer.OrdinalIgnoreCase);
 
-        return bestCandidate?.CoinId;
+        var bestCandidates = rankLookup.ToDictionary(
+            group => group.Key,
+            group => group
+                .OrderBy(p => p.MarketCapRank ?? int.MaxValue)
+                .Select(p => p.CoinId!).ToArray());
+
+        return bestCandidates;
     }
 
     private async Task<List<CoinList>> GetCoinListFromApi(CancellationToken cancellationToken)
@@ -162,10 +173,7 @@ public partial class CoinGeckoClient
 
     private async Task<decimal> GetUsdFxRate(string quoteCurrencyId, string date)
     {
-        if (quoteCurrencyId.IsNullOrWhiteSpace())
-            throw new ArgumentException($"{nameof(quoteCurrencyId)} can not be null or whitespace",
-                nameof(quoteCurrencyId));
-
+        ArgumentException.ThrowIfNullOrWhiteSpace(quoteCurrencyId);
         var cacheKey = $"{_typeName}|usd-fx-rate|{quoteCurrencyId}|{date}";
         return await GetFromCacheOrApi(cacheKey, async () => await GetUsdFxRateFromApi(quoteCurrencyId, date));
     }
@@ -201,15 +209,33 @@ public partial class CoinGeckoClient
         return value!;
     }
 
+    private async Task<Response<IDictionary<string, IDictionary<string, decimal?>>>> GetAllPricesInternal(
+        IEnumerable<string> ids,
+        string[]? vsCurrencies,
+        CancellationToken cancellationToken)
+    {
+        (var baseIds, var quoteIds) = await GetIdsForPriceQuery(ids, vsCurrencies, cancellationToken);
+
+        var response = await _simpleClient.PriceAsync(baseIds, quoteIds, cancellationToken: cancellationToken);
+
+        if (Logger.IsEnabled(LogLevel.Debug))
+        {
+            Logger.LogDebug("Received latest price {PriceAsyncResponse}", JsonSerializer.Serialize(response));
+        }
+
+        return response;
+    }
+
     /// <summary>
     /// Each requested quote currency needs to be either a 'base' or a 'vs' id in the price call,
     /// depending if it's a supported quote currency or not.<br />
     /// This method ensures a valid list of 'base' and 'vs' ids
     /// according to the logic explained in the comment for <see cref="GetLatestPrice(string, string)"/>
     /// </summary>
-    private static (string BaseIds, string QuoteIds) GetIdsForPriceQuery(
-        IEnumerable<string> ids, string[]? vsCurrencies,
-        ICollection<string> supportedQuoteCurrencies)
+    private async Task<(string BaseIds, string QuoteIds)> GetIdsForPriceQuery(
+        IEnumerable<string> ids,
+        string[]? vsCurrencies,
+        CancellationToken cancellationToken)
     {
         List<string> baseIds = new();
         List<string> quoteIds = new();
@@ -217,6 +243,8 @@ public partial class CoinGeckoClient
         if (ids != null) baseIds.AddRange(ids);
 
         vsCurrencies ??= [];
+
+        var supportedQuoteCurrencies = await GetSupportedQuoteCurrencies(cancellationToken);
 
         foreach (var id in vsCurrencies)
         {

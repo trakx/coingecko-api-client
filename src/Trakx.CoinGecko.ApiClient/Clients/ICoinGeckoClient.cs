@@ -44,6 +44,16 @@ public interface ICoinGeckoClient
         bool include24HrVol = false,
         CancellationToken cancellationToken = default);
 
+    /// <summary>
+    /// Returns a collection of prices similar to <see cref="GetAllPrices(IEnumerable{string}, string[]?, CancellationToken)"/>,
+    /// first mapping the token symbols to any matching coingecko Ids.<br />
+    /// Also returns a map between the provided <paramref name="symbols"/> and the found coingecko ids.
+    /// </summary>
+    Task<PricesForSymbols> GetAllPricesForSymbols(
+        IList<string> symbols,
+        string[]? vsCurrencies = null,
+        CancellationToken cancellationToken = default);
+
 
     // market data
 
