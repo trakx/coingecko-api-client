@@ -1,4 +1,5 @@
 using Microsoft.Extensions.Caching.Memory;
+using Trakx.Common.ApiClient.Extensions;
 using Trakx.Common.Testing.Mocks;
 
 namespace Trakx.CoinGecko.ApiClient.Tests.Unit;
@@ -48,58 +49,165 @@ public partial class CoinGeckoClientTests
         _end = now.AddMonths(-1);
     }
 
-    [Fact]
-    public async Task GetLatestPrice_should_return_valid_price_when_passing_valid_id()
+    private void ConfigurePriceAsync(string _coin, string currency, decimal coinPrice, decimal currencyPrice)
     {
-        var currency = _mockCreator.GetString(5);
-        var coinPrice = _mockCreator.GetPrice();
-        var currencyPrice = _mockCreator.GetPrice();
+        var bag = MultiplePricesTests.MakePriceBag();
+        bag[_coin] = BagDecimal(coinPrice);
+        bag[currency] = BagDecimal(currencyPrice);
 
-        ConfigurePriceAsync(_coin, currency, coinPrice, currencyPrice);
-
-        ConfigureSupportedQuoteCurrencies(Constants.Usd);
-
-        var result = await _coinGeckoClient.GetLatestPrice(_coin, currency);
-
-        result.Should().Be(coinPrice / currencyPrice);
+        _simpleClient
+            .PriceAsync(Arg.Any<string>(), Arg.Any<string>())
+            .Returns(bag.AsResponse());
     }
 
-    [Fact]
-    public async Task GetAllPrices_should_return_multiple_prices_when_passing_valid_ids_and_currencies()
+    private void ConfigureHistoryAsync(string? _coin = null, DateTime? date = null, decimal? price = null, decimal? volume = null)
     {
-        var currency = _mockCreator.GetString(10);
-        var coinPrice = _mockCreator.GetPrice();
-        var currentPrice = _mockCreator.GetPrice();
+        var idValue = _coin ?? _mockCreator.GetString(10);
 
-        ConfigurePriceAsync(_coin, currency, coinPrice, currentPrice);
+        var result = new CoinFullData
+        {
+            Id = idValue,
+            Symbol = idValue,
+            Market_data = new Market_data
+            {
+                Market_cap = BagDecimal(0),
+                Total_volume = BagDecimal(volume ?? _mockCreator.GetPrice()),
+                Current_price = BagDecimal(price ?? _mockCreator.GetPrice()),
+            }
+        };
 
-        string[] baseIds = [_coin];
-        string[] quoteIds = [currency];
-        var supportedQuoteCurrencies = ConfigureSupportedQuoteCurrencies(Constants.Usd);
+        var timestamp = (date ?? _mockCreator.GetUtcDateTime()).ToDateString();
 
-        var result = await _coinGeckoClient.GetAllPrices(baseIds, quoteIds);
-
-        Integration.CoinGeckoClientTests.AssertMultiplePrices(result, baseIds, quoteIds, supportedQuoteCurrencies);
+        _coinsClient
+            .HistoryAsync(idValue, timestamp, localization: false)
+            .Returns(((CoinData)result).AsResponse());
     }
 
-    [Fact]
-    public async Task GetAllPricesForSymbols_throws_if_symbols_are_null()
+    private void ConfigureListAllAsync(string? _coin = default, string? symbol = default, int count = 1)
     {
-        var action = async () => _ = await _coinGeckoClient.GetAllPricesForSymbols(null!);
-        await action.Should().ThrowAsync<ArgumentNullException>();
+        var list = Enumerable.Range(0, count)
+            .Select(_ => new CoinList
+            {
+                Id = _coin ?? _mockCreator.GetString(10),
+                Symbol = symbol ?? _mockCreator.GetString(30)
+            }).ToList();
+
+        _coinsClient
+            .ListAllAsync()
+            .Returns(list.AsResponse());
     }
 
-    [Fact]
-    public async Task GetAllPricesForSymbols_gets_prices_for_all_mapped_coingecko_ids()
+    private List<string> ConfigureSupportedQuoteCurrencies(params string[] quoteCurrencies)
     {
-        // TODO
-        await Task.CompletedTask;
+        var supportedQuoteCurrencies = quoteCurrencies.ToList();
+
+        _simpleClient
+            .Supported_vs_currenciesAsync()
+            .Returns(supportedQuoteCurrencies.AsResponse());
+
+        return supportedQuoteCurrencies;
     }
 
-    [Fact]
-    public async Task GetAllPricesForSymbols_returns_expected_data()
+    internal static Dictionary<string, decimal?> BagDecimal(decimal value, string currency = Constants.Usd)
     {
-        // TODO
-        await Task.CompletedTask;
+        return new() { [currency] = value };
+    }
+
+    private void SetupMarketsPage(List<SearchCoinData> marketData, int page = 1)
+    {
+        _coinsClient.MarketsAsync(
+            vs_currency: ICoinGeckoMarketClient.MainQuoteCurrency,
+            ids: Arg.Any<string?>(),
+            category: Arg.Any<string>(),
+            order: Arg.Any<string>(),
+            per_page: Arg.Any<int?>(),
+            page: page,
+            cancellationToken: Arg.Any<CancellationToken>())
+
+        .Returns(marketData.AsResponse());
+    }
+
+    private void SetupRangeResponse(string coin, string vsCurrency, DateTimeOffset start, DateTimeOffset end, Range range)
+    {
+        _coinsClient
+            .RangeAsync(coin, vsCurrency, start.ToUnixTimeSeconds(), end.ToUnixTimeSeconds())
+            .Returns(range.AsResponse());
+    }
+
+    private static Range CreateRange(params double[] dates)
+    {
+        return new Range
+        {
+            Market_caps = new List<TimestampedValue>
+            {
+                new() { dates[0], 318_992_245_176.35913 },
+                new() { dates[1], 319_632_242_563.95764 },
+            },
+            Total_volumes = new List<TimestampedValue>
+            {
+                new() { dates[0], 38_069_451_649.54143 },
+                new() { dates[1], 38_825_217_290.29339 },
+            },
+            Prices = new List<TimestampedValue>
+            {
+                new() { dates[0], 2756.166102270321 },
+                new() { dates[1], 2761.460672838776 },
+            }
+        };
+    }
+
+    private void SetupMarketDataResponse()
+    {
+        var marketData = new Dictionary<DateTimeOffset, MarketData>();
+
+        _memoryCache
+            .TryGetValue(Arg.Any<string>(), out Arg.Any<object?>())
+            .Returns(call =>
+            {
+                call[1] = marketData;
+                return true;
+            });
+    }
+
+    private void AssertCachedEntry(params object?[] keyFragments)
+    {
+        AssertCachedEntryBase(nameof(_memoryCache.CreateEntry), keyFragments);
+    }
+
+    private void AssertReusedCachedEntry(params object?[] keyFragments)
+    {
+        AssertCachedEntryBase(nameof(_memoryCache.TryGetValue), keyFragments);
+    }
+
+    private void AssertCachedEntryBase(string methodName, object?[] keyFragments)
+    {
+        string[] fragments = keyFragments
+            .Where(p => p != null)
+            .Select(p => p!.ToString()!)
+            .ToArray();
+
+        string[] cacheKeys = _memoryCache
+            .GetReceivedCalls(methodName)
+            .Select(p => p.GetArgument<object>())
+            .Where(p => p != null)
+            .Select(p => p.ToString()!)
+            .ToArray();
+
+        foreach (var cacheKey in cacheKeys)
+        {
+            var isExpectedKey = fragments.All(cacheKey.Contains);
+            if (isExpectedKey) return; // we found a key with all expected fragments
+        }
+
+        string StringsToList(string[] s) => string.Join(Environment.NewLine + " - ", s.Prepend(" "));
+
+        // we did not find a key matching all fragments
+        var failMessage = $"""
+            No entry found in MemoryCache with key fragments:{StringsToList(fragments)}
+
+            Found cached entries with the following keys:{StringsToList(cacheKeys)}
+            """;
+
+        Assert.Fail(failMessage);
     }
 }

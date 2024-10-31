@@ -70,7 +70,7 @@ public partial class CoinGeckoClient
 
         foreach (var symbol in symbols)
         {
-            var ids = fullMap[symbol];
+            var ids = fullMap.GetValueOrDefault(symbol);
             if (ids == null)
             {
                 // symbol is unranked, search API for the symbol
