@@ -12,17 +12,17 @@ public partial class CoinGeckoClient : ICoinGeckoClient
     private static readonly TimeSpan DefaultCacheLifeSpan = TimeSpan.FromDays(1);
     private static readonly ILogger Logger = LoggerProvider.Create<CoinGeckoClient>();
 
-    private readonly IMemoryCache _cache;
+    private readonly IMemoryCache _memoryCache;
     protected readonly string? _typeName;
 
     public CoinGeckoClient(
-        IMemoryCache cache,
+        IMemoryCache memoryCache,
         ICoinsClient coinsClient,
         ISimpleClient simpleClient,
         ISearchClient searchClient,
         IDateTimeProvider dateTimeProvider)
     {
-        _cache = cache;
+        _memoryCache = memoryCache;
         _coinsClient = coinsClient;
         _simpleClient = simpleClient;
         _searchClient = searchClient;
@@ -32,7 +32,7 @@ public partial class CoinGeckoClient : ICoinGeckoClient
 
     private async Task<T> GetFromCacheOrApi<T>(string cacheKey, Func<Task<T>> getFromApi)
     {
-        var value = await _cache.GetOrCreateAsync<T>(cacheKey, async (entry) =>
+        var value = await _memoryCache.GetOrCreateAsync<T>(cacheKey, async (entry) =>
         {
             entry.AbsoluteExpirationRelativeToNow = DefaultCacheLifeSpan;
             return await getFromApi();

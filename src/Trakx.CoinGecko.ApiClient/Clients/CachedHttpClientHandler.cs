@@ -1,8 +1,4 @@
-﻿using System;
-using System.Net;
-using System.Net.Http;
-using System.Threading;
-using System.Threading.Tasks;
+﻿using System.Net;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Logging;
 using Trakx.Common.ApiClient.Exceptions;
@@ -15,8 +11,8 @@ public sealed record CachedHttpResponse(HttpStatusCode StatusCode, string Conten
 
 public class CachedHttpClientHandler : DelegatingHandler
 {
-    private readonly IDistributedCache _cache;
-    private readonly DistributedCacheEntryOptions _cacheOptions = new();
+    private readonly IDistributedCache _distributedCache;
+    private readonly DistributedCacheEntryOptions _distributedCacheOptions = new();
 
     private static readonly ILogger Logger = LoggerProvider.Create<CachedHttpClientHandler>();
 
@@ -24,13 +20,13 @@ public class CachedHttpClientHandler : DelegatingHandler
     /// A <see cref="DelegatingHandler" /> which caches results for <see cref="CoinGeckoApiConfiguration.CacheDuration"/> time.<br />
     /// The goal is to avoid unnecessary requests to the external CoinGecko API.
     /// </summary>
-    public CachedHttpClientHandler(IDistributedCache cache, CoinGeckoApiConfiguration apiConfiguration)
+    public CachedHttpClientHandler(IDistributedCache distributedCache, CoinGeckoApiConfiguration apiConfiguration)
     {
-        _cache = cache;
+        _distributedCache = distributedCache;
 
         if (apiConfiguration.CacheDuration > TimeSpan.Zero)
         {
-            _cacheOptions.AbsoluteExpirationRelativeToNow = apiConfiguration.CacheDuration;
+            _distributedCacheOptions.AbsoluteExpirationRelativeToNow = apiConfiguration.CacheDuration;
         }
     }
 
@@ -78,7 +74,7 @@ public class CachedHttpClientHandler : DelegatingHandler
     {
         var cacheKey = await GetCacheKey(request, cancellationToken);
 
-        var cachedResponse = await _cache.GetAsync<CachedHttpResponse>(cacheKey, cancellationToken);
+        var cachedResponse = await _distributedCache.GetAsync<CachedHttpResponse>(cacheKey, cancellationToken);
         if (cachedResponse != null)
         {
             Logger.LogDebug("Reusing cached response for {cacheKey}", cacheKey);
@@ -100,7 +96,7 @@ public class CachedHttpClientHandler : DelegatingHandler
         // cache the fresh response
         var freshContent = await freshResponse.Content.ReadAsStringAsync(cancellationToken);
         cachedResponse = new CachedHttpResponse(freshResponse.StatusCode, freshContent);
-        await _cache.SetAsync(cacheKey, cachedResponse, _cacheOptions, cancellationToken);
+        await _distributedCache.SetAsync(cacheKey, cachedResponse, _distributedCacheOptions, cancellationToken);
 
         return CreateResponse(cachedResponse.StatusCode, cachedResponse.Content);
     }
