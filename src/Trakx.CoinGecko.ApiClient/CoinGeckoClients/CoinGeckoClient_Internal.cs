@@ -13,26 +13,13 @@ public partial class CoinGeckoClient
 
     private async Task<T> GetFromCacheOrApi<T>(string cacheKey, Func<Task<T>> getFromApi)
     {
-        var value = await GetOrCreateAsync<T>(_cache, cacheKey, async (entry) =>
+        var value = await _cache.GetOrCreateAsync<T>(cacheKey, async (entry) =>
         {
             entry.AbsoluteExpirationRelativeToNow = DefaultCacheLifeSpan;
             return await getFromApi();
         });
 
         return value!;
-    }
-
-    public static async Task<TItem?> GetOrCreateAsync<TItem>(IMemoryCache cache, object key, Func<ICacheEntry, Task<TItem>> factory)
-    {
-        if (!cache.TryGetValue(key, out object? result))
-        {
-            using ICacheEntry entry = cache.CreateEntry(key);
-
-            result = await factory(entry).ConfigureAwait(false);
-            entry.Value = result;
-        }
-
-        return (TItem?)result;
     }
 
     private async Task<Response<IDictionary<string, IDictionary<string, decimal?>>>> GetAllPricesInternal(
