@@ -10,7 +10,7 @@ public partial class CoinGeckoClientTests
     {
         ConfigureListAllAsync();
         _ = await _coinGeckoClient.GetCoinList();
-        AssertCachedEntry("coin-list");
+        AssertCachedEntry(nameof(_coinGeckoClient.GetCoinList));
     }
 
     [Fact]
@@ -26,7 +26,7 @@ public partial class CoinGeckoClientTests
     {
         ConfigureSupportedQuoteCurrencies(Constants.Usd);
         _ = await _coinGeckoClient.GetSupportedQuoteCurrencies();
-        AssertCachedEntry("supported-vs-currencies");
+        AssertCachedEntry(nameof(_coinGeckoClient.GetSupportedQuoteCurrencies));
     }
 
     [Fact]
@@ -42,7 +42,7 @@ public partial class CoinGeckoClientTests
     {
         ConfigureListAllAsync();
         _ = await _coinGeckoClient.GetCoinGeckoIdFromSymbol(Symbol);
-        AssertCachedEntry("id-from-symbol", Symbol);
+        AssertCachedEntry(nameof(_coinGeckoClient.GetCoinGeckoIdFromSymbol), Symbol);
     }
 
     [Fact]
@@ -81,7 +81,7 @@ public partial class CoinGeckoClientTests
     public async Task GetCoinsFromSymbol_caches_result()
     {
         _ = await _coinGeckoClient.GetCoinsFromSymbol(Symbol);
-        AssertCachedEntry($"coins-from-symbol", Symbol);
+        AssertCachedEntry(nameof(_coinGeckoClient.GetCoinsFromSymbol), Symbol);
     }
 
     [Fact]
@@ -107,7 +107,7 @@ public partial class CoinGeckoClientTests
     public async Task MapRankedSymbolsToCoinGeckoIds_caches_result()
     {
         _ = await _coinGeckoClient.MapRankedSymbolsToCoinGeckoIds();
-        AssertCachedEntry("symbol-to-ids-map");
+        AssertCachedEntry(nameof(_coinGeckoClient.MapRankedSymbolsToCoinGeckoIds));
     }
 
     [Fact]

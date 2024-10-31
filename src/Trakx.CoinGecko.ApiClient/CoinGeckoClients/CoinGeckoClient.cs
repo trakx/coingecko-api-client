@@ -27,7 +27,7 @@ public partial class CoinGeckoClient : ICoinGeckoClient
         _simpleClient = simpleClient;
         _searchClient = searchClient;
         _dateTimeProvider = dateTimeProvider;
-        _typeName = GetType().FullName;
+        _typeName = GetType().Name;
     }
 
     private async Task<T> GetFromCacheOrApi<T>(string cacheKey, Func<Task<T>> getFromApi)
@@ -39,5 +39,10 @@ public partial class CoinGeckoClient : ICoinGeckoClient
         });
 
         return value!;
+    }
+
+    internal string BuildCacheKey(params object?[] keyFragments)
+    {
+        return string.Join('|', keyFragments.Prepend(_typeName));
     }
 }

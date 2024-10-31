@@ -105,10 +105,10 @@ public partial class CoinGeckoClient
         });
     }
 
-    private async Task<decimal> GetUsdFxRate(string quoteCurrencyId, string date, CancellationToken cancellationToken = default)
+    internal async Task<decimal> GetUsdFxRate(string quoteCurrencyId, string date, CancellationToken cancellationToken = default)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(quoteCurrencyId);
-        var cacheKey = $"{_typeName}|usd-fx-rate|{quoteCurrencyId}|{date}";
+        var cacheKey = BuildCacheKey(nameof(GetUsdFxRate), quoteCurrencyId, date);
         return await GetFromCacheOrApi(cacheKey, async () => await GetUsdFxRateInternal(quoteCurrencyId, date, cancellationToken));
     }
 

@@ -1,5 +1,3 @@
-using System.Linq.Expressions;
-
 namespace Trakx.CoinGecko.ApiClient.Tests.Unit;
 
 // will soon become CoinGeckoMarketClientTests
@@ -14,7 +12,7 @@ public partial class CoinGeckoClientTests
 
         _ = await _coinGeckoClient.GetMarketData(_coin, VsCurrency, days);
 
-        AssertReusedCachedEntry("chart", _coin, VsCurrency, days);
+        AssertReusedCachedEntry(nameof(_coinGeckoClient.GetMarketData), _coin, VsCurrency, days);
 
         _coinsClient.ReceivedCalls().Should().BeEmpty();
         _simpleClient.ReceivedCalls().Should().BeEmpty();
@@ -27,7 +25,12 @@ public partial class CoinGeckoClientTests
 
         _ = await _coinGeckoClient.GetMarketDataForDateRange(_coin, VsCurrency, _start, _end);
 
-        AssertReusedCachedEntry("range", _coin, VsCurrency, _start.ToUnixTimeSeconds(), _end.ToUnixTimeSeconds());
+        AssertReusedCachedEntry(
+            nameof(_coinGeckoClient.GetMarketDataForDateRange),
+            _coin,
+            VsCurrency,
+            _start.ToUnixTimeSeconds(),
+            _end.ToUnixTimeSeconds());
 
         _coinsClient.ReceivedCalls().Should().BeEmpty();
         _simpleClient.ReceivedCalls().Should().BeEmpty();
@@ -71,7 +74,7 @@ public partial class CoinGeckoClientTests
 
         _ = await _coinGeckoClient.GetMarketDataAsOfFromId(_coin, date, VsCurrency);
 
-        AssertCachedEntry("market-data", _coin, VsCurrency, date.ToDateString());
+        AssertCachedEntry(nameof(_coinGeckoClient.GetMarketDataAsOfFromId), _coin, VsCurrency, date.ToDateString());
     }
 
     [Fact]
@@ -100,20 +103,18 @@ public partial class CoinGeckoClientTests
         result.Volume.Should().Be(coinVolume / currencyPrice);
         result.QuoteCurrency.Should().Be(coin);
 
-        Expression<Predicate<object>> fxRatePredicate = o => TextContainsAll(o, asOfString, "fx-rate", currency);
-        _memoryCache.Received(1).TryGetValue(Arg.Is(fxRatePredicate), out _);
-        _memoryCache.Received(1).CreateEntry(Arg.Is(fxRatePredicate));
+        AssertCachedEntry(nameof(_coinGeckoClient.GetUsdFxRate), asOfString, currency);
+        AssertReusedCachedEntry(nameof(_coinGeckoClient.GetUsdFxRate), asOfString, currency);
 
-        Expression<Predicate<object>> marketDataPredicate = o => TextContainsAll(o, asOfString, "market-data", currency, coin);
-        _memoryCache.Received(1).TryGetValue(Arg.Is(marketDataPredicate), out _);
-        _memoryCache.Received(1).CreateEntry(Arg.Is(marketDataPredicate));
+        AssertCachedEntry(nameof(_coinGeckoClient.GetMarketDataAsOfFromId), asOfString, currency, coin);
+        AssertReusedCachedEntry(nameof(_coinGeckoClient.GetMarketDataAsOfFromId), asOfString, currency, coin);
     }
 
     [Fact]
     public async Task GetMarketRank_caches_results()
     {
         _ = await _coinGeckoClient.GetMarketRank();
-        AssertCachedEntry("market-rank", ICoinGeckoMarketClient.MarketRankDefaultLimit);
+        AssertCachedEntry(nameof(_coinGeckoClient.GetMarketRank), ICoinGeckoMarketClient.MarketRankDefaultLimit);
     }
 
     [Fact]
@@ -132,7 +133,8 @@ public partial class CoinGeckoClientTests
 
         var initialApiCalls = _coinsClient.GetReceivedCalls(nameof(_coinsClient.MarketsAsync)).Count();
 
-        var cacheKey = $"{typeof(CoinGeckoClient).FullName}|market-rank|{ICoinGeckoClient.MarketRankDefaultLimit}";
+        var cacheKey = _coinGeckoClient.BuildCacheKey(nameof(_coinGeckoClient.GetMarketRank), ICoinGeckoClient.MarketRankDefaultLimit);
+
         _memoryCache
             .TryGetValue(cacheKey, out Arg.Any<object?>())
             .Returns(call =>
@@ -152,7 +154,7 @@ public partial class CoinGeckoClientTests
     public async Task Search_caches_results()
     {
         _ = await _coinGeckoClient.Search();
-        AssertCachedEntry("search", ICoinGeckoMarketClient.MainQuoteCurrency, ICoinGeckoMarketClient.DefaultSearchOrder);
+        AssertCachedEntry(nameof(_coinGeckoClient.Search), ICoinGeckoMarketClient.MainQuoteCurrency, ICoinGeckoMarketClient.DefaultSearchOrder);
     }
 
     private bool TextContainsAll(object o, params string[] fragments)
