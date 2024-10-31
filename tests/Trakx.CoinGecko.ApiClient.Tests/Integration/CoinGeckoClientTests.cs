@@ -1,8 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Trakx.CoinGecko.ApiClient.Models;
 
@@ -10,14 +5,16 @@ namespace Trakx.CoinGecko.ApiClient.Tests.Integration;
 
 public class CoinGeckoClientTests : CoinGeckoClientTestBase
 {
-    private readonly ICoinGeckoClient _coinsClient;
+    private readonly ICoinGeckoClient _coinGeckoClient;
     private readonly string _quoteCurrencyId;
     private readonly DateTime _asOf;
+
+    private static readonly string[] QuoteCurrencies = [CoinGeckoClient.MainQuoteCurrency];
 
     public CoinGeckoClientTests(CoinGeckoApiFixture apiFixture, ITestOutputHelper output)
         : base(apiFixture, output)
     {
-        _coinsClient = ServiceProvider.GetRequiredService<ICoinGeckoClient>();
+        _coinGeckoClient = ServiceProvider.GetRequiredService<ICoinGeckoClient>();
 
         _quoteCurrencyId = Constants.UsdCoin;
         _asOf = DateTime.Today.AddDays(-5);
@@ -27,7 +24,7 @@ public class CoinGeckoClientTests : CoinGeckoClientTestBase
     [ClassData(typeof(CoinGeckoIdsTestData))]
     public async Task GetLatestPrice_should_return_valid_price_when_passing_valid_id(string id)
     {
-        var result = await _coinsClient.GetLatestPrice(id, Constants.Usd);
+        var result = await _coinGeckoClient.GetLatestPrice(id, Constants.Usd);
         result.Should().NotBeNull();
     }
 
@@ -35,7 +32,7 @@ public class CoinGeckoClientTests : CoinGeckoClientTestBase
     [ClassData(typeof(CoinGeckoIdsTestData))]
     public async Task GetMarketDataAsOfFromId_should_return_valid_data_when_passing_valid_id(string id)
     {
-        var result = await _coinsClient.GetMarketDataAsOfFromId(id, _asOf, _quoteCurrencyId);
+        var result = await _coinGeckoClient.GetMarketDataAsOfFromId(id, _asOf, _quoteCurrencyId);
         result!.AsOf.Should().NotBeNull();
         result.CoinId.Should().Be(id);
         result.CoinSymbol.Should().NotBeEmpty();
@@ -48,23 +45,23 @@ public class CoinGeckoClientTests : CoinGeckoClientTestBase
     [Fact]
     public async Task GetCoinGeckoIdFromSymbol_should_return_valid_data_when_passing_valid_id()
     {
-        var result = await _coinsClient.GetCoinGeckoIdFromSymbol("btc");
+        var result = await _coinGeckoClient.GetCoinGeckoIdFromSymbol("btc");
         result.Should().Be("bitcoin");
     }
 
     [Fact]
     public async Task GetCoinList_should_return_the_full_list_when_passing_no_arguments()
     {
-        var result = await _coinsClient.GetCoinList();
+        var result = await _coinGeckoClient.GetCoinList();
         result.Should().NotBeNullOrEmpty();
     }
 
     [Fact]
     public async Task GetSupportedQuoteCurrencies_includes_the_main_quote_currency()
     {
-        var result = await _coinsClient.GetSupportedQuoteCurrencies();
+        var result = await _coinGeckoClient.GetSupportedQuoteCurrencies();
         result.Should().NotBeNullOrEmpty();
-        result.Should().Contain(CoinGeckoClient.MainQuoteCurrency);
+        result.Should().Contain(QuoteCurrencies);
     }
 
     [Fact]
@@ -72,11 +69,9 @@ public class CoinGeckoClientTests : CoinGeckoClientTestBase
     {
         var baseIds = GetCoinIds();
 
-        var quoteIds = CoinGeckoClient.MainQuoteCurrency.AsSingletonArray();
+        var result = await _coinGeckoClient.GetAllPrices(baseIds, QuoteCurrencies);
 
-        var result = await _coinsClient.GetAllPrices(baseIds, quoteIds);
-
-        AssertMultiplePrices(result, baseIds, quoteIds, quoteIds);
+        AssertMultiplePrices(result, baseIds, QuoteCurrencies, QuoteCurrencies);
     }
 
     [Fact]
@@ -84,11 +79,9 @@ public class CoinGeckoClientTests : CoinGeckoClientTestBase
     {
         var baseIds = LotsOfTokens;
 
-        var quoteIds = CoinGeckoClient.MainQuoteCurrency.AsSingletonArray();
+        var result = await _coinGeckoClient.GetAllPrices(baseIds, QuoteCurrencies);
 
-        var result = await _coinsClient.GetAllPrices(baseIds, quoteIds);
-
-        AssertMultiplePrices(result, baseIds, quoteIds, quoteIds);
+        AssertMultiplePrices(result, baseIds, QuoteCurrencies, QuoteCurrencies);
     }
 
     [Fact]
@@ -97,14 +90,14 @@ public class CoinGeckoClientTests : CoinGeckoClientTestBase
         var baseIds = GetCoinIds();
 
         const string unsupportedQuote = Constants.UsdCoin;
-        var unsupportedQuoteIds = unsupportedQuote.AsSingletonArray();
+        string[] unsupportedQuoteIds = [unsupportedQuote];
 
-        var supportedQuoteCurrencies = await _coinsClient.GetSupportedQuoteCurrencies();
+        var supportedQuoteCurrencies = await _coinGeckoClient.GetSupportedQuoteCurrencies();
 
         // sanity check
         supportedQuoteCurrencies.Should().NotContain(unsupportedQuote);
 
-        var result = await _coinsClient.GetAllPrices(baseIds, unsupportedQuoteIds);
+        var result = await _coinGeckoClient.GetAllPrices(baseIds, unsupportedQuoteIds);
 
         AssertMultiplePrices(result, baseIds, unsupportedQuoteIds, supportedQuoteCurrencies);
     }
@@ -115,7 +108,7 @@ public class CoinGeckoClientTests : CoinGeckoClientTestBase
         var coinIds = GetCoinIds();
         var quoteCurrencies = new[] { Constants.Usd, "eth" };
 
-        var result = await _coinsClient.GetAllPricesExtended(
+        var result = await _coinGeckoClient.GetAllPricesExtended(
             coinIds,
             quoteCurrencies,
             includeMarketCap: true,
@@ -139,7 +132,7 @@ public class CoinGeckoClientTests : CoinGeckoClientTestBase
         var coinGeckoId = "bitcoin";
         var currencyId = Constants.Usd;
         int daysCount = 2;
-        var result = await _coinsClient.GetMarketData(coinGeckoId,
+        var result = await _coinGeckoClient.GetMarketData(coinGeckoId,
             currencyId, daysCount, CancellationToken.None);
         result.Should().HaveCountGreaterOrEqualTo(daysCount);
         foreach (var item in result)
@@ -153,17 +146,38 @@ public class CoinGeckoClientTests : CoinGeckoClientTestBase
         }
     }
 
+    [Fact]
+    public async Task GetAllPricesForSymbols_gets_prices_for_expected_symbols()
+    {
+        string[] symbols = ["btc", "waxl", "trkx"];
+        var result = await _coinGeckoClient.GetAllPricesForSymbols(symbols);
+
+        result.Should().NotBeNull();
+
+        var map = result.SymbolToIdMap;
+        map.Should().NotBeNull();
+        map.Should().ContainKey("btc").WhoseValue.Should().BeEquivalentTo("bitcoin");
+        map.Should().ContainKey("waxl").WhoseValue.Should().BeEquivalentTo("wrapped-axelar");
+        map.Should().ContainKey("trkx").WhoseValue.Should().BeEquivalentTo(["trakx"]);
+
+        var prices = result.Prices;
+        prices.Should().NotBeNull();
+        prices.GetPrice("bitcoin").Should().NotBe(default);
+        prices.GetPrice("wrapped-axelar").Should().NotBe(default);
+        prices.GetPrice("trakx").Should().NotBe(default);
+    }
+
     /// <summary>
     /// Asserts the prices collected from <see cref="SimpleClient.PriceAsync"/>
     /// and saved in a <see cref="MultiplePrices"/> result.
     /// </summary>
     internal static void AssertMultiplePrices(MultiplePrices result,
         string[] baseIds,
-        string[] quoteIds,
+        string[] vsCurrencies,
         IEnumerable<string> supportedQuoteCurrencies)
     {
         var baseCount = baseIds.Length;
-        var unsupportedCount = quoteIds.Except(supportedQuoteCurrencies).Count();
+        var unsupportedCount = vsCurrencies.Except(supportedQuoteCurrencies).Count();
 
         var expectedBaseCount = baseCount + unsupportedCount;
 
@@ -171,16 +185,16 @@ public class CoinGeckoClientTests : CoinGeckoClientTestBase
         /// the client should add the requested quote ids to the base ids,
         /// then query the prices against the fallback main quote currency
         /// which is <see cref="CoinGeckoClient.MainQuoteCurrency"/>
-        var expectedQuoteCount = Math.Max(1, quoteIds.Length - unsupportedCount);
+        var expectedQuoteCount = Math.Max(1, vsCurrencies.Length - unsupportedCount);
 
         var expectedPriceCount = expectedBaseCount * expectedQuoteCount;
         result.TotalPriceCount.Should().Be(expectedPriceCount);
 
         foreach (var baseId in baseIds)
         {
-            foreach (var quoteId in quoteIds)
+            foreach (var vsCurrency in vsCurrencies)
             {
-                var price = result.GetPrice(baseId, quoteId);
+                var price = result.GetPrice(baseId, vsCurrency);
                 price.Should().BeGreaterThan(0);
             }
         }

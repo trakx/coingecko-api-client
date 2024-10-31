@@ -15,6 +15,29 @@ paths:
         200:
           description: Status OK
           content: {}
+  /search:
+    get:
+      tags:
+      - Search
+      summary: Search Queries
+      description: This endpoint allows you to **search for coins, categories and
+        markets listed on CoinGecko**.
+      operationId: search-data
+      parameters:
+      - name: query
+        in: query
+        description: search query
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: List of coins, categories and markets matching search term
+            ordered by market cap
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Search"
   /simple/price:
     get:
       tags:
@@ -1904,3 +1927,84 @@ components:
           type: number
           format: decimal
           nullable: true
+    Search:
+      type: object
+      properties:
+        coins:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+                description: coin id
+              name:
+                type: string
+                description: coin name
+              api_symbol:
+                type: string
+                description: coin api symbol
+              symbol:
+                type: string
+                description: coin symbol
+              market_cap_rank:
+                type: number
+                description: coin market cap rank
+              thumb:
+                type: string
+                description: coin thumb image url
+              large:
+                type: string
+                description: coin large image url
+        exchanges:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+                description: exchange id
+              name:
+                type: string
+                description: exchange name
+              market_type:
+                type: string
+                description: exchange market type
+              thumb:
+                type: string
+                description: exchange thumb image url
+              large:
+                type: string
+                description: exchange large image url
+        icos:
+          type: array
+          items:
+            type: string
+        categories:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: number
+                description: category id
+              name:
+                type: string
+                description: category name
+        nfts:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+                description: nft collection id
+              name:
+                type: string
+                description: nft name
+              symbol:
+                type: string
+                description: nft collection symbol
+              thumb:
+                type: string
+                description: nft collection thumb image url

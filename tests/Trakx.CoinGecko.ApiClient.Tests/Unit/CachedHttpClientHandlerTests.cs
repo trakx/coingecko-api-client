@@ -1,9 +1,5 @@
-﻿using System.Collections.Generic;
-using System.Net;
-using System.Net.Http;
+﻿using System.Net;
 using System.Text.Json;
-using System.Threading;
-using System.Threading.Tasks;
 using Microsoft.Extensions.Caching.Distributed;
 using Trakx.Common.ApiClient.Exceptions;
 
@@ -13,7 +9,7 @@ public class CachedHttpClientHandlerTests
 {
     private static readonly CancellationToken Cancellation = CancellationToken.None;
 
-    private readonly IDistributedCache _cache;
+    private readonly IDistributedCache _distributedCache;
     private readonly TestMessageHandler _innerHandler;
     private readonly CachedHttpClientHandler _handler;
 
@@ -21,11 +17,11 @@ public class CachedHttpClientHandlerTests
     {
         var configuration = new CoinGeckoApiConfiguration();
 
-        _cache = Substitute.For<IDistributedCache>();
+        _distributedCache = Substitute.For<IDistributedCache>();
 
         _innerHandler = new TestMessageHandler();
 
-        _handler = new CachedHttpClientHandler(_cache, configuration)
+        _handler = new CachedHttpClientHandler(_distributedCache, configuration)
         {
             InnerHandler = _innerHandler
         };
@@ -40,7 +36,7 @@ public class CachedHttpClientHandlerTests
 
         _ = await _handler.SendAsyncInternal(request, Cancellation);
 
-        _cache.ReceivedCalls().Should().BeEmpty();
+        _distributedCache.ReceivedCalls().Should().BeEmpty();
         _innerHandler.CallsToSendAsync.Should().Be(1);
     }
 
@@ -56,21 +52,21 @@ public class CachedHttpClientHandlerTests
         var responseContent = await response.Content.ReadAsStringAsync();
         responseContent.Should().Be(cachedResponse.Content);
 
-        _cache.ReceivedCalls().Should().HaveCount(1);
+        _distributedCache.ReceivedCalls().Should().HaveCount(1);
         _innerHandler.CallsToSendAsync.Should().Be(0);
     }
 
     [Fact]
     public async Task SendAsyncInternal_gets_fresh_response_if_not_cached()
     {
-        _cache.GetAsync(Arg.Any<string>(), Cancellation).Returns((byte[])null!);
+        _distributedCache.GetAsync(Arg.Any<string>(), Cancellation).Returns((byte[])null!);
         _innerHandler.SetupResponse(HttpStatusCode.NotFound, string.Empty);
 
         HttpRequestMessage request = CreateRequest(HttpMethod.Get);
 
         _ = await _handler.SendAsyncInternal(request, Cancellation);
 
-        _cache.ReceivedCalls().Should().HaveCount(1);
+        _distributedCache.ReceivedCalls().Should().HaveCount(1);
         _innerHandler.CallsToSendAsync.Should().Be(1);
     }
 
@@ -79,7 +75,7 @@ public class CachedHttpClientHandlerTests
     {
         const string errorMessage = "something unexpected happened";
 
-        _cache.GetAsync(Arg.Any<string>(), Cancellation).Returns((byte[])null!);
+        _distributedCache.GetAsync(Arg.Any<string>(), Cancellation).Returns((byte[])null!);
         _innerHandler.SetupResponse(HttpStatusCode.InternalServerError, errorMessage);
 
         HttpRequestMessage request = CreateRequest(HttpMethod.Get);
@@ -111,7 +107,7 @@ public class CachedHttpClientHandlerTests
 
         byte[] cachedValue = JsonSerializer.SerializeToUtf8Bytes(cachedResponse);
 
-        _cache
+        _distributedCache
             .GetAsync(cacheKey, Cancellation)
             .Returns(cachedValue);
 

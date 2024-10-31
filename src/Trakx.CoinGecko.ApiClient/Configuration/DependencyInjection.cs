@@ -17,7 +17,7 @@ using Trakx.Common.Logging;
 
 namespace Trakx.CoinGecko.ApiClient;
 
-public static partial class ApiClientExtensions
+public static class DependencyInjection
 {
     public static IServiceCollection AddCoinGeckoClient(
         this IServiceCollection services, IConfiguration configuration)
@@ -43,6 +43,9 @@ public static partial class ApiClientExtensions
 
         // clients: api and http
         services.AddSingleton<ICoinGeckoClient, CoinGeckoClient>();
+        services.AddSingleton<ICoinGeckoSymbolsClient, CoinGeckoClient>();
+        services.AddSingleton<ICoinGeckoPricesClient, CoinGeckoClient>();
+        services.AddSingleton<ICoinGeckoMarketClient, CoinGeckoClient>();
         services.AddTransient<CachedHttpClientHandler>();
         services.AddHttpClientsForCoinGeckoClients(apiConfiguration);
 
@@ -73,7 +76,8 @@ public static partial class ApiClientExtensions
             .AddHttpClientForCoinGeckoClient<IPingClient, PingClient>(configurator, delays)
             .AddHttpClientForCoinGeckoClient<ISimpleClient, SimpleClient>(configurator, delays)
             .AddHttpClientForCoinGeckoClient<IStatus_updatesClient, Status_updatesClient>(configurator, delays)
-            .AddHttpClientForCoinGeckoClient<ITrendingClient, TrendingClient>(configurator, delays);
+            .AddHttpClientForCoinGeckoClient<ITrendingClient, TrendingClient>(configurator, delays)
+            .AddHttpClientForCoinGeckoClient<ISearchClient, SearchClient>(configurator, delays);
     }
 
     internal static IServiceCollection AddHttpClientForCoinGeckoClient<TInterface, TImplementation>(

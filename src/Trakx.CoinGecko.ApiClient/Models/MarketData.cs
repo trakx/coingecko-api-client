@@ -14,5 +14,4 @@ public record MarketData
     public string? CoinSymbol { get; init; }
     public decimal? CirculatingSupply { get; init; }
     public int? MarketCapRank { get; init; }
-
 }
