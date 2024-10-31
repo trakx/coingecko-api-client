@@ -13,11 +13,7 @@ public partial class CoinGeckoClient : ICoinGeckoClient
     private static readonly ILogger Logger = LoggerProvider.Create<CoinGeckoClient>();
 
     private readonly IMemoryCache _cache;
-    private readonly ICoinsClient _coinsClient;
-    private readonly ISimpleClient _simpleClient;
-    private readonly ISearchClient _searchClient;
-    private readonly IDateTimeProvider _dateTimeProvider;
-    private readonly string? _typeName;
+    protected readonly string? _typeName;
 
     public CoinGeckoClient(
         IMemoryCache cache,

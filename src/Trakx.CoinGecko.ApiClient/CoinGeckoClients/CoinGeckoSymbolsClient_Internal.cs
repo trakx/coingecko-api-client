@@ -5,6 +5,8 @@ namespace Trakx.CoinGecko.ApiClient;
 // will soon become CoinGeckoSymbolsClient
 public partial class CoinGeckoClient
 {
+    private readonly ISearchClient _searchClient;
+
     private async Task<List<CoinList>> GetCoinListInternal(CancellationToken cancellationToken = default)
     {
         var coinList = await _coinsClient.ListAllAsync(cancellationToken: cancellationToken);

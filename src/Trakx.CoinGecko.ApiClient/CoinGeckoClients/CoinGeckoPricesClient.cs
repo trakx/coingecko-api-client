@@ -5,6 +5,8 @@ namespace Trakx.CoinGecko.ApiClient;
 // will soon become CoinGeckoPricesClient
 public partial class CoinGeckoClient : ICoinGeckoPricesClient
 {
+    private readonly ISimpleClient _simpleClient;
+
     /// <inheritdoc />
     public async Task<decimal?> GetLatestPrice(
         string coinGeckoId,

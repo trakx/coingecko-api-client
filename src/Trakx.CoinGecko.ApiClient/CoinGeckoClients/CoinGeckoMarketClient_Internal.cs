@@ -7,6 +7,8 @@ namespace Trakx.CoinGecko.ApiClient;
 // will soon become CoinGeckoMarketClient
 public partial class CoinGeckoClient
 {
+    private readonly ICoinsClient _coinsClient;
+
     private async Task<Dictionary<DateTimeOffset, MarketData>> GetMarketDataInternal(
         string id,
         string vsCurrency,
