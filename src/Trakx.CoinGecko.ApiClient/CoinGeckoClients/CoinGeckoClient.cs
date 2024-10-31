@@ -27,11 +27,13 @@ public partial class CoinGeckoClient : ICoinGeckoClient
         _simpleClient = simpleClient;
         _searchClient = searchClient;
         _dateTimeProvider = dateTimeProvider;
-        _typeName = GetType().FullName;
+        _typeName = GetType().Name;
     }
 
-    private async Task<T> GetFromCacheOrApi<T>(string cacheKey, Func<Task<T>> getFromApi)
+    private async Task<T> GetFromCacheOrApi<T>(object?[] keyFragments, Func<Task<T>> getFromApi)
     {
+        string cacheKey = BuildCacheKey(keyFragments);
+
         var value = await _cache.GetOrCreateAsync<T>(cacheKey, async (entry) =>
         {
             entry.AbsoluteExpirationRelativeToNow = DefaultCacheLifeSpan;
@@ -39,5 +41,10 @@ public partial class CoinGeckoClient : ICoinGeckoClient
         });
 
         return value!;
+    }
+
+    internal string BuildCacheKey(params object?[] keyFragments)
+    {
+        return string.Join('|', keyFragments.Prepend(_typeName));
     }
 }

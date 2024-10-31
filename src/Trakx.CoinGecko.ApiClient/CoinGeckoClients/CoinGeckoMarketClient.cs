@@ -18,8 +18,9 @@ public partial class CoinGeckoClient : ICoinGeckoMarketClient
         if (days <= 1)
             return await GetMarketDataInternal(id, vsCurrency, days, cancellationToken);
 
-        var cacheKey = $"{_typeName}|chart|{id}|{vsCurrency}|{days}";
-        return await GetFromCacheOrApi(cacheKey, async () => await GetMarketDataInternal(id, vsCurrency, days, cancellationToken));
+        return await GetFromCacheOrApi(
+            [nameof(GetMarketData), id, vsCurrency, days],
+            async () => await GetMarketDataInternal(id, vsCurrency, days, cancellationToken));
     }
 
     /// <inheritdoc />
@@ -38,8 +39,9 @@ public partial class CoinGeckoClient : ICoinGeckoMarketClient
         if (endsHowLongAgo.Days <= 1)
             return await GetMarketDataForDateRangeInternal(id, vsCurrency, startUnix, endUnix, cancellationToken);
 
-        var cacheKey = $"{_typeName}|range|{id}|{vsCurrency}|{startUnix}|{endUnix}";
-        return await GetFromCacheOrApi(cacheKey, async () => await GetMarketDataForDateRangeInternal(id, vsCurrency, startUnix, endUnix, cancellationToken));
+        return await GetFromCacheOrApi(
+            [nameof(GetMarketDataForDateRange), id, vsCurrency, startUnix, endUnix],
+            async () => await GetMarketDataForDateRangeInternal(id, vsCurrency, startUnix, endUnix, cancellationToken));
     }
 
     /// <inheritdoc />
@@ -50,8 +52,10 @@ public partial class CoinGeckoClient : ICoinGeckoMarketClient
         CancellationToken cancellationToken = default)
     {
         var date = asOf.ToDateString();
-        var cacheKey = $"{_typeName}|market-data|{id}|{quoteCurrencyId}|{date}";
-        return await GetFromCacheOrApi(cacheKey, async () => await GetMarketDataAsOfFromIdInternal(id, asOf, quoteCurrencyId, date));
+
+        return await GetFromCacheOrApi(
+            [nameof(GetMarketDataAsOfFromId), id, quoteCurrencyId, date],
+            async () => await GetMarketDataAsOfFromIdInternal(id, asOf, quoteCurrencyId, date));
     }
 
     /// <inheritdoc />
@@ -65,9 +69,10 @@ public partial class CoinGeckoClient : ICoinGeckoMarketClient
         // If a call is made for a rank of over 1000, it runs and is cached on its own.
 
         var limitCacheKey = Math.Max(limit, ICoinGeckoMarketClient.MarketRankDefaultLimit);
-        var cacheKey = $"{_typeName}|market-rank|{limitCacheKey}";
 
-        var list = await GetFromCacheOrApi(cacheKey, async () => await GetMarketRankInternal(limit, cancellationToken));
+        var list = await GetFromCacheOrApi(
+            [nameof(GetMarketRank), limitCacheKey],
+            async () => await GetMarketRankInternal(limit, cancellationToken));
 
         // this ensures we only return the requested "limit" amount even when reusing the default "1000" result
         if (list.Count > limit)
@@ -86,7 +91,8 @@ public partial class CoinGeckoClient : ICoinGeckoMarketClient
         int? page = null,
         CancellationToken cancellationToken = default)
     {
-        var cacheKey = $"{_typeName}|search|{vsCurrency}|{ids}|{category}|{order}|{page}|{per_page}";
-        return await GetFromCacheOrApi(cacheKey, async () => await SearchMarketsInternal(vsCurrency, ids, category, order, per_page, page, cancellationToken));
+        return await GetFromCacheOrApi(
+            [nameof(Search), vsCurrency, ids, category, order, page, per_page],
+            async () => await SearchMarketsInternal(vsCurrency, ids, category, order, per_page, page, cancellationToken));
     }
 }
