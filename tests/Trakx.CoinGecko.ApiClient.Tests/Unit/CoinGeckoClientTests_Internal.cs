@@ -31,7 +31,7 @@ public partial class CoinGeckoClientTests
             }
         };
 
-        var timestamp = CoinGeckoClient.GetDateString(date ?? _mockCreator.GetUtcDateTime());
+        var timestamp = (date ?? _mockCreator.GetUtcDateTime()).ToDateString();
 
         _coinsClient
             .HistoryAsync(idValue, timestamp, localization: false)
@@ -124,10 +124,45 @@ public partial class CoinGeckoClientTests
             });
     }
 
-    private void AssertCachedEntry(params string[] keyFragments)
+    private void AssertCachedEntry(params object?[] keyFragments)
     {
-        _memoryCache
-            .Received(1)
-            .CreateEntry(Arg.Is<object>(key => keyFragments.All(key.ToString()!.Contains)));
+        AssertCachedEntryBase(nameof(_memoryCache.CreateEntry), keyFragments);
+    }
+
+    private void AssertReusedCachedEntry(params object?[] keyFragments)
+    {
+        AssertCachedEntryBase(nameof(_memoryCache.TryGetValue), keyFragments);
+    }
+
+    private void AssertCachedEntryBase(string methodName, object?[] keyFragments)
+    {
+        string[] fragments = keyFragments
+            .Where(p => p != null)
+            .Select(p => p!.ToString()!)
+            .ToArray();
+
+        string[] cacheKeys = _memoryCache
+            .GetReceivedCalls(methodName)
+            .Select(p => p.GetArgument<object>())
+            .Where(p => p != null)
+            .Select(p => p.ToString()!)
+            .ToArray();
+
+        foreach (var cacheKey in cacheKeys)
+        {
+            var isExpectedKey = fragments.All(cacheKey.Contains);
+            if (isExpectedKey) return; // we found a key with all expected fragments
+        }
+
+        string StringsToList(string[] s) => string.Join(Environment.NewLine + " - ", s.Prepend(" "));
+
+        // we did not find a key matching all fragments
+        var failMessage = $"""
+            No entry found in MemoryCache with key fragments:{StringsToList(fragments)}
+
+            Found cached entries with the following keys:{StringsToList(cacheKeys)}
+            """;
+
+        Assert.Fail(failMessage);
     }
 }

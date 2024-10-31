@@ -2,7 +2,6 @@
 using Microsoft.Extensions.Logging;
 using Trakx.CoinGecko.ApiClient.Models;
 using Trakx.Common.DateAndTime;
-using Trakx.Common.Extensions;
 using Trakx.Common.Logging;
 
 namespace Trakx.CoinGecko.ApiClient;
@@ -45,8 +44,8 @@ public partial class CoinGeckoClient : ICoinGeckoClient
         ArgumentException.ThrowIfNullOrWhiteSpace(quoteCurrencyId);
 
         var prices = await GetAllPrices(
-            coinGeckoId.AsSingletonIEnumerable(),
-            quoteCurrencyId.AsSingletonArray(),
+            [coinGeckoId],
+            [quoteCurrencyId],
             cancellationToken);
 
         var price = prices.GetPrice(coinGeckoId, quoteCurrencyId);
@@ -142,77 +141,5 @@ public partial class CoinGeckoClient : ICoinGeckoClient
         };
     }
 
-    /// <inheritdoc />
-    public async Task<MarketData?> GetMarketDataAsOfFromId(string id, DateTime asOf, string quoteCurrencyId = Constants.UsdCoin)
-    {
-        var date = GetDateString(asOf);
-        var cacheKey = $"{_typeName}|market-data|{id}|{quoteCurrencyId}|{date}";
-        return await GetFromCacheOrApi(cacheKey, async () => await GetMarketDataAsOfFromIdFromApi(id, asOf, quoteCurrencyId, date));
-    }
 
-    /// <inheritdoc />
-    public async Task<IDictionary<DateTimeOffset, MarketData>> GetMarketDataForDateRange(
-        string id, string vsCurrency,
-        DateTimeOffset start, DateTimeOffset end,
-        CancellationToken cancellationToken = default)
-    {
-        var startUnix = start.ToUnixTimeSeconds();
-        var endUnix = end.ToUnixTimeSeconds();
-
-        // skip cache for any query ending today or yesterday
-        var endsHowLongAgo = _dateTimeProvider.UtcNowAsOffset.Date - end.Date;
-        if (endsHowLongAgo.Days <= 1)
-            return await GetMarketDataForDateRangeFromApi(id, vsCurrency, startUnix, endUnix, cancellationToken);
-
-        var cacheKey = $"{_typeName}|range|{id}|{vsCurrency}|{startUnix}|{endUnix}";
-        return await GetFromCacheOrApi(cacheKey, async () => await GetMarketDataForDateRangeFromApi(id, vsCurrency, startUnix, endUnix, cancellationToken));
-    }
-
-    /// <inheritdoc />
-    public async Task<IDictionary<DateTimeOffset, MarketData>> GetMarketData(
-        string id, string vsCurrency, int days, CancellationToken cancellationToken = default)
-    {
-        // skip cache for queries for 1 day only
-        if (days <= 1)
-            return await GetMarketDataFromApi(id, vsCurrency, days, cancellationToken);
-
-        var cacheKey = $"{_typeName}|chart|{id}|{vsCurrency}|{days}";
-        return await GetFromCacheOrApi(cacheKey, async () => await GetMarketDataFromApi(id, vsCurrency, days, cancellationToken));
-    }
-
-    /// <inheritdoc />
-    public async Task<List<MarketData>> Search(
-        string vsCurrency = Constants.Usd,
-        string? ids = null,
-        string? category = null,
-        string order = "market_cap_desc",
-        int? per_page = null,
-        int? page = null,
-        CancellationToken cancellationToken = default)
-    {
-        var cacheKey = $"{_typeName}|search|{vsCurrency}|{ids}|{category}|{order}|{page}|{per_page}";
-        return await GetFromCacheOrApi(cacheKey, async () => await SearchApi(vsCurrency, ids, category, order, per_page, page, cancellationToken));
-    }
-
-    /// <inheritdoc />
-    public async Task<IList<MarketData>> GetMarketRank(
-        int limit = ICoinGeckoClient.MarketRankDefaultLimit,
-        CancellationToken cancellationToken = default)
-    {
-        // The default limit is 1000 coins in the results.
-        // We can cache the calls to get 1000 ranked coins daily.
-        // If a call is made to get a lower amount, say 50 coins, we grab the cached 1000 list and take only the first 50.
-        // If a call is made for a rank of over 1000, it runs and is cached on its own.
-
-        var limitCacheKey = Math.Max(limit, ICoinGeckoClient.MarketRankDefaultLimit);
-        var cacheKey = $"{_typeName}|market-rank|{limitCacheKey}";
-
-        var list = await GetFromCacheOrApi(cacheKey, async () => await GetMarketRankFromApi(limit, cancellationToken));
-
-        // this ensures we only return the requested "limit" amount even when reusing the default "1000" result
-        if (list.Count > limit)
-            list = list.Take(limit).ToList();
-
-        return list;
-    }
 }

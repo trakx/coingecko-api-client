@@ -1,8 +1,4 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net;
-using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Trakx.CoinGecko.ApiClient.Tests.Integration;
@@ -73,15 +69,11 @@ public class CoinsClientTests : CoinGeckoClientTestBase
         range.Content.Total_volumes.Count.Should().Be(range.Content.Prices.Count);
 
         var first = range.Content.Prices.First();
-        DateTimeOffset
-            .FromUnixTimeMilliseconds((long)first[0])
-            .Should().BeCloseTo(start, TimeSpan.FromDays(1));
+        first[0].AsUnixMillisToDate().Should().BeCloseTo(start, TimeSpan.FromDays(1));
         first[1].Should().BeApproximately(613d, 15d);
 
         var last = range.Content.Prices.Last();
-        DateTimeOffset
-            .FromUnixTimeMilliseconds((long)last[0])
-            .Should().BeCloseTo(end, TimeSpan.FromDays(1));
+        last[0].AsUnixMillisToDate().Should().BeCloseTo(end, TimeSpan.FromDays(1));
         last[1].Should().BeApproximately(746d, 10d);
 
         EnsureAllJsonElementsWereMapped(range);

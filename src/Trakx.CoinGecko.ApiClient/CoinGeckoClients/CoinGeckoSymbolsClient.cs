@@ -1,5 +1,6 @@
 ﻿namespace Trakx.CoinGecko.ApiClient;
 
+// will soon become CoinGeckoSymbolsClient
 public partial class CoinGeckoClient : ICoinGeckoSymbolsClient
 {
     /// <inheritdoc />
