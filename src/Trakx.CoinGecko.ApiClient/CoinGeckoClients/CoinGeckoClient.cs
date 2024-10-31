@@ -30,10 +30,8 @@ public partial class CoinGeckoClient : ICoinGeckoClient
         _typeName = GetType().Name;
     }
 
-    private async Task<T> GetFromCacheOrApi<T>(object?[] keyFragments, Func<Task<T>> getFromApi)
+    private async Task<T> GetFromCacheOrApi<T>(string cacheKey, Func<Task<T>> getFromApi)
     {
-        string cacheKey = BuildCacheKey(keyFragments);
-
         var value = await _cache.GetOrCreateAsync<T>(cacheKey, async (entry) =>
         {
             entry.AbsoluteExpirationRelativeToNow = DefaultCacheLifeSpan;

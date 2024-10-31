@@ -108,9 +108,8 @@ public partial class CoinGeckoClient
     internal async Task<decimal> GetUsdFxRate(string quoteCurrencyId, string date, CancellationToken cancellationToken = default)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(quoteCurrencyId);
-        return await GetFromCacheOrApi(
-            [nameof(GetUsdFxRate), quoteCurrencyId, date],
-            async () => await GetUsdFxRateInternal(quoteCurrencyId, date, cancellationToken));
+        var cacheKey = BuildCacheKey(nameof(GetUsdFxRate), quoteCurrencyId, date);
+        return await GetFromCacheOrApi(cacheKey, async () => await GetUsdFxRateInternal(quoteCurrencyId, date, cancellationToken));
     }
 
     private async Task<decimal> GetUsdFxRateInternal(
