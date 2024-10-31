@@ -1,5 +1,4 @@
 ﻿using System.Text.Json;
-using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using Trakx.Common.ApiClient;
 using Trakx.Common.Extensions;
@@ -7,21 +6,9 @@ using Trakx.Common.Logging;
 
 namespace Trakx.CoinGecko.ApiClient;
 
+// will soon become CoinGeckoPricesClient
 public partial class CoinGeckoClient
 {
-    private static readonly TimeSpan DefaultCacheLifeSpan = TimeSpan.FromDays(1);
-
-    private async Task<T> GetFromCacheOrApi<T>(string cacheKey, Func<Task<T>> getFromApi)
-    {
-        var value = await _cache.GetOrCreateAsync<T>(cacheKey, async (entry) =>
-        {
-            entry.AbsoluteExpirationRelativeToNow = DefaultCacheLifeSpan;
-            return await getFromApi();
-        });
-
-        return value!;
-    }
-
     private async Task<Response<IDictionary<string, IDictionary<string, decimal?>>>> GetAllPricesInternal(
         IEnumerable<string> ids,
         string[]? vsCurrencies,

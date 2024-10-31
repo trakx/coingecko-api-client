@@ -1,8 +1,12 @@
-﻿namespace Trakx.CoinGecko.ApiClient;
+﻿using Trakx.Common.DateAndTime;
+
+namespace Trakx.CoinGecko.ApiClient;
 
 // will soon become CoinGeckoMarketClient
 public partial class CoinGeckoClient : ICoinGeckoMarketClient
 {
+    private readonly IDateTimeProvider _dateTimeProvider;
+
     /// <inheritdoc />
     public async Task<IDictionary<DateTimeOffset, MarketData>> GetMarketData(
         string id,

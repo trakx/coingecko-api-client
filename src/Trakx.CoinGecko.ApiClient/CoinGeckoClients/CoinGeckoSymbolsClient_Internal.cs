@@ -5,6 +5,8 @@ namespace Trakx.CoinGecko.ApiClient;
 // will soon become CoinGeckoSymbolsClient
 public partial class CoinGeckoClient
 {
+    private readonly ISearchClient _searchClient;
+
     private async Task<List<CoinList>> GetCoinListInternal(CancellationToken cancellationToken = default)
     {
         var coinList = await _coinsClient.ListAllAsync(cancellationToken: cancellationToken);
@@ -70,7 +72,7 @@ public partial class CoinGeckoClient
 
         foreach (var symbol in symbols)
         {
-            var ids = fullMap[symbol];
+            var ids = fullMap.GetValueOrDefault(symbol);
             if (ids == null)
             {
                 // symbol is unranked, search API for the symbol
