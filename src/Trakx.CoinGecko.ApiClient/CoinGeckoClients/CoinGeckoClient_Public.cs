@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Caching.Memory;
+﻿using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using Trakx.CoinGecko.ApiClient.Models;
 using Trakx.Common.DateAndTime;
@@ -122,13 +117,6 @@ public partial class CoinGeckoClient : ICoinGeckoClient
     }
 
     /// <inheritdoc />
-    public async Task<string?> GetCoinGeckoIdFromSymbol(string symbol, CancellationToken cancellationToken = default)
-    {
-        var cacheKey = $"{_typeName}|id-from-symbol|{symbol}";
-        return await GetFromCacheOrApi(cacheKey, async () => await GetCoinGeckoIdFromSymbolInternal(symbol, cancellationToken));
-    }
-
-    /// <inheritdoc />
     public async Task<PricesForSymbols> GetAllPricesForSymbols(
         IList<string> symbols,
         string[]? vsCurrencies = default,
@@ -152,34 +140,6 @@ public partial class CoinGeckoClient : ICoinGeckoClient
             // necessary so the caller can navigate symbol -> coingeckoid(s) -> price(s)
             SymbolToIdMap = symbolIdMap,
         };
-    }
-
-    /// <inheritdoc />
-    public async Task<List<Coins>> GetCoinsFromSymbol(string symbol, CancellationToken cancellationToken)
-    {
-        var cacheKey = $"{_typeName}|coins-from-symbol|{symbol}";
-        return await GetFromCacheOrApi(cacheKey, async () => await GetCoinsFromSymbolInternal(symbol, cancellationToken));
-    }
-
-    /// <inheritdoc />
-    public async Task<SymbolToCoinGeckoIdsMap> MapRankedSymbolsToCoinGeckoIds(CancellationToken cancellationToken = default)
-    {
-        var cacheKey = $"{_typeName}|symbol-to-ids-map";
-        return await GetFromCacheOrApi(cacheKey, async () => await GetSymbolToCoinGeckoIdMapInternal(cancellationToken));
-    }
-
-    /// <inheritdoc />
-    public async Task<IList<CoinList>> GetCoinList(CancellationToken cancellationToken = default)
-    {
-        var cacheKey = $"{_typeName}|coin-list";
-        return await GetFromCacheOrApi(cacheKey, async () => await GetCoinListFromApi(cancellationToken));
-    }
-
-    /// <inheritdoc />
-    public async Task<ICollection<string>> GetSupportedQuoteCurrencies(CancellationToken cancellationToken = default)
-    {
-        var cacheKey = $"{_typeName}|supported-vs-currencies";
-        return await GetFromCacheOrApi(cacheKey, async () => await GetSupportedQuoteCurrenciesFromApi(cancellationToken));
     }
 
     /// <inheritdoc />

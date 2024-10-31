@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
 using Trakx.Common.ApiClient.Extensions;
 
 namespace Trakx.CoinGecko.ApiClient.Tests.Unit;
@@ -75,7 +71,7 @@ public partial class CoinGeckoClientTests
     private void SetupMarketsPage(List<SearchCoinData> marketData, int page = 1)
     {
         _coinsClient.MarketsAsync(
-            vs_currency: ICoinGeckoClient.MainQuoteCurrency,
+            vs_currency: ICoinGeckoMarketClient.MainQuoteCurrency,
             ids: Arg.Any<string?>(),
             category: Arg.Any<string>(),
             order: Arg.Any<string>(),
@@ -126,5 +122,12 @@ public partial class CoinGeckoClientTests
                 call[1] = marketData;
                 return true;
             });
+    }
+
+    private void AssertCachedEntry(params string[] keyFragments)
+    {
+        _memoryCache
+            .Received(1)
+            .CreateEntry(Arg.Is<object>(key => keyFragments.All(key.ToString()!.Contains)));
     }
 }
