@@ -1,6 +1,3 @@
-using System;
-using System.Linq;
-using System.Net.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Trakx.Common.Infrastructure.Caching;
 
@@ -44,7 +41,7 @@ public class DependencyInjectionTests
     public void AddCoinGeckoClient_sets_expected_base_url_and_timeout()
     {
         var configurator = new ClientConfigurator(_coinGeckoApiConfiguration);
-        var delays = _coinGeckoApiConfiguration.InitialRetryDelay.AsSingletonList();
+        List<TimeSpan> delays = [_coinGeckoApiConfiguration.InitialRetryDelay];
 
         // custom test client
         _serviceCollection.AddHttpClientForCoinGeckoClient<IExtensionsTestClient, ExtensionsTestClient>(configurator, delays);

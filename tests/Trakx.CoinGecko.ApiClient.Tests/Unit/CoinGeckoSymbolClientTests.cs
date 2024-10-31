@@ -2,6 +2,7 @@ using Trakx.Common.ApiClient.Extensions;
 
 namespace Trakx.CoinGecko.ApiClient.Tests.Unit;
 
+// will soon become CoinGeckoSymbolClientTests
 public partial class CoinGeckoClientTests
 {
     [Fact]
