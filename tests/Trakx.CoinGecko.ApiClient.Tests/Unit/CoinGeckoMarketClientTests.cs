@@ -36,7 +36,7 @@ public partial class CoinGeckoClientTests
     [Fact]
     public async Task GetMarketDataForDateRange_should_call_Range_and_transform_data()
     {
-        var dates = new double[] { 1619756926435, 1619757185872 };
+        var dates = new double[] { 161_975_692_6435, 161_975_718_5872 };
 
         var range = CreateRange(dates);
         SetupRangeResponse(_coin, VsCurrency, _start, _end, range);
