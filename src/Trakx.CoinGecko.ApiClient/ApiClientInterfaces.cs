@@ -1440,7 +1440,7 @@ namespace Trakx.CoinGecko.ApiClient
         /// category id
         /// </summary>
         [Newtonsoft.Json.JsonProperty("id", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public double? Id { get; set; }
+        public string Id { get; set; }
 
         /// <summary>
         /// category name

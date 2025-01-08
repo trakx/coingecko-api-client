@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Polly;
@@ -90,7 +86,7 @@ public static class DependencyInjection
         var clientType = typeof(TImplementation);
 
         var httpClientBuilder = services
-            .AddHttpClient<TInterface, TImplementation>(clientType.FullName!, configurator.ApplyConfiguration)
+            .AddHttpClient<TInterface, TImplementation>(clientType.FullName!, client => configurator.ApplyConfiguration(client))
             .AddHttpMessageHandler<CachedHttpClientHandler>()
             .AddPolicyHandler((serviceProvider, _) =>
             {
@@ -123,7 +119,7 @@ public static class DependencyInjection
         DelegateResult<HttpResponseMessage> response, TimeSpan minDelay)
     {
         var retryAfter = response.Result?.Headers?.RetryAfter;
-        if (retryAfter == null) return default;
+        if (retryAfter == null) return TimeSpan.Zero;
 
         var waitDuration = retryAfter.Delta.GetValueOrDefault();
 
