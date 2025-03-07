@@ -11,11 +11,11 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="8.0.12" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="8.0.13" />
     <PackageReference Include="Polly.Caching.Memory" Version="3.0.2" />
-    <PackageReference Include="Trakx.Common.ApiClient" Version="1.5.2" />
-    <PackageReference Include="Trakx.Common.Caching" Version="1.5.2" />
-    <PackageReference Include="Trakx.Common.Infrastructure.Caching" Version="1.5.2" />
+    <PackageReference Include="Trakx.Common.ApiClient" Version="1.5.4" />
+    <PackageReference Include="Trakx.Common.Caching" Version="1.5.4" />
+    <PackageReference Include="Trakx.Common.Infrastructure.Caching" Version="1.5.4" />
   </ItemGroup>
 
   <Target Name="NSwag" BeforeTargets="Build" Condition="'$(GenerateApiClient)'=='True' ">
