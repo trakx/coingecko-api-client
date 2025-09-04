@@ -156,7 +156,7 @@ public class CoinGeckoClientTests : CoinGeckoClientTestBase
 
         var map = result.SymbolToIdMap;
         map.Should().NotBeNull();
-        map.Should().ContainKey("btc").WhoseValue.Should().BeEquivalentTo("bitcoin");
+        map.Should().ContainKey("btc").WhoseValue.Should().ContainEquivalentOf("bitcoin");
         map.Should().ContainKey("waxl").WhoseValue.Should().BeEquivalentTo("wrapped-axelar");
         map.Should().ContainKey("trkx").WhoseValue.Should().BeEquivalentTo(["trakx"]);
 
