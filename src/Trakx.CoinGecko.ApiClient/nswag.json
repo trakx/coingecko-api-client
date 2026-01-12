@@ -1,5 +1,5 @@
 ﻿{
-  "runtime": "Net80",
+  "runtime": "Net100",
   "defaultVariables": null,
   "documentGenerator": {
     "fromDocument": {
@@ -22,13 +22,12 @@
       "useHttpClientCreationMethod": false,
       "httpClientType": "System.Net.Http.HttpClient",
       "useHttpRequestMessageCreationMethod": false,
-      "useBaseUrl": true,
+      "useBaseUrl": false,
       "generateBaseUrlProperty": false,
       "generateSyncMethods": false,
       "exposeJsonSerializerSettings": false,
       "clientClassAccessModifier": "internal",
       "typeAccessModifier": "public",
-
       "parameterDateTimeFormat": "s",
       "parameterDateFormat": "yyyy-MM-dd",
       "generateUpdateJsonSerializerSettingsMethod": true,
@@ -36,7 +35,6 @@
       "serializeTypeInformation": false,
       "queryNullValue": "",
       "operationGenerationMode": "MultipleClientsFromFirstTagAndOperationId",
-      
       "className": "{controller}Client",
       "namespace": "Trakx.CoinGecko.ApiClient",
       "output": "ApiClients.cs",
@@ -44,7 +42,6 @@
         "Trakx.Common.ApiClient",
         "Trakx.Common.ApiClient.Exceptions"
       ],
-      
       "generateContractsOutput": true,
       "contractsNamespace": "Trakx.CoinGecko.ApiClient",
       "contractsOutputFilePath": "ApiClientInterfaces.cs",
@@ -52,7 +49,6 @@
         "Trakx.Common.ApiClient",
         "Trakx.Common.ApiClient.Exceptions"
       ],
-
       "generateOptionalParameters": true,
       "generateJsonMethods": false,
       "enforceFlagEnums": false,

@@ -1,6 +1,4 @@
-﻿using System.Net.Http;
-
-namespace Trakx.CoinGecko.ApiClient;
+﻿namespace Trakx.CoinGecko.ApiClient;
 
 public class ClientConfigurator
 {
@@ -15,10 +13,12 @@ public class ClientConfigurator
 
     internal void ApplyConfiguration(HttpClient client)
     {
+        client.BaseAddress = Configuration.BaseUrl;
+
         if (Configuration.IsPro && !client.DefaultRequestHeaders.Contains(ProHeader))
             client.DefaultRequestHeaders.Add(ProHeader, Configuration.ApiKey);
 
-        if (Configuration.Timeout != default)
+        if (Configuration.Timeout != TimeSpan.Zero)
             client.Timeout = Configuration.Timeout;
     }
 }

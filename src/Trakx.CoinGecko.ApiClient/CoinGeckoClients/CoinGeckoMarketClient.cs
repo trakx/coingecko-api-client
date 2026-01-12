@@ -52,7 +52,7 @@ public partial class CoinGeckoClient : ICoinGeckoMarketClient
         var date = asOf.ToDateString();
 
         var cacheKey = BuildCacheKey(nameof(GetMarketDataAsOfFromId), id, quoteCurrencyId, date);
-        return await GetFromCacheOrApi(cacheKey, async () => await GetMarketDataAsOfFromIdInternal(id, asOf, quoteCurrencyId, date));
+        return await GetFromCacheOrApi(cacheKey, async () => await GetMarketDataAsOfFromIdInternal(id, asOf, quoteCurrencyId, date, cancellationToken));
     }
 
     /// <inheritdoc />

@@ -1,7 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
-using Trakx.CoinGecko.ApiClient.Models;
+﻿using Trakx.CoinGecko.ApiClient.Models;
 
 namespace Trakx.CoinGecko.ApiClient;
 
