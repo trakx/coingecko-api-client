@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using Trakx.CoinGecko.ApiClient.Models;
 
 namespace Trakx.CoinGecko.ApiClient.Tests.Unit;

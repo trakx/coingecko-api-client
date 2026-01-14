@@ -51,25 +51,16 @@ public class DependencyInjectionTests
         var testClient = serviceProvider.GetRequiredService<IExtensionsTestClient>();
 
         testClient.HttpClient.Timeout.Should().Be(_coinGeckoApiConfiguration.Timeout);
-        testClient.Url.Should().Be(_coinGeckoApiConfiguration.BaseUrl);
+        testClient.HttpClient.BaseAddress.Should().Be(_coinGeckoApiConfiguration.BaseUrl);
     }
 }
 
 public interface IExtensionsTestClient
 {
     HttpClient HttpClient { get; }
-    Uri Url { get; }
 }
 
-public class ExtensionsTestClient : AuthorisedClient, IExtensionsTestClient
+public class ExtensionsTestClient(HttpClient httpClient) : IExtensionsTestClient
 {
-    public HttpClient HttpClient { get; }
-
-    public Uri Url => new(base.BaseUrl);
-
-    public ExtensionsTestClient(ClientConfigurator configuration, HttpClient httpClient)
-        : base(configuration)
-    {
-        HttpClient = httpClient;
-    }
+    public HttpClient HttpClient { get; } = httpClient;
 }
