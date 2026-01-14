@@ -1,5 +1,4 @@
 using System.Net;
-using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Trakx.CoinGecko.ApiClient.Tests.Integration;
@@ -32,7 +31,7 @@ public class SimpleClientTests : CoinGeckoClientTestBase
     [Fact]
     public async Task Supported_vs_currencies()
     {
-        var currencies = await _simpleClient.Supported_vs_currenciesAsync(default);
+        var currencies = await _simpleClient.Supported_vs_currenciesAsync();
         currencies.StatusCode.Should().Be((int)HttpStatusCode.OK);
         currencies.Content.Should().NotBeEmpty();
     }

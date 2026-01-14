@@ -1,19 +1,15 @@
 ﻿namespace Trakx.CoinGecko.ApiClient;
 
-public class ClientConfigurator
+internal class ClientConfigurator(CoinGeckoApiConfiguration configuration)
 {
     private const string ProHeader = "X-Cg-Pro-Api-Key";
 
-    public CoinGeckoApiConfiguration Configuration { get; }
-
-    public ClientConfigurator(CoinGeckoApiConfiguration configuration)
-    {
-        Configuration = configuration;
-    }
+    internal CoinGeckoApiConfiguration Configuration { get; } = configuration;
 
     internal void ApplyConfiguration(HttpClient client)
     {
-        client.BaseAddress = Configuration.BaseUrl;
+        var baseUrl = Configuration.BaseUrl.AbsoluteUri.TrimEnd('/') + "/";
+        client.BaseAddress = new Uri(baseUrl);
 
         if (Configuration.IsPro && !client.DefaultRequestHeaders.Contains(ProHeader))
             client.DefaultRequestHeaders.Add(ProHeader, Configuration.ApiKey);
