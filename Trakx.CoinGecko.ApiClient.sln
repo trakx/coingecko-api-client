@@ -10,7 +10,6 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_Solution Items", "_Solution Items", "{F9183CBB-5B9E-4E27-A07E-261D68E1A66A}"
 	ProjectSection(SolutionItems) = preProject
 		Directory.Build.props = Directory.Build.props
-		LICENSE = LICENSE
 		src\Packable.Projects.props = src\Packable.Projects.props
 		README.md = README.md
 	EndProjectSection

@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Trakx.CoinGecko.ApiClient;
+﻿namespace Trakx.CoinGecko.ApiClient;
 
 [Serializable]
 public class FailedToRetrieveCoinGeckoIdException : Exception

@@ -2,11 +2,10 @@
 
 public abstract class AuthorisedClient
 {
-    public string BaseUrl { get; }
-
-    protected AuthorisedClient(ClientConfigurator configurator)
+    protected async Task<HttpRequestMessage> CreateHttpRequestMessageAsync(CancellationToken cancellationToken)
     {
-        BaseUrl = configurator.Configuration.BaseUrl.AbsoluteUri;
-        if (BaseUrl[^1] != '/') BaseUrl += "/";
+        await Task.CompletedTask;
+        HttpRequestMessage httpRequestMessage = new();
+        return httpRequestMessage;
     }
 }

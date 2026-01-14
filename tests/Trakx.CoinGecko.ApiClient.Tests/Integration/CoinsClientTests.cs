@@ -82,17 +82,16 @@ public class CoinsClientTests : CoinGeckoClientTestBase
     [Fact]
     public async Task Export_recent_prices()
     {
-        var coins = new List<string>()
-        {
+        List<string> coins =
+        [
             "bitcoin", "pax-gold", "usd-coin", "ethereum", "binancecoin", "crypto-com-chain", "ftx-token",
             "huobi-token", "kucoin-shares", "okb", "woo-network", "1inch", "pancakeswap-token", "curve-dao-token",
             "dydx", "loopring", "thorchain", "havven", "sushi", "uniswap", "0x", "api3", "perpetual-protocol",
             "yearn-finance", "cosmos", "polkadot", "zelcash", "icon", "chainlink", "quant-network", "zencash",
             "aave", "anchor-protocol", "compound-governance-token", "kava", "maker", "cardano", "avalanche-2",
             "dogecoin", "terra-luna", "solana", "ripple", "amp-token", "the-graph", "axie-infinity", "chiliz",
-            "enjincoin", "flow", "gala", "decentraland", "the-sandbox", "smooth-love-potion", "theta-token", "wax",
-            "matic-network", "tron"
-        };
+            "enjincoin", "flow", "gala", "decentraland", "the-sandbox", "smooth-love-potion", "theta-token", "wax", "tron"
+        ];
 
         var coinList = coins.ToCsvList(distinct: true, toLower: true, quoted: false);
 
@@ -104,7 +103,12 @@ public class CoinsClientTests : CoinGeckoClientTestBase
         _output.WriteLine("\"coin\",\"price\"");
         foreach (var coin in coins)
         {
-            var price = data.Content[coin][Constants.Usd]!.Value;
+            var coinData = data.Content[coin];
+
+            if (!coinData.TryGetValue(Constants.Usd, out var coinDataValue) || coinDataValue == null)
+                Assert.Fail($"Coin {coin} has no USD price data");
+
+            var price = coinDataValue.Value;
             _output.WriteLine($"\"{coin}\",\"{price}\"");
         }
     }

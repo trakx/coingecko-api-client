@@ -6,7 +6,7 @@ namespace Trakx.CoinGecko.ApiClient.Tests.Unit;
 
 public partial class CoinGeckoClientTests
 {
-    internal const string VsCurrency = Constants.Usd;
+    private const string VsCurrency = Constants.Usd;
 
     protected const string Symbol = nameof(Symbol);
     protected const string First = nameof(First);

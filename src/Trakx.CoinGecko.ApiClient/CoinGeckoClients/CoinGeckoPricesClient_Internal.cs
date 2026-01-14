@@ -2,19 +2,18 @@
 using Microsoft.Extensions.Logging;
 using Trakx.Common.ApiClient;
 using Trakx.Common.Extensions;
-using Trakx.Common.Logging;
 
 namespace Trakx.CoinGecko.ApiClient;
 
 // will soon become CoinGeckoPricesClient
 public partial class CoinGeckoClient
 {
-    private async Task<Response<IDictionary<string, IDictionary<string, decimal?>>>> GetAllPricesInternal(
+    private async Task<Response<IDictionary<string, PriceInMultipleCurrencies>>> GetAllPricesInternal(
         IEnumerable<string> ids,
         string[]? vsCurrencies,
         CancellationToken cancellationToken = default)
     {
-        (var baseIds, var quoteIds) = await GetIdsForPriceQuery(ids, vsCurrencies, cancellationToken);
+        var (baseIds, quoteIds) = await GetIdsForPriceQuery(ids, vsCurrencies, cancellationToken);
 
         var response = await _simpleClient.PriceAsync(baseIds, quoteIds, cancellationToken: cancellationToken);
 
@@ -30,15 +29,15 @@ public partial class CoinGeckoClient
     /// Each requested quote currency needs to be either a 'base' or a 'vs' id in the price call,
     /// depending if it's a supported quote currency or not.<br />
     /// This method ensures a valid list of 'base' and 'vs' ids
-    /// according to the logic explained in the comment for <see cref="GetLatestPrice(string, string)"/>
+    /// according to the logic explained in the comment for <see cref="GetLatestPrice(string,string,CancellationToken)"/>
     /// </summary>
     private async Task<(string BaseIds, string QuoteIds)> GetIdsForPriceQuery(
         IEnumerable<string> ids,
         string[]? vsCurrencies,
         CancellationToken cancellationToken = default)
     {
-        List<string> baseIds = new();
-        List<string> quoteIds = new();
+        List<string> baseIds = [];
+        List<string> quoteIds = [];
 
         if (ids != null) baseIds.AddRange(ids);
 

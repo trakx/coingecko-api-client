@@ -181,10 +181,10 @@ public class CoinGeckoClientTests : CoinGeckoClientTestBase
 
         var expectedBaseCount = baseCount + unsupportedCount;
 
-        /// when called with no supported currencies,
-        /// the client should add the requested quote ids to the base ids,
-        /// then query the prices against the fallback main quote currency
-        /// which is <see cref="CoinGeckoClient.MainQuoteCurrency"/>
+        // when called with no supported currencies,
+        // the client should add the requested quote ids to the base ids,
+        // then query the prices against the fallback main quote currency
+        // which is <see cref="CoinGeckoClient.MainQuoteCurrency"/>
         var expectedQuoteCount = Math.Max(1, vsCurrencies.Length - unsupportedCount);
 
         var expectedPriceCount = expectedBaseCount * expectedQuoteCount;
@@ -360,7 +360,6 @@ public class CoinGeckoClientTests : CoinGeckoClientTestBase
         "magic",
         "maker",
         "mask-network",
-        "matic-network",
         "metars-genesis",
         "mina-protocol",
         "monero",

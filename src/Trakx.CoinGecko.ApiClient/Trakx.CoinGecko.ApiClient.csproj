@@ -7,20 +7,20 @@
   <Import Project="../Packable.Projects.props" />
 
   <ItemGroup>
-    <PackageReference Include="NSwag.ApiDescription.Client" Version="14.0.2">
+    <PackageReference Include="NSwag.ApiDescription.Client" Version="14.6.3">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="8.0.20" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="10.0.2" />
     <PackageReference Include="Polly.Caching.Memory" Version="3.0.2" />
-    <PackageReference Include="Trakx.Common.ApiClient" Version="1.7.6" />
-    <PackageReference Include="Trakx.Common.Caching" Version="1.7.6" />
-    <PackageReference Include="Trakx.Common.Infrastructure.Caching" Version="1.7.6" />
+    <PackageReference Include="Trakx.Common.ApiClient" Version="2.0.3" />
+    <PackageReference Include="Trakx.Common.Caching" Version="2.0.3" />
+    <PackageReference Include="Trakx.Common.Infrastructure.Caching" Version="2.0.3" />
   </ItemGroup>
 
   <Target Name="NSwag" BeforeTargets="Build" Condition="'$(GenerateApiClient)'=='True' ">
     <Copy SourceFiles="@(Reference)" DestinationFolder="$(OutDir)References" />
-    <Exec EnvironmentVariables="ASPNETCORE_ENVIRONMENT=Development" Command="$(NSwagExe_Net80) run nswag.json /variables:Configuration=$(Configuration)" />
+    <Exec EnvironmentVariables="ASPNETCORE_ENVIRONMENT=Development" Command="$(NSwagExe_Net100) run nswag.json /variables:Configuration=$(Configuration)" />
     <RemoveDir Directories="$(OutDir)References" />
   </Target>
 

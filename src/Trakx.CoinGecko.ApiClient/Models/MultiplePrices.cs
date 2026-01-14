@@ -1,7 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-
-namespace Trakx.CoinGecko.ApiClient.Models;
+﻿namespace Trakx.CoinGecko.ApiClient.Models;
 
 public class MultiplePrices
 {
