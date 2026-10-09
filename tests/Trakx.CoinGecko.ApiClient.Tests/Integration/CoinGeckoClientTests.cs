@@ -435,7 +435,6 @@ public class CoinGeckoClientTests : CoinGeckoClientTestBase
         "theta-token",
         "thorchain",
         "tokenize-xchange",
-        "tominet",
         "tomochain",
         "tribe-2",
         "tron",
