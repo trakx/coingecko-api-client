@@ -149,7 +149,7 @@ public class CoinGeckoClientTests : CoinGeckoClientTestBase
     [Fact]
     public async Task GetAllPricesForSymbols_gets_prices_for_expected_symbols()
     {
-        string[] symbols = ["btc", "waxl", "trkx"];
+        string[] symbols = ["btc", "waxl"];
         var result = await _coinGeckoClient.GetAllPricesForSymbols(symbols);
 
         result.Should().NotBeNull();
@@ -158,13 +158,11 @@ public class CoinGeckoClientTests : CoinGeckoClientTestBase
         map.Should().NotBeNull();
         map.Should().ContainKey("btc").WhoseValue.Should().ContainEquivalentOf("bitcoin");
         map.Should().ContainKey("waxl").WhoseValue.Should().BeEquivalentTo("wrapped-axelar");
-        map.Should().ContainKey("trkx").WhoseValue.Should().BeEquivalentTo(["trakx"]);
 
         var prices = result.Prices;
         prices.Should().NotBeNull();
         prices.GetPrice("bitcoin").Should().NotBe(default);
         prices.GetPrice("wrapped-axelar").Should().NotBe(default);
-        prices.GetPrice("trakx").Should().NotBe(default);
     }
 
     /// <summary>

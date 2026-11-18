@@ -5922,6 +5922,7 @@ namespace Trakx.CoinGecko.ApiClient
 }
 
 #pragma warning restore 108
+#pragma warning restore CS0618
 #pragma warning restore 114
 #pragma warning restore 472
 #pragma warning restore 612

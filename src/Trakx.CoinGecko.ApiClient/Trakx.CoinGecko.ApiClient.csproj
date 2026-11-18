@@ -7,15 +7,15 @@
   <Import Project="../Packable.Projects.props" />
 
   <ItemGroup>
-    <PackageReference Include="NSwag.ApiDescription.Client" Version="14.6.3">
+    <PackageReference Include="NSwag.ApiDescription.Client" Version="14.8.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="10.0.2" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="10.0.15" />
     <PackageReference Include="Polly.Caching.Memory" Version="3.0.2" />
-    <PackageReference Include="Trakx.Common.ApiClient" Version="2.2.0" />
-    <PackageReference Include="Trakx.Common.Caching" Version="2.2.0" />
-    <PackageReference Include="Trakx.Common.Infrastructure.Caching" Version="2.2.0" />
+    <PackageReference Include="Trakx.Common.ApiClient" Version="2.2.1" />
+    <PackageReference Include="Trakx.Common.Caching" Version="2.2.1" />
+    <PackageReference Include="Trakx.Common.Infrastructure.Caching" Version="2.2.1" />
   </ItemGroup>
 
   <Target Name="NSwag" BeforeTargets="Build" Condition="'$(GenerateApiClient)'=='True' ">
